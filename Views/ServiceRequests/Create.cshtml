@@ -1,0 +1,222 @@
+﻿@model ServiceRequestViewModel
+@{
+    ViewData["Title"] = "Create Service Request";
+}
+
+<header class="custom-gray-header text-white p-3 d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-items-center w-100 p-3 custom-header">
+        <h1 class="m-0 text-white">Admin Portal</h1>
+    </div>
+</header>
+<h2>Create Service Request</h2>
+<style>
+    .custom-header {
+        background-color: #957200;
+        border-radius: 8px;
+    }
+
+    .btn-light {
+        color: #957200;
+        border: 2px solid #957200;
+        transition: all 0.3s ease;
+    }
+
+        .btn-light:hover {
+            background-color: #957200;
+            color: white;
+        }
+
+
+</style>
+
+<form asp-action="Create" method="post" enctype="multipart/form-data">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Patient Name</label>
+                    <select asp-for="PatientRegistrationsId" asp-items="ViewBag.Patients" class="form-control" id="PatientSelect">
+                        <option value="">-- Select Patient --</option>
+                    </select>
+
+                    <span asp-validation-for="PatientRegistrationsId" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>E-Voucher PDF File</label>
+                    <input type="file" asp-for="EVoucherPDFFile" class="form-control" />
+                    <span asp-validation-for="EVoucherPDFFile" class="text-danger"></span>
+                </div>
+
+            </div>
+        </div>
+
+        <div id="patientDetails" style="display: none;">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Mobile Number</label>
+                        <input type="text" id="MobileNumber" class="form-control" readonly />
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Program Name</label>
+                        <input type="text" id="ProgramName" class="form-control" readonly />
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Program Sponsor</label>
+                        <input type="text" id="ProgramSponsor" class="form-control" readonly />
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>National ID</label>
+                        <input type="text" id="NationalID" class="form-control" readonly />
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Membership Number</label>
+                        <input type="text" id="MembershipNumber" class="form-control" readonly />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="RequiredTests">Required Tests</label>
+                    <select asp-for="RequiredTests" class="form-control select2-test" id="RequiredTests">
+                        <option value="">-- Select Test --</option>
+                        <option value="Germline BRCA">Germline BRCA</option>
+                        <option value="Tissue BRCA">Tissue BRCA</option>
+                        <option value="Somatic BRCA">Somatic BRCA</option>
+                        <option value="HRD test">HRD test</option>
+                        <option value="COPD">COPD</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Lab</label>
+                    <select id="LabId" asp-items="@ViewBag.Labs" class="form-control">
+                        <option value="">-- Select Lab --</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Lab Branch</label>
+                    <select id="LabBranchId" asp-for="LabBranchId" class="form-control">
+                        <option value="">-- Select LabBranch --</option>
+                    </select>
+                    <span asp-validation-for="LabBranchId" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>CoPayment Percentage</label>
+                    <select asp-for="CoPaymentPercentage" class="form-control">
+                        <option value="0">-- Select CoPayment Percentage --</option>
+                        <option value="0">0%</option>
+                        <option value="30">30%</option>
+                    </select>
+                    <span asp-validation-for="CoPaymentPercentage" class="text-danger"></span>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+           @*  <div class="col-md-6">
+                <div class="form-group">
+                    <label>Service Provider</label>
+                    <select asp-for="OwnerType" class="form-control">
+                        <option value="">-- Select Service Provider --</option>
+                        <option value="Scan">Scan</option>
+                        <option value="Pharmacy">Pharmacy</option>
+                        <option value="Labs">Labs</option>
+                    </select>
+                    <span asp-validation-for="OwnerType" class="text-danger"></span>
+                </div>
+            </div> *@
+            <div class="col-md-6">
+                <div class="form-group form-check">
+                    <input type="checkbox" asp-for="Payment" class="form-check-input" />
+                    <label class="form-check-label" asp-for="Payment">Payment Completed</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12 text-center mt-3">
+                <button type="submit" class="btn text-white" style="background-color: #957200;">Submit</button>
+                <a asp-action="Indexadmin" asp-controller="PatientRegistrations" class="btn btn-secondary">Back</a>
+            </div>
+        </div>
+
+    </div>
+</form>
+
+
+
+@section Scripts {
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $("#PatientSelect").select2({
+                placeholder: "-- Select Patient --",
+                allowClear: true
+            });
+
+            $('#LabId').on('change', function () {
+                var labId = $(this).val();
+                var $labBranchDropdown = $('#LabBranchId');
+
+                $labBranchDropdown.empty();
+                $labBranchDropdown.append('<option value="">-- Select Lab Branch --</option>');
+
+                if (labId) {
+                    $.get('/ServiceRequests/GetLabBranches', { labId: labId }, function (data) {
+                        $.each(data, function (index, branch) {
+                            $labBranchDropdown.append('<option value="' + branch.id + '">' + branch.labBranchName + '</option>');
+                        });
+                    });
+                }
+            });
+
+            $('#PatientSelect').change(function () {
+                var patientId = $(this).val();
+                if (patientId) {
+                    $.get('/PatientRegistrations/GetPatientDetails/' + patientId, function (data) {
+                        $('#MobileNumber').val(data.mobileNumber);
+                        $('#ProgramName').val(data.programName);
+                        $('#ProgramSponsor').val(data.programSponsor);
+                        $('#NationalID').val(data.nationalID);
+                        $('#MembershipNumber').val(data.membershipNumber);
+                        $('#patientDetails').show();
+                    });
+                } else {
+                    $('#patientDetails').hide();
+                }
+            });
+        });
+    </script>
+}

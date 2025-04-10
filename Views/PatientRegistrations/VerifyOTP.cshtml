@@ -1,0 +1,177 @@
+﻿@model int
+@{
+    Layout = null;
+    ViewData["Title"] = "Enter Verification Code";
+
+    var patientId = Context.Request.Query["patientId"];
+    var serviseRequstid = Context.Request.Query["serviseRequstid"];
+
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <title>Enter Verification Code</title>
+    <link rel="stylesheet" href="~/css/login.css" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(90deg, #957200, #B8860B);
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            width: 400px;
+            text-align: center;
+        }
+
+        .logo {
+            width: 270px; 
+            height: auto; 
+        }
+
+
+        h2 {
+            text-align: center;
+            color: #957200;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .submit {
+            background-color: #957200;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+            .submit:hover {
+                background-color: #B8860B;
+            }
+
+        .error-message {
+            color: red;
+            text-align: center;
+        }
+
+        .resend-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .resend-link {
+            background: none;
+            border: none;
+            padding: 0;
+            font: inherit;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #957200;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: bold;
+            transition: color 0.3s ease-in-out;
+        }
+
+            .resend-link i {
+                font-size: 18px;
+            }
+
+            .resend-link:hover {
+                color: #B8860B;
+            }
+
+        .back-link {
+            margin-top: 10px;
+            color: #6c757d;
+        }
+
+            .back-link:hover {
+                color: #5a6268;
+            }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="~/img/ECARE-lOGO.jpg" alt="ECARE Logo" class="logo" />
+        <h2>Enter Verification Code</h2>
+
+        @if (ViewData["ErrorMessage"] != null)
+        {
+            <div class="error-message">@ViewData["ErrorMessage"]</div>
+        }
+
+        <form asp-action="VerifyOTP" asp-controller="PatientRegistrations" method="post">
+            <input type="hidden" name="patientId" value="@patientId" />
+            <input type="hidden" name="serviseRequstid" value="@serviseRequstid" />
+
+            <div class="form-group">
+                <input type="text" name="otpCode" class="form-control" placeholder="Enter Verification Code" required />
+            </div>
+
+            <button type="submit" class="submit">Verify</button>
+        </form>
+
+        <div class="resend-container">
+            <a asp-action="SendVerificationCode"
+               asp-controller="PatientRegistrations"
+               asp-route-id="@patientId"
+               asp-route-serviseRequstid="@serviseRequstid"
+               class="resend-link">
+                <i class="fa-solid fa-envelope"></i> Resend Email Code
+            </a>
+
+            <form asp-action="SendOTP" asp-controller="PatientRegistrations" method="post">
+                <input type="hidden" name="patientId" value="@patientId" />
+                <input type="hidden" name="serviseRequstid" value="@serviseRequstid" />
+                <button type="submit" class="resend-link">
+                    <i class="fa-solid fa-mobile"></i> Resend OTP Code
+                </button>
+            </form>
+
+
+
+            <a asp-action="Index" asp-controller="PatientRegistrations" class="resend-link">
+                <i class="fa-solid fa-arrow-left"></i> Back to Patient List
+            </a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,326 @@
+﻿@model PatientRegistrations
+<header class="custom-gray-header text-white p-3 d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-items-center w-100 p-3 custom-header">
+        <h1 class="m-0 text-white">Admin Portal</h1>
+    </div>
+</header>
+<style>
+    .custom-header {
+        background-color: #957200;
+        border-radius: 8px;
+    }
+
+    .btn-light {
+        color: #957200;
+        border: 2px solid #957200;
+        transition: all 0.3s ease;
+    }
+
+        .btn-light:hover {
+            background-color: #957200;
+            color: white;
+        }
+
+</style>
+<h2>Create Patient Registration</h2>
+
+<form asp-action="Create" method="post" enctype="multipart/form-data">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Date of registration</label>
+                    <input type="date" class="form-control" name="VisitDate" value="@ViewBag.TodayDate" disabled />
+                </div>
+
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="ProgramName">Program Name</label>
+                    <select asp-for="ProgramName" class="form-control">
+                        <option value="">-- Select a Program --</option>
+                        <option value="Nesmet Hawa">Nesmet Hawa (AZ)</option>
+                        <option value="Mesh Rehletak Le Wahdak">Mesh Rehletak Le Wahdak (AZ)</option>
+                        <option value="Ghaly Alena Erleada">Ghaly Alena Erleada (Janssen)</option>
+                    </select>
+                    <span asp-validation-for="ProgramName" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Patient Name</label>
+                    <input asp-for="PatientName" class="form-control" />
+                    <span asp-validation-for="PatientName" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Program Sponsor</label>
+                    <select asp-for="ProgramSponsor" asp-items="ViewBag.Sponsors" class="form-control">
+                        <option value="">-- Select Sponsor --</option>
+                    </select>
+                    <span asp-validation-for="ProgramSponsor" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <div class="form-group">
+                        <label>National ID / Passport</label>
+                        <input asp-for="NationalID" class="form-control" />
+                        <span asp-validation-for="NationalID" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="Medication">Medication</label>
+                    <select asp-for="Medication" class="form-control" required>
+                        <option value="">-- Select Medication --</option>
+                        <option value="Erleada">Erleada</option>
+                        <option value="NA">NA</option>
+                    </select>
+                    <span asp-validation-for="Medication" class="text-danger"></span>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row"> 
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Copy Of ID Or Passport File (front)</label>
+                    <input type="file" asp-for="CopyOfIDOrPassportFileFront" class="form-control" accept=".jpg,.jpeg,.png,.pdf" required />
+                    <span asp-validation-for="CopyOfIDOrPassportFileFront" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="Indication">Indication</label>
+                    <select asp-for="Indication" asp-items="ViewBag.Indications" class="form-control">
+                        <option value="">-- Select Indication --</option>
+                    </select>
+                    <span asp-validation-for="Indication" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Copy Of ID Or Passport File (Back)</label>
+                    <input type="file" asp-for="CopyOfIDOrPassportFileBack" class="form-control" accept=".jpg,.jpeg,.png,.pdf" required />
+                    <span asp-validation-for="CopyOfIDOrPassportFileBack" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Start Date Of Medication</label>
+                    <input asp-for="StartDateOfMedication" class="form-control" />
+                    <span asp-validation-for="StartDateOfMedication" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <label asp-for="Gender"></label>
+                <select asp-for="Gender" class="form-control" required>
+                    <option value="">-- Select Gender --</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select>
+                <span asp-validation-for="Gender" class="text-danger"></span>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Healthcare Provider</label>
+                    <input asp-for="HealthcareProvider" class="form-control" />
+                    <span asp-validation-for="HealthcareProvider" class="text-danger"></span>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Age</label>
+                    <input asp-for="Age" class="form-control" />
+                    <span asp-validation-for="Age" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Healthcare Provider Address</label>
+                    <input asp-for="HealthcareProviderAddress" class="form-control" />
+                    <span asp-validation-for="HealthcareProviderAddress" class="text-danger"></span>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Age Group</label>
+                    <select asp-for="AgeGroup" asp-items="ViewBag.AgeGroups" class="form-control">
+                        <option value="">-- Select Age Group --</option>
+                    </select>
+                    <span asp-validation-for="AgeGroup" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>HCP Government</label>
+                    <select asp-for="HCPGovernment" asp-items="ViewBag.Governorates" class="form-control">
+                        <option value="">-- Select Governorate --</option>
+                    </select>
+                    <span asp-validation-for="HCPGovernment" class="text-danger"></span>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+
+                <div class="form-group">
+                    <label>Phone Number 1</label>
+                    <input asp-for="PhoneNumber1" class="form-control" />
+                    <span asp-validation-for="PhoneNumber1" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>HCP Territory</label>
+                    <input asp-for="HCPTerritory" class="form-control" />
+                    <span asp-validation-for="HCPTerritory" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Phone Number 2</label>
+                    <input asp-for="PhoneNumber2" class="form-control" />
+                    <span asp-validation-for="PhoneNumber2" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Prescription</label>
+                    <input asp-for="PrescriptionFile" class="form-control" />
+                    <span asp-validation-for="PrescriptionFile" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="Email"></label>
+                    <input asp-for="Email" type="email" class="form-control" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Test Document 1 File</label>
+                    <input asp-for="TestDocument1File" class="form-control" />
+                    <span asp-validation-for="TestDocument1File" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="Government"></label>
+                    <select asp-for="Government" class="form-control" asp-items="ViewBag.Governorates">
+                        <option value="">-- Select Governorate --</option>
+                    </select>
+                    <span asp-validation-for="Government" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Test Document 2 File</label>
+                    <input asp-for="TestDocument2File" class="form-control" type="file" />
+                    <span asp-validation-for="TestDocument2File" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <div class="form-group">
+                        <label>Patient Territory</label>
+                        <input asp-for="Territory" class="form-control" />
+                        <span asp-validation-for="Territory" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Patient Address</label>
+                    <input asp-for="PatientAddress" class="form-control" />
+                    <span asp-validation-for="PatientAddress" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Caregiver Name</label>
+                    <input asp-for="CaregiverName" class="form-control" />
+                    <span asp-validation-for="CaregiverName" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>CaregiverPhone</label>
+                    <input asp-for="CaregiverPhone" class="form-control" />
+                    <span asp-validation-for="CaregiverPhone" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Patient Membership number</label>
+                    <input asp-for="MembershipNumber" class="form-control" />
+                    <span asp-validation-for="MembershipNumber" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+     
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label asp-for="Comment"></label>
+                    <textarea asp-for="Comment" class="form-control"></textarea>
+                    <span asp-validation-for="Comment" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12 text-center mt-3">
+                <button type="submit" class="btn text-white" style="background-color: #957200;">Save</button>
+                <a asp-controller="PatientRegistrations" asp-action="Indexadmin" class="btn btn-secondary">Cancel</a>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

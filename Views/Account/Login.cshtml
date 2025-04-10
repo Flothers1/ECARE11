@@ -1,0 +1,147 @@
+﻿@{
+    Layout = null;
+   
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="~/img/ECARE-lOGO.jpg" rel="shortcut icon" type="image/x-icon" />
+    @* <script src="~/js/PreventContextMenu.js"></script> *@
+    <link rel="stylesheet" href="~/css/all.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/login.css" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(90deg, #957200, #B8860B);
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .form-section {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .image-section {
+            flex: 1;
+            text-align: center;
+        }
+
+            .image-section img {
+                width: 400px;
+                height: auto;
+                border-radius: 10px;
+            }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .text {
+            position: relative;
+        }
+
+            .text ion-icon {
+                position: absolute;
+                left: 10px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: #957200;
+            }
+
+            .text input {
+                width: 100%;
+                padding: 10px 10px 10px 40px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                font-size: 16px;
+            }
+
+        .forget {
+            text-align: right;
+        }
+
+            .forget a {
+                color: #957200;
+                text-decoration: none;
+            }
+
+        .submit {
+            background-color: #957200;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+            .submit:hover {
+                background-color: #B8860B;
+            }
+
+        .error-message {
+            color: red;
+            text-align: center;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <section class="form-section">
+            @* <h1 style="text-align: center; color: #957200; font-size: 36px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-weight: bold; letter-spacing: 1px;">
+                @roleTitle
+            </h1> *@
+
+            <form asp-action="Login" asp-controller="Account" method="post">
+                <div asp-validation-summary="All" class="error-message"></div>
+                @* <input type="hidden" name="role" value="@role" /> *@
+
+                <div class="text">
+                    <ion-icon name="person-outline"></ion-icon>
+                    <input type="text" name="username" placeholder="Enter your username" required>
+                </div>
+
+                <div class="text">
+                    <ion-icon name="lock-closed-outline"></ion-icon>
+                    <input type="password" name="password" placeholder="Enter your password" required>
+                </div>
+
+                <input class="submit" type="submit" value="Login">
+            </form>
+
+        </section>
+
+        <div class="image-section">
+            <img src="~/img/ECARE-lOGO.jpg" alt="Logo">
+        </div>
+    </div>
+
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,208 @@
+﻿@model ECARE.ViewModel.RegisterViewModel
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="stylesheet" href="~/css/login.css" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(90deg, #957200, #B8860B);
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            width: 400px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #957200;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .submit {
+            background-color: #957200;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+            .submit:hover {
+                background-color: #B8860B;
+            }
+
+        .error-message {
+            color: red;
+            text-align: center;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+            .login-link a {
+                color: #957200;
+                text-decoration: none;
+            }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            background-color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.3s ease-in-out;
+        }
+
+            select:hover,
+            select:focus {
+                border-color: #007bff; 
+            }
+
+        option {
+            font-size: 16px;
+            padding: 5px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Register</h2>
+
+        <form asp-action="Register" asp-controller="Account" method="post">
+            <div asp-validation-summary="All" class="error-message"></div>
+
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" asp-for="Username" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" asp-for="Email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" asp-for="Password" required>
+            </div>
+
+            <div class="form-group">
+                <label for="role">Select Role</label>
+                <select asp-for="Role" required data-val-required="Please select a Role from the list." class="form-control form-select" id="Role">
+                    <option value="">-- Select Role --</option>
+                    <option value="Admin">Admin</option>
+@*                     <option value="LabUser">Lab User</option>
+ *@                    <option  value="LabAdmin">LabAdmin</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Lab</label>
+                <select id="LabId" asp-for="LabId" asp-items="@Model.Labs" >
+                    <option value="">-- Select Lab --</option>
+                </select>
+            </div>
+
+           
+          @*   <div class="form-group">
+                <label>LabBranch</label>
+                <select id="LabBranchId" asp-for="LabBranchId">
+                    <option value="">-- Select LabBranch --</option>
+                </select>
+            </div> *@
+
+
+
+            <button type="submit" class="submit">Create Account</button>
+        </form>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script>
+        $('#LabId').on('change', function () {
+            var labId = $(this).val();
+            var $labBranchDropdown = $('#LabBranchId');
+            $labBranchDropdown.empty();
+            $labBranchDropdown.append('<option value="">-- Select Lab Branch --</option>');
+
+            if (labId) {
+                $.get('/ServiceRequests/GetLabBranches', { labId: labId }, function (data) {
+                    $.each(data, function (index, branch) {
+                        $labBranchDropdown.append('<option value="' + branch.id + '">' + branch.labBranchName + '</option>');
+                    });
+                });
+            }
+        });
+
+        $(document).ready(function () {
+            function toggleFields() {
+                var selectedRole = $('#Role').val();
+                if (selectedRole === "Admin") {
+                    $('#LabId').closest('.form-group').hide();
+                    $('#LabBranchId').closest('.form-group').hide();
+                } else if (selectedRole === "LabUser") {
+                    $('#LabId').closest('.form-group').show();
+                    $('#LabBranchId').closest('.form-group').show();
+                } else if (selectedRole === "LabAdmin") {
+                    $('#LabId').closest('.form-group').show();
+                    $('#LabBranchId').closest('.form-group').hide();
+                } else {
+                    $('#LabId').closest('.form-group').hide();
+                    $('#LabBranchId').closest('.form-group').hide();
+                }
+            }
+
+            $('#Role').on('change', function () {
+                toggleFields();
+            });
+
+            toggleFields();
+        });
+
+    </script>
+ 
+</body>
+
+</html>

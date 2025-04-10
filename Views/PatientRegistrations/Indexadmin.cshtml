@@ -1,0 +1,371 @@
+﻿@model List<PatientRegistrations>
+
+@{
+    ViewData["Title"] = "Patient Registrations";
+
+}
+
+<header class="custom-gray-header text-white p-3 d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-items-center w-100 p-3 custom-header">
+        <h1 class="m-0 text-white">Admin Portal</h1>
+        <form asp-controller="Account" asp-action="Logout" method="post">
+            <button type="submit" class="btn btn-light fw-bold px-4 py-2">Logout</button>
+        </form>
+    </div>
+
+    <div class="dropdown">
+      @*   <div id="userIcon" class="rounded-circle d-flex align-items-center justify-content-center text-white bg-primary dropdown-toggle"
+             style="width: 40px; height: 40px; font-size: 16px; font-weight: bold; cursor: pointer; background:#957200 !important"
+             data-bs-toggle="dropdown" aria-expanded="false">
+            M
+        </div> *@
+      @*   <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userIcon">
+            <li><a class="dropdown-item text-danger" href="@Url.Action("Logout", "Account")">Logout</a></li>
+        </ul> *@
+    </div>
+
+</header>
+
+<style>
+    .custom-header {
+        background-color: #957200;
+        border-radius: 8px;
+    }
+
+    .btn-light {
+        color: #957200;
+        border: 2px solid #957200;
+        transition: all 0.3s ease;
+    }
+
+        .btn-light:hover {
+            background-color: #957200;
+            color: white;
+        }
+    
+
+    .table-tab-container {
+        height: calc(100% - 120px);
+    }
+
+    #tickets_wrapper {
+        height: calc(100% - 80px);
+    }
+
+    .table-overflow {
+        height: 100%;
+    }
+
+    th {
+        width: calc(100% / 7);
+    }
+
+    .assing-btn {
+        font-size: 13px;
+        padding: 5px;
+    }
+
+    .btn-gray2 {
+        float: left;
+        margin-right: 40px;
+    }
+
+</style>
+<div class="d-flex gap-2 mb-3">
+    <a asp-controller="PatientRegistrations" asp-action="Create" class="btn text-white" style="background-color: #957200;">Register Patient</a>
+    <a asp-controller="ServiceRequests" asp-action="Create" class="btn text-white" style="background-color: #957200;">Create Lab Service Request</a>
+    <a asp-controller="Account" asp-action="Register" class="btn text-white" style="background-color: #957200;">Create New User</a>
+
+</div>
+
+
+<ul class="tab-container p-0 m-0 d-flex">
+    <li>
+        <a class="active" asp-action="Index">
+            <i class="mdi mdi-ticket-account icon-side-bar"></i>
+            Patients List
+        </a>
+    </li>
+    <li class="nav-item @(ViewContext.RouteData.Values["action"].ToString() == "ServiceRequests" ? "active" : "")">
+        <a asp-action="ServiceRequests" asp-controller="PatientRegistrations">
+            <i class="mdi mdi-ticket-confirmation icon-side-bar"></i> Service Requests
+        </a>
+    </li>
+
+</ul>
+
+<div class="table-tab-container">
+
+    <table id="patientsTable" class="table table-tab d-block text-center border-bottom-0 table-overflow">
+        <thead>
+            <tr>
+                <th>Registration Date</th>
+                <th>Patient Name</th>
+                <th>National ID</th>
+               
+                <th>Copy Of ID/Passport(Front)</th>
+                <th>Copy Of ID/Passport(Back)</th>
+
+                <th>Gender</th>
+                <th>Age</th>
+                <th>Age Group</th>
+                <th>Phone Number 1</th>
+                <th>Phone Number 2</th>
+                <th>Email</th>
+                <th>Government</th>
+                <th>Territory</th>
+                <th>Caregiver Name</th>
+                <th>Caregiver Phone</th>
+                <th>Program Name</th>
+                <th>Membership Number</th>
+                <th>Program Sponsor</th>
+                <th>Medication</th>
+                <th>Indication</th>
+                <th>Comment</th>
+                <th>Start Date Of Medication</th>
+                <th>Healthcare Provider</th>
+                <th>Healthcare Provider Address</th>
+                <th>HCP Government</th>
+                <th>HCP Territory</th>
+                <th>Prescription</th>
+                <th>Test Document 1</th>
+                <th>Test Document 2</th>
+
+                @* <th>Co Payment Percentage</th>
+                <th>Required Tests</th>
+                <th>Lab </th>
+                <th>Lab Branch</th>
+                <th>E-Voucher PDF</th>
+                <th>Payment </th> *@
+
+                
+
+           </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                int counter = 1;
+                @foreach (var patient in Model)
+                {
+                    <tr>
+                        <td>@patient.RegistrationDate.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                        <td>@patient.PatientName</td>
+                        <td>@patient.NationalID</td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(patient.CopyOfIDOrPassportPathFront))
+                            {
+                                <a href="@Url.Content(patient.CopyOfIDOrPassportPathFront)" download target="_blank">
+                                    Download Document
+                                </a>
+                            }
+                            else
+                            {
+                                <span>No document available</span>
+                            }
+
+                        </td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(patient.CopyOfIDOrPassportPathBack))
+                            {
+                                <a href="@Url.Content(patient.CopyOfIDOrPassportPathBack)" download target="_blank">
+                                    Download Document
+                                </a>
+                            }
+                            else
+                            {
+                                <span>No document available</span>
+                            }
+
+                        </td>
+
+
+
+                        <td>@patient.Gender</td>
+                        <td>@patient.Age</td>
+                        <td>@patient.AgeGroup</td>
+                        <td>@patient.PhoneNumber1</td>
+                        <td>@patient.PhoneNumber2</td>
+                        <td>@patient.Email</td>
+                        <td>@patient.Government</td>
+                        <td>@patient.Territory</td>
+                        <td>@patient.CaregiverName</td>
+                        <td>@patient.CaregiverPhone</td>
+                        <td>@patient.ProgramName</td>
+                        <td>@patient.MembershipNumber</td>
+                        <td>@patient.ProgramSponsor</td>
+                        <td>@patient.Medication</td>
+                        <td>@patient.Indication</td>
+                        <td>@patient.Comment</td>
+                        <td>@patient.StartDateOfMedication.ToString("yyyy-MM-dd")</td>
+                        <td>@patient.HealthcareProvider</td>
+                        <td>@patient.HealthcareProviderAddress</td>
+                        <td>@patient.HCPGovernment</td>
+                        <td>@patient.HCPTerritory</td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(patient.Prescription))
+                            {
+                                <a href="@Url.Content(patient.Prescription)" download target="_blank">
+                                    Download Document
+                                </a>
+                            }
+                            else
+                            {
+                                <span>No document available</span>
+                            }
+
+                        </td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(patient.TestDocument1))
+                            {
+                                <a href="@Url.Content(patient.TestDocument1)" download target="_blank">
+                                    Download Document
+                                </a>
+                            }
+                            else
+                            {
+                                <span>No document available</span>
+                            }
+
+                        </td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(patient.TestDocument2))
+                            {
+                                <a href="@Url.Content(patient.TestDocument2)" download target="_blank">
+                                    Download Document
+                                </a>
+                            }
+                            else
+                            {
+                                <span>No document available</span>
+                            }
+
+                        </td>
+                      @*   <td>
+                            @if (patient.ServiceRequests != null && patient.ServiceRequests.Any())
+                            {
+                                foreach (var request in patient.ServiceRequests)
+                                {
+                                    <span>@request.CoPaymentPercentage</span>
+                                    <br />
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-muted">No CoPaymentPercentage available</span>
+                            }
+                        </td>
+                        <td>
+                            @if (patient.ServiceRequests != null && patient.ServiceRequests.Any())
+                            {
+                                foreach (var request in patient.ServiceRequests)
+                                {
+                                    <span>@request.RequiredTests</span>
+                                    <br />
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-muted">No Test available</span>
+                            }
+                        </td>
+
+                        <td>
+                            @(patient?.ServiceRequests?.FirstOrDefault()?.LabBranch?.Lab?.LabName ?? "No Lab Assigned")
+                        </td>
+                        <td>
+                            @(patient?.ServiceRequests?.FirstOrDefault()?.LabBranch?.LabBranchName ?? "No Lab Branch Assigned")
+                        </td>
+
+                        <td>
+                            @if (patient.ServiceRequests != null && patient.ServiceRequests.Any())
+                            {
+                                foreach (var request in patient.ServiceRequests)
+                                {
+                                    if (!string.IsNullOrEmpty(request.EVoucherPDF))
+                                    {
+                                        <a href="@Url.Content(request.EVoucherPDF)" download target="_blank">
+                                            Download eVoucher
+                                        </a>
+                                        <br />
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">No eVoucher available</span>
+                                        <br />
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-muted">No eVoucher available</span>
+                            }
+                        </td>
+
+                        <td>
+                            @if (patient.ServiceRequests != null && patient.ServiceRequests.Any())
+                            {
+                                foreach (var request in patient.ServiceRequests)
+                                {
+                                    <span>@request.Payment</span>
+                                    <br />
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-muted">No Payment available</span>
+                            }
+                        </td> *@
+
+
+                       @*  <td>
+                            <a class="permission-link" asp-action="VerificationCode" asp-controller="Devices" title="Verification Code">
+                                <img src="~/img/MSG_transparent.png" alt="Verification Code" style="width: 24px; height: 24px; display: inline-block; margin: 0; padding: 0;">
+                                <img src="~/img/otp_transparent.png" alt="OTP Code" style="width: 24px; height: 24px; display: inline-block; margin: 0; padding: 0;">
+                                <img src="~/img/resolve_transparent.png" alt="OTP Code" style="width: 24px; height: 24px; display: inline-block; margin: 0; padding: 0;">
+                            </a>
+                        </td> *@
+                    </tr>
+
+                    counter++;
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="31" class="text-center">No patients found.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/jquery.table2excel.min.js"></script>
+    <script src="~/js/jquery.dataTables.min.js"></script>
+    <script>
+        $(function () {
+            var table = $('#patientsTable').DataTable({
+                "columnDefs": [{ "type": "date", "targets": 0 }],
+                "order": [[0, "desc"]]
+            });
+
+            var buttonElement = $('<button>', {
+                type: 'submit',
+                class: 'btn-gray2 mb-3',
+                id: 'data2excel',
+                text: 'Export to Excel'
+            });
+
+            $('#patientsTable_wrapper').prepend(buttonElement);
+
+            $('#data2excel').click(function (e) {
+                var currentPageLength = table.page.len();
+                table.page.len(-1).draw();
+                $("#patientsTable").table2excel({ filename: "PatientRegistrations.xls" });
+                table.page.len(currentPageLength).draw();
+            });
+        });
+    </script>
+}
