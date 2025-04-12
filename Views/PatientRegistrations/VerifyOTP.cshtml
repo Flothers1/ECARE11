@@ -3,8 +3,8 @@
     Layout = null;
     ViewData["Title"] = "Enter Verification Code";
 
-    var patientId = Context.Request.Query["patientId"];
-    var serviseRequstid = Context.Request.Query["serviseRequstid"];
+    var patientId = ViewBag.PatientId ?? Context.Request.Query["patientId"];
+    var serviceRequestid = ViewBag.ServiceRequestid ?? Context.Request.Query["serviceRequestid"];
 
 }
 
@@ -140,7 +140,7 @@
 
         <form asp-action="VerifyOTP" asp-controller="PatientRegistrations" method="post">
             <input type="hidden" name="patientId" value="@patientId" />
-            <input type="hidden" name="serviseRequstid" value="@serviseRequstid" />
+            <input type="hidden" name="serviceRequestid" value="@serviceRequestid" />
 
             <div class="form-group">
                 <input type="text" name="otpCode" class="form-control" placeholder="Enter Verification Code" required />
@@ -153,14 +153,14 @@
             <a asp-action="SendVerificationCode"
                asp-controller="PatientRegistrations"
                asp-route-id="@patientId"
-               asp-route-serviseRequstid="@serviseRequstid"
+               asp-route-serviceRequestid="@serviceRequestid"
                class="resend-link">
                 <i class="fa-solid fa-envelope"></i> Resend Email Code
             </a>
 
             <form asp-action="SendOTP" asp-controller="PatientRegistrations" method="post">
                 <input type="hidden" name="patientId" value="@patientId" />
-                <input type="hidden" name="serviseRequstid" value="@serviseRequstid" />
+                <input type="hidden" name="serviseRequstid" value="@serviceRequestid" />
                 <button type="submit" class="resend-link">
                     <i class="fa-solid fa-mobile"></i> Resend OTP Code
                 </button>

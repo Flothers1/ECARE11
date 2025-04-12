@@ -280,8 +280,11 @@ namespace ECARE.Controllers
 
             if (serviceRequest.OTP != otpCode)
             {
+                ViewBag.PatientId = patientId;
+                ViewBag.ServiceRequestid = serviceRequestid;
+                ViewBag.Error = "Invalid or expired OTP";
                 ViewData["ErrorMessage"] = "Incorrect OTP!";
-                return View(patientId);
+                return View();
             }
 
             if (serviceRequest.OTPExpiration < DateTime.Now)
@@ -299,7 +302,7 @@ namespace ECARE.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> SendOTP(int patientId, int serviceRequestid)
+        public async Task<IActionResult> SendOTP(int patientId, int serviseRequstid)
         {
             string apiUrl = "https://app.community-ads.com/SendSMSAPI/api/SMSSender/SendSMS";
 
@@ -310,7 +313,7 @@ namespace ECARE.Controllers
                 return RedirectToAction("Index", new { message = "Patient is not registered or does not have a phone number!" });
             }
             var latestRequest = await _context.ServiceRequests
-        .FirstOrDefaultAsync(sr => sr.Service_RequestId == serviceRequestid && sr.PatientRegistrationsId == patientId);
+        .FirstOrDefaultAsync(sr => sr.Service_RequestId == serviseRequstid && sr.PatientRegistrationsId == patientId);
 
 
             var otpCode = new Random().Next(100000, 999999).ToString();
@@ -337,7 +340,7 @@ namespace ECARE.Controllers
                 latestRequest.OTPExpiration = DateTime.Now.AddMinutes(20);
                 _context.SaveChanges();
 
-                return RedirectToAction("VerifyOTP", new { id = patientId , serviceRequestid = latestRequest.Service_RequestId }); 
+                return RedirectToAction("VerifyOTP", new { patientId = patientId, serviceRequestid = serviseRequstid }); 
             }
 
             return RedirectToAction("Index", new { message = "An error occurred during sending!" });
