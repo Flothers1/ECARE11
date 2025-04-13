@@ -21,7 +21,7 @@
              data-bs-toggle="dropdown" aria-expanded="false">
             M
         </div> *@
-       @*  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userIcon">
+        @*  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userIcon">
             <li><a class="dropdown-item text-danger" href="@Url.Action("Logout", "Account")">Logout</a></li>
         </ul> *@
     </div>
@@ -70,22 +70,86 @@
         float: left;
         margin-right: 40px;
     }
-
+    /* invoice */
     .invoice-icon-link {
-        color: #957200; /* Your brand gold color */
-        font-size: 1.5rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px; /* Reduced from 10px to 5px */
+        text-decoration: none;
+        color: #957200;
         transition: all 0.3s ease;
-        display: inline-block;
+    }
+
+    .icon-wrapper {
+        display: flex;
+        font-size: 1.5rem;
         padding: 8px;
         border-radius: 50%;
         background-color: rgba(149, 114, 0, 0.1);
+        transition: all 0.3s ease;
     }
 
-    .invoice-icon-link:hover {
+    .download-text {
+        font-size: 0.875rem;
+        margin-right: 0; /* Removed the 4px margin */
+        transition: color 0.3s ease;
+    }
+
+    .invoice-icon-link:hover .icon-wrapper {
         color: white;
         background-color: #957200;
         transform: scale(1.1);
         box-shadow: 0 2px 8px rgba(149, 114, 0, 0.3);
+    }
+
+    .invoice-icon-link:hover .download-text {
+        color: #957200;
+        text-decoration: underline;
+    }
+    /* IVoucher */
+    .evoucher-icon-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        text-decoration: none;
+        color: #957200;
+        transition: all 0.3s ease;
+    }
+
+    /* For unavailable items (warning and danger states) */
+    .unavailable-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        color: #6c757d; /* text-muted color */
+    }
+
+        .unavailable-item.danger {
+            color: #dc3545; /* text-danger color */
+        }
+
+    /* Icon wrappers for warnings and danger */
+    .icon-wrapper.warning {
+        background-color: rgba(255, 193, 7, 0.1);
+        color: #ffc107; /* warning color */
+    }
+
+    .icon-wrapper.danger {
+        background-color: rgba(220, 53, 69, 0.1);
+        color: #dc3545; /* danger color */
+    }
+
+    /* Hover effects for eVoucher (same as invoice) */
+    .evoucher-icon-link:hover .icon-wrapper {
+        color: white;
+        background-color: #957200;
+        transform: scale(1.1);
+        box-shadow: 0 2px 8px rgba(149, 114, 0, 0.3);
+    }
+
+    .evoucher-icon-link:hover .download-text {
+        color: #957200;
+        text-decoration: underline;
     }
 </style>
 
@@ -153,31 +217,47 @@
                                     {
                                         if (!string.IsNullOrEmpty(request.EVoucherPDF))
                                         {
-                                            <a href="@Url.Content(request.EVoucherPDF)" download target="_blank">Download eVoucher</a>
+                                            <a href="@Url.Content(request.EVoucherPDF)" download target="_blank" class="evoucher-icon-link">
+                                                <span class="download-text">Download eVoucher</span>
+                                                <span class="icon-wrapper">
+                                                    <i class="fa-solid fa-ticket"></i>
+                                                </span>
+                                            </a>
                                         }
                                         else
                                         {
-                                            <span class="text-muted">No eVoucher available</span>
+                                            <span class="unavailable-item">
+                                                <span class="warning-text">No eVoucher available</span>
+                                                <span class="icon-wrapper warning">
+                                                    <i class="fa-solid fa-circle-exclamation"></i>
+                                                </span>
+                                            </span>
                                         }
                                     }
                                     else
                                     {
-                                        <span class="text-danger">Downloading the eVoucher is not allowed until verification is completed.</span>
+                                        <span class="unavailable-item danger">
+                                            <span class="warning-text">Downloading the eVoucher is not allowed until verification is completed.</span>
+                                            <span class="icon-wrapper danger">
+                                                <i class="fa-solid fa-triangle-exclamation"></i>
+                                            </span>
+                                        </span>
                                     }
                                 </td>
                                 <td>
                                     @if (!string.IsNullOrEmpty(request.Invoice))
                                     {
-                                        <a href="@Url.Content(request.Invoice)" download target="_blank" class="invoice-icon-link"
-                                           title="Download Invoice">
-                                            <i class="fa-solid fa-file-invoice-dollar"></i>
-                                            </a>
+                                        <a href="@Url.Content(request.Invoice)" download target="_blank" class="invoice-icon-link">
+                                            <span class="download-text">Download Invoice</span>
+                                            <span class="icon-wrapper">
+                                                <i class="fa-solid fa-file-invoice-dollar"></i>
+                                            </span>
+                                        </a>
                                     }
                                     else
                                     {
                                         <span class="text-muted">No Invoice available</span>
                                     }
-                                   
                                 </td>
 
                                 @if (ViewContext.RouteData.Values["action"]?.ToString() != "ClosedRequests")

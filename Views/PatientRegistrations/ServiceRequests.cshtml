@@ -133,6 +133,60 @@
     .upload-feedback {
         color: #957200;
     }
+    /* ivouvher */
+    .evoucher-icon-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        text-decoration: none;
+        color: #957200;
+        transition: all 0.3s ease;
+    }
+
+    .icon-wrapper {
+        display: flex;
+        font-size: 1.5rem;
+        padding: 8px;
+        border-radius: 50%;
+        background-color: rgba(149, 114, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .download-text {
+        font-size: 0.875rem;
+        transition: color 0.3s ease;
+    }
+
+    /* For unavailable items (warning states) */
+    .unavailable-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        color: #6c757d; /* text-muted color */
+    }
+
+    .warning-text {
+        font-size: 0.875rem;
+    }
+
+    /* Icon wrappers for warnings */
+    .icon-wrapper.warning {
+        background-color: rgba(255, 193, 7, 0.1);
+        color: #ffc107; /* warning color */
+    }
+
+    /* Hover effects for eVoucher (same as invoice) */
+    .evoucher-icon-link:hover .icon-wrapper {
+        color: white;
+        background-color: #957200;
+        transform: scale(1.1);
+        box-shadow: 0 2px 8px rgba(149, 114, 0, 0.3);
+    }
+
+    .evoucher-icon-link:hover .download-text {
+        color: #957200;
+        text-decoration: underline;
+    }
 </style>
 <div class="d-flex gap-2 mb-3">
     <a asp-controller="PatientRegistrations" asp-action="Create" class="btn text-white" style="background-color: #957200;">Register Patient</a>
@@ -229,17 +283,24 @@
                             <td>
                                 <span>@(request?.LabBranch?.LabBranchName ?? "No Branch")</span>
                             </td>
-
                             <td>
                                 @if (!string.IsNullOrEmpty(request.EVoucherPDF))
                                 {
-                                    <a href="@Url.Content(request.EVoucherPDF)" download target="_blank">
-                                        Download eVoucher
+                                    <a href="@Url.Content(request.EVoucherPDF)" download target="_blank" class="evoucher-icon-link">
+                                        <span class="download-text">Download eVoucher</span>
+                                        <span class="icon-wrapper">
+                                            <i class="fa-solid fa-ticket"></i>
+                                        </span>
                                     </a>
                                 }
                                 else
                                 {
-                                    <span class="text-muted">No eVoucher available</span>
+                                    <span class="unavailable-item">
+                                        <span class="warning-text">No eVoucher available</span>
+                                        <span class="icon-wrapper warning">
+                                            <i class="fa-solid fa-circle-exclamation"></i>
+                                        </span>
+                                    </span>
                                 }
                             </td>
                             <td>@patient.NationalID</td>

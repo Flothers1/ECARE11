@@ -69,7 +69,65 @@
         float: left;
         margin-right: 40px;
     }
+    /* downloads files */
+    .document-icon-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        text-decoration: none;
+        color: #957200;
+        transition: all 0.3s ease;
+    }
 
+    .icon-wrapper {
+        display: flex;
+        font-size: 1.5rem;
+        padding: 8px;
+        border-radius: 50%;
+        background-color: rgba(149, 114, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .download-text {
+        font-size: 0.875rem;
+        transition: color 0.3s ease;
+    }
+
+    /* For unavailable items (warning states) */
+    .unavailable-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        color: #6c757d; /* text-muted color */
+    }
+
+    .warning-text {
+        font-size: 0.875rem;
+    }
+
+    /* Icon wrappers for warnings and danger */
+    .icon-wrapper.warning {
+        background-color: rgba(255, 193, 7, 0.1);
+        color: #ffc107; /* warning color */
+    }
+
+    .icon-wrapper.danger {
+        background-color: rgba(220, 53, 69, 0.1);
+        color: #dc3545; /* danger color */
+    }
+
+    /* Hover effects for all document links */
+    .document-icon-link:hover .icon-wrapper {
+        color: white;
+        background-color: #957200;
+        transform: scale(1.1);
+        box-shadow: 0 2px 8px rgba(149, 114, 0, 0.3);
+    }
+
+    .document-icon-link:hover .download-text {
+        color: #957200;
+        text-decoration: underline;
+    }
 </style>
 <div class="d-flex gap-2 mb-3">
     <a asp-controller="PatientRegistrations" asp-action="Create" class="btn text-white" style="background-color: #957200;">Register Patient</a>
@@ -155,28 +213,42 @@
                         <td>
                             @if (!string.IsNullOrEmpty(patient.CopyOfIDOrPassportPathFront))
                             {
-                                <a href="@Url.Content(patient.CopyOfIDOrPassportPathFront)" download target="_blank">
-                                    Download Document
+                                <a href="@Url.Content(patient.CopyOfIDOrPassportPathFront)" download target="_blank" class="document-icon-link id-document">
+                                    <span class="download-text">Download ID Front</span>
+                                    <span class="icon-wrapper">
+                                        <i class="fa-solid fa-id-card"></i>
+                                    </span>
                                 </a>
                             }
                             else
                             {
-                                <span>No document available</span>
+                                <span class="unavailable-item">
+                                    <span class="warning-text">No document available</span>
+                                    <span class="icon-wrapper warning">
+                                        <i class="fa-solid fa-circle-exclamation"></i>
+                                    </span>
+                                </span>
                             }
-
                         </td>
                         <td>
                             @if (!string.IsNullOrEmpty(patient.CopyOfIDOrPassportPathBack))
                             {
-                                <a href="@Url.Content(patient.CopyOfIDOrPassportPathBack)" download target="_blank">
-                                    Download Document
+                                <a href="@Url.Content(patient.CopyOfIDOrPassportPathBack)" download target="_blank" class="document-icon-link id-document">
+                                    <span class="download-text">Download ID Back</span>
+                                    <span class="icon-wrapper">
+                                        <i class="fa-solid fa-id-card"></i>
+                                    </span>
                                 </a>
                             }
                             else
                             {
-                                <span>No document available</span>
+                                <span class="unavailable-item">
+                                    <span class="warning-text">No document available</span>
+                                    <span class="icon-wrapper warning">
+                                        <i class="fa-solid fa-circle-exclamation"></i>
+                                    </span>
+                                </span>
                             }
-
                         </td>
 
 
@@ -205,41 +277,62 @@
                         <td>
                             @if (!string.IsNullOrEmpty(patient.Prescription))
                             {
-                                <a href="@Url.Content(patient.Prescription)" download target="_blank">
-                                    Download Document
+                                <a href="@Url.Content(patient.Prescription)" download target="_blank" class="document-icon-link prescription-document">
+                                    <span class="download-text">Download Prescription</span>
+                                    <span class="icon-wrapper">
+                                        <i class="fa-solid fa-prescription"></i>
+                                    </span>
                                 </a>
                             }
                             else
                             {
-                                <span>No document available</span>
+                                <span class="unavailable-item">
+                                    <span class="warning-text">No document available</span>
+                                    <span class="icon-wrapper warning">
+                                        <i class="fa-solid fa-circle-exclamation"></i>
+                                    </span>
+                                </span>
                             }
-
                         </td>
                         <td>
                             @if (!string.IsNullOrEmpty(patient.TestDocument1))
                             {
-                                <a href="@Url.Content(patient.TestDocument1)" download target="_blank">
-                                    Download Document
+                                <a href="@Url.Content(patient.TestDocument1)" download target="_blank" class="document-icon-link test-document">
+                                    <span class="download-text">Download Test Document 1</span>
+                                    <span class="icon-wrapper">
+                                        <i class="fa-solid fa-vial"></i>
+                                    </span>
                                 </a>
                             }
                             else
                             {
-                                <span>No document available</span>
+                                <span class="unavailable-item">
+                                    <span class="warning-text">No document available</span>
+                                    <span class="icon-wrapper warning">
+                                        <i class="fa-solid fa-circle-exclamation"></i>
+                                    </span>
+                                </span>
                             }
-
                         </td>
                         <td>
                             @if (!string.IsNullOrEmpty(patient.TestDocument2))
                             {
-                                <a href="@Url.Content(patient.TestDocument2)" download target="_blank">
-                                    Download Document
+                                <a href="@Url.Content(patient.TestDocument2)" download target="_blank" class="document-icon-link test-document">
+                                    <span class="download-text">Download Test Document 2</span>
+                                    <span class="icon-wrapper">
+                                        <i class="fa-solid fa-vial"></i>
+                                    </span>
                                 </a>
                             }
                             else
                             {
-                                <span>No document available</span>
+                                <span class="unavailable-item">
+                                    <span class="warning-text">No document available</span>
+                                    <span class="icon-wrapper warning">
+                                        <i class="fa-solid fa-circle-exclamation"></i>
+                                    </span>
+                                </span>
                             }
-
                         </td>
                       @*   <td>
                             @if (patient.ServiceRequests != null && patient.ServiceRequests.Any())
