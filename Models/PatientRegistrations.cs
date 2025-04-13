@@ -10,7 +10,7 @@ namespace ECARE.Models
         public int PatientRegistrationsId { get; set; }
         [Column("[Registration Date]")]
 
-        public DateTime RegistrationDate { get; set; } = DateTime.Now;
+        public DateTime RegistrationDate { get; set; } = DateTime.UtcNow.AddHours(2);
         [Column("[Patient Name]")]
         [RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "Name must contain letters only")]
 
