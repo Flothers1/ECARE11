@@ -1,4 +1,6 @@
-﻿using ECARE.Interface;
+﻿using CountryData.Standard;
+using ECARE.Constants;
+using ECARE.Interface;
 using ECARE.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -49,6 +51,7 @@ namespace ECARE.Controllers
 
         //    return View(patients);
         //}
+        [Authorize(Roles = AuthorizationConstants.LabAdmin) ]
         public async Task<IActionResult> Index()
         {
             var user = await _usersService.GetUserAfterLogin();
@@ -105,13 +108,16 @@ namespace ECARE.Controllers
         public IActionResult Create()
         {
             
-            List<string> egyptGovernorates = new List<string>
-    {
-        "Cairo", "Giza", "Alexandria", "Aswan", "Asyut", "Beheira", "Beni Suef",
-        "Dakahlia", "Damietta", "Fayoum", "Gharbia", "Ismailia", "Kafr El Sheikh",
-        "Luxor", "Matrouh", "Minya", "Monufia", "New Valley", "North Sinai",
-        "Port Said", "Qalyubia", "Qena", "Red Sea", "Sharqia", "Sohag", "South Sinai", "Suez"
-    };
+    var countryHelper = new CountryHelper();
+            var regionsByCountry = countryHelper.GetRegionByCountryCode("EG");
+
+            List<string> regions = new List<string>();
+            foreach (var region in regionsByCountry)
+            {
+                if(region == null) { continue; }
+
+                regions.Add(region.Name);
+            }
             var medications = new List<string> { "Erleada", "NA"};
             var indications = new List<string>
     {
@@ -140,13 +146,14 @@ namespace ECARE.Controllers
 
             ViewBag.Medications = new SelectList(medications, "Erleada");
 
-            ViewBag.Governorates = new SelectList(egyptGovernorates);
+            ViewBag.Governorates = new SelectList(regions);
             ViewBag.TodayDate = DateTime.Today.ToString("yyyy-MM-dd"); 
 
             return View();
         }
 
         [HttpPost]
+        [Authorize(Roles = AuthorizationConstants.Admin)]
         public async Task<IActionResult> Create(PatientRegistrations patient)
         {
            

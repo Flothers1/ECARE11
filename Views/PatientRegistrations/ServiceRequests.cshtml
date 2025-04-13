@@ -133,6 +133,60 @@
     .upload-feedback {
         color: #957200;
     }
+    /* ivouvher */
+    .evoucher-icon-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        text-decoration: none;
+        color: #957200;
+        transition: all 0.3s ease;
+    }
+
+    .icon-wrapper {
+        display: flex;
+        font-size: 1.5rem;
+        padding: 8px;
+        border-radius: 50%;
+        background-color: rgba(149, 114, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .download-text {
+        font-size: 0.875rem;
+        transition: color 0.3s ease;
+    }
+
+    /* For unavailable items (warning states) */
+    .unavailable-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        color: #6c757d; /* text-muted color */
+    }
+
+    .warning-text {
+        font-size: 0.875rem;
+    }
+
+    /* Icon wrappers for warnings */
+    .icon-wrapper.warning {
+        background-color: rgba(255, 193, 7, 0.1);
+        color: #ffc107; /* warning color */
+    }
+
+    /* Hover effects for eVoucher (same as invoice) */
+    .evoucher-icon-link:hover .icon-wrapper {
+        color: white;
+        background-color: #957200;
+        transform: scale(1.1);
+        box-shadow: 0 2px 8px rgba(149, 114, 0, 0.3);
+    }
+
+    .evoucher-icon-link:hover .download-text {
+        color: #957200;
+        text-decoration: underline;
+    }
 </style>
 <div class="d-flex gap-2 mb-3">
     <a asp-controller="PatientRegistrations" asp-action="Create" class="btn text-white" style="background-color: #957200;">Register Patient</a>
@@ -229,26 +283,30 @@
                             <td>
                                 <span>@(request?.LabBranch?.LabBranchName ?? "No Branch")</span>
                             </td>
-
                             <td>
                                 @if (!string.IsNullOrEmpty(request.EVoucherPDF))
                                 {
-                                    <a href="@Url.Content(request.EVoucherPDF)" download target="_blank">
-                                        Download eVoucher
+                                    <a href="@Url.Content(request.EVoucherPDF)" download target="_blank" class="evoucher-icon-link">
+                                        <span class="download-text">Download eVoucher</span>
+                                        <span class="icon-wrapper">
+                                            <i class="fa-solid fa-ticket"></i>
+                                        </span>
                                     </a>
                                 }
                                 else
                                 {
-                                    <span class="text-muted">No eVoucher available</span>
+                                    <span class="unavailable-item">
+                                        <span class="warning-text">No eVoucher available</span>
+                                        <span class="icon-wrapper warning">
+                                            <i class="fa-solid fa-circle-exclamation"></i>
+                                        </span>
+                                    </span>
                                 }
                             </td>
                             <td>@patient.NationalID</td>
+
                             <td class="text-center align-middle">
                                 <div class="upload-container" data-request-id="@request.Service_RequestId">
-                                    <form asp-controller="ServiceRequests" asp-action="UploadInvoice" method="post"
-                                          enctype="multipart/form-data" class="d-inline-block">
-                                        @Html.AntiForgeryToken()
-                                        <input type="hidden" name="serviceRequestId" value="@request.Service_RequestId" />
 
                                         <div class="position-relative">
                                             <!-- Conditional display -->
@@ -260,19 +318,18 @@
                                             }
 
                                             <!-- Styled upload button -->
-                                            <label class="btn btn-sm custom-btn @(string.IsNullOrEmpty(request.Invoice) ? "btn-filled" : "btn-outline")">
-                                                <i class="fas @(string.IsNullOrEmpty(request.Invoice) ? "fa-upload" : "fa-sync") me-1"></i>
-                                                @(string.IsNullOrEmpty(request.Invoice) ? "Upload Invoice" : "Update Invoice")
-                                                <input type="file"
-                                                       name="file"
-                                                       class="d-none"
-                                                       accept=".jpg,.jpeg,.png,.pdf"
-                                                       onchange="this.form.submit()" />
-                                            </label>
+                                        <label class="btn btn-sm custom-btn @(string.IsNullOrEmpty(request.Invoice) ? "btn-filled" : "btn-outline")">
+                                            <i class="fas @(string.IsNullOrEmpty(request.Invoice) ? "fa-upload" : "fa-sync") me-1"></i>
+                                            @(string.IsNullOrEmpty(request.Invoice) ? "Upload Invoice" : "Update Invoice")
+                                            <input type="file"
+                                                   name="file"
+                                                   class="invoice-upload d-none"
+                                                   accept=".jpg,.jpeg,.png,.pdf"
+                                                   onchange="uploadInvoiceFile(event)" />
+                                        </label>
 
                                             <div class="upload-feedback small mt-1"></div>
                                         </div>
-                                    </form>
                                 </div>
                             </td>
                             <td>
@@ -358,35 +415,41 @@
         });
     </script>
     <script>
-        $(document).ready(function () {
-              // Intercept the form submission for forms targeting UploadInvoice in the Uploads controller.
-              $(document).on('submit', 'form[asp-action="UploadInvoice"]', function (e) {
-                  e.preventDefault(); // Prevent the normal form submission
+        function uploadInvoiceFile(e) {
+          // Get the file object (note: use files, not value)
+          var file = e.target.files[0];
+          if (!file) {
+            return;
+          }
 
-                  var $form = $(this);
-                  var formData = new FormData($form[0]);
+          // Get the container div that holds the data-request-id attribute
+          var $container = $(e.target).closest('.upload-container');
+          var serviceRequestId = $container.data('request-id');
 
-                  $.ajax({
-                      url: $form.attr('action'),
-                      type: 'POST',
-                      data: formData,
-                      contentType: false,
-                      processData: false,
-                      success: function (response) {
-                          // Redirect manually after a successful upload
-                          window.location.href = '@Url.Action("Indexadmin", "PatientRegistrations")';
-                      },
-                      error: function (jqXHR, textStatus, errorThrown) {
-                          console.error("Error details:", jqXHR.responseText, textStatus, errorThrown);
-                          $form.find('.upload-feedback').html('<span class="text-danger">Upload failed: ' + jqXHR.responseText + '</span>');
-                      }
-                  });
-              });
+          // Prepare the form data
+          var formData = new FormData();
+          formData.append("file", file);
+          formData.append("serviceRequestId", serviceRequestId);
+          // Add anti-forgery token if needed; assuming it's available in a hidden field or meta tag
+          formData.append("__RequestVerificationToken", $('input[name="__RequestVerificationToken"]').val());
 
-              // Automatically submit the form when a file is selected.
-              $(document).on('change', '.invoice-upload', function () {
-                  $(this).closest('form').submit();
-              });
+          // Send the AJAX request
+          $.ajax({
+            url: '@Url.Action("UploadInvoice", "ServiceRequests")',
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function(response) {
+              // Redirect manually after a successful upload (or update UI accordingly)
+              window.location.href = '@Url.Action("Indexadmin", "PatientRegistrations")';
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+              console.error("Error details:", jqXHR.responseText, textStatus, errorThrown);
+              $container.find('.upload-feedback').html('<span class="text-danger">Upload failed: ' + jqXHR.responseText + '</span>');
+            }
           });
+        }
     </script>
+
 }

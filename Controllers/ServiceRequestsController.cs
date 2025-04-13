@@ -1,6 +1,8 @@
-﻿using ECARE.Interface.FileStorage;
+﻿using ECARE.Constants;
+using ECARE.Interface.FileStorage;
 using ECARE.Models;
 using ECARE.ViewModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -35,6 +37,8 @@ namespace ECARE.Controllers
 
 
         // GET: ServiceRequest/Create
+        [Authorize(Roles = AuthorizationConstants.Admin)]
+
         public async Task<IActionResult> Create()
         {
             var serviceRequestViewModel = new ServiceRequestViewModel();
