@@ -246,11 +246,6 @@
 
                             <td class="text-center align-middle">
                                 <div class="upload-container" data-request-id="@request.Service_RequestId">
-                               @*      <form asp-controller="ServiceRequests" asp-action="UploadInvoice" method="post"
-                                          enctype="multipart/form-data" class="d-inline-block"> *@
-@* 
-                                        @Html.AntiForgeryToken()
-                                        <input type="hidden" name="serviceRequestId" value="@request.Service_RequestId" /> *@
 
                                         <div class="position-relative">
                                             <!-- Conditional display -->
@@ -274,7 +269,6 @@
 
                                             <div class="upload-feedback small mt-1"></div>
                                         </div>
-                                    @* </form> *@
                                 </div>
                             </td>
                             <td>
