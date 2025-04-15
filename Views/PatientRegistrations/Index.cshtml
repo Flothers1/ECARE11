@@ -8,13 +8,14 @@
 
 
 <header class="custom-gray-header text-white p-3 d-flex justify-content-between align-items-center mb-4">
+    <!-- Notification container -->
+    <div id="notification-container" class="position-fixed top-0 end-0 p-3" style="z-index: 1050;"></div>
     <div class="d-flex justify-content-between align-items-center w-100 p-3 custom-header">
         <h1 class="m-0 text-white">Elab Portal</h1>
         <form asp-controller="Account" asp-action="Logout" method="post">
             <button type="submit" class="btn btn-light fw-bold px-4 py-2">Logout</button>
         </form>
     </div>
-
     <div class="dropdown">
         @* <div id="userIcon" class="rounded-circle d-flex align-items-center justify-content-center text-white bg-primary dropdown-toggle"
              style="width: 40px; height: 40px; font-size: 16px; font-weight: bold; cursor: pointer; background:#D4AF37 !important"
@@ -151,6 +152,25 @@
         color: #957200;
         text-decoration: underline;
     }
+    /* dash of unavailable */
+    .unavailable-dash {
+        display: inline-block;
+        color: #6c757d; /* text-muted color */
+        font-weight: 400;
+        font-size: 1rem;
+    }
+    /* The notification by SignalR */
+    .small-swal-popup {
+        width: 2500px !important; /* Small width */
+        height:200px;
+        font-size: 0.5rem !important; /* Reduced font size */
+        padding: 0.5rem !important; /* Compact padding */
+        border-radius: 5px !important; /* Slightly rounded corners */
+        /* Uses default background */
+        color: #333 !important; /* Dark gray text for good contrast */
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2) !important; /* Subtle shadow for depth */
+        text-align: center;
+    }
 </style>
 
 <ul class="tab-container p-0 m-0 d-flex">
@@ -173,6 +193,7 @@
             <tr>
                 <th>Patient Name</th>
                 <th>Phone Number 1</th>
+                <th>National ID</th>
                 <th>Email</th>
                 <th>Lab</th>
                 <th>LabBranch</th>
@@ -206,6 +227,7 @@
                             <tr>
                                 <td>@patient.PatientName</td>
                                 <td>@patient.PhoneNumber1</td>
+                                <td>@patient.NationalID</td>
                                 <td>@patient.Email</td>
                                 <td>@(request?.LabBranch?.Lab?.LabName ?? "No Lab")</td>
                                 <td>@(request?.LabBranch?.LabBranchName ?? "No Branch")</td>
@@ -226,21 +248,13 @@
                                         }
                                         else
                                         {
-                                            <span class="unavailable-item">
-                                                <span class="warning-text">No eVoucher available</span>
-                                                <span class="icon-wrapper warning">
-                                                    <i class="fa-solid fa-circle-exclamation"></i>
-                                                </span>
-                                            </span>
+                                            <span class="unavailable-dash">—</span>
                                         }
                                     }
                                     else
                                     {
                                         <span class="unavailable-item danger">
-                                            <span class="warning-text">Downloading the eVoucher is not allowed until verification is completed.</span>
-                                            <span class="icon-wrapper danger">
-                                                <i class="fa-solid fa-triangle-exclamation"></i>
-                                            </span>
+                                            <span class="text-danger fw-bold">❌ Not Verified</span>
                                         </span>
                                     }
                                 </td>
@@ -256,7 +270,7 @@
                                     }
                                     else
                                     {
-                                        <span class="text-muted">No Invoice available</span>
+                                        <span class="unavailable-dash">—</span>
                                     }
                                 </td>
 
@@ -329,12 +343,17 @@
     </table>
 </div>
 
+
 @section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/jquery.table2excel.min.js"></script>
-    <script src="~/js/jquery.dataTables.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js"
+            integrity="sha512-7SRCYIJtR6F8ocwW7UxW6wGKqbSyqREDbfCORCbGLatU0iugBLwyOXpzhkPyHIFdBO0K2VCu57fvP2Twgx1o2A=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
     <script>
-        $(function () {
+        $(document).ready(function(){
+
+              $(function () {
             var table = $('#patientsTable').DataTable({
                 "columnDefs": [{ "type": "date", "targets": 1 }],
                 "order": [[1, "desc"]]
@@ -356,5 +375,58 @@
                 table.page.len(currentPageLength).draw();
             });
         });
+
+        });
+
+    </script>
+
+    <script>
+        // Build the connection to the SignalR hub
+
+               var connection = new signalR.HubConnectionBuilder()
+               .withUrl("/notificationHub")
+               .build();
+
+           // Function to display notifications using SweetAlert2
+              function showNotification(message, type = 'success') {
+               Swal.fire({
+                   position: 'top-end',
+                   icon: type,
+                   title: message,
+                   showConfirmButton: false,
+                   timer: 1500,
+                   customClass: {
+                       popup: 'small-swal-popup'
+                   }
+               });
+           }
+
+           // Listen for the "ReceiveNotification" event from the hub
+           connection.on("ReceiveNotification", function (message) {
+               showNotification(message);
+
+               // Refresh the table automatically
+               // Option 1: Reload the entire page (for server-side rendered table)
+                 setTimeout(function () {
+                 location.reload();
+                  }, 2000); // 3500ms delay; adjust as needed
+
+               // Option 2: If using DataTables with AJAX, uncomment the following lines
+               // and ensure you have the table instance available.
+               // Example:
+               // var table = $('#patientsTable').DataTable();
+               // table.ajax.reload();
+           });
+
+           // Start the connection and join the lab group after connection is established
+           connection.start().then(function () {
+               // @userLabId should contain the lab id (for example, passed via ViewBag)
+               connection.invoke("JoinGroup", "@userLabId").catch(function (err) {
+                   console.error("Error joining group: " + err.toString());
+               });
+           }).catch(function (err) {
+               console.error("Error establishing SignalR connection: " + err.toString());
+           });
+
     </script>
 }

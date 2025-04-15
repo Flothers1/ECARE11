@@ -62,22 +62,47 @@
         float: left;
         margin-right: 40px;
     }
-
+    /* Document download styling */
     .invoice-icon-link {
-        color: #957200; /* Your brand gold color */
-        font-size: 1.5rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        text-decoration: none;
+        color: #957200;
         transition: all 0.3s ease;
-        display: inline-block;
+    }
+
+    .icon-wrapper {
+        display: flex;
+        font-size: 1.5rem;
         padding: 8px;
         border-radius: 50%;
         background-color: rgba(149, 114, 0, 0.1);
+        transition: all 0.3s ease;
     }
 
-    .invoice-icon-link:hover {
+    .download-text {
+        font-size: 0.875rem;
+        transition: color 0.3s ease;
+    }
+
+    .invoice-icon-link:hover .icon-wrapper {
         color: white;
         background-color: #957200;
         transform: scale(1.1);
         box-shadow: 0 2px 8px rgba(149, 114, 0, 0.3);
+    }
+
+    .invoice-icon-link:hover .download-text {
+        color: #957200;
+        text-decoration: underline;
+    }
+    /* Icon wrappers for warnings */
+    .unavailable-dash {
+        display: inline-block;
+        color: #6c757d; /* text-muted color */
+        font-weight: 400;
+        font-size: 1rem;
     }
 </style>
 <ul class="tab-container p-0 m-0 d-flex">
@@ -137,28 +162,30 @@
                                 }
                                 else
                                 {
-                                    <span class="text-muted">No eVoucher available</span>
+                                    <span class="unavailable-dash">—</span>
                                 }
                             }
                             else
                             {
-                                <span class="text-danger">Downloading the eVoucher is not allowed until verification is completed.</span>
+                                <span class="unavailable-item danger">
+                                    <span class="text-danger fw-bold">❌ Not Verified</span>
+                                </span>
                             }
                         </td>
                         <td>
                             @if (!string.IsNullOrEmpty(request.Invoice))
                             {
-                                <a href="@Url.Content(request.Invoice)" download target="_blank" class="invoice-icon-link"
-                                   title="Download Invoice">
-                                    
-                                    <i class="fa-solid fa-file-invoice-dollar"></i>
-                                    </a>
+                                <a href="@Url.Content(request.Invoice)" download target="_blank" class="invoice-icon-link">
+                                    <span class="download-text">Download Invoice</span>
+                                    <span class="icon-wrapper">
+                                        <i class="fas fa-file-invoice-dollar"></i>
+                                    </span>
+                                </a>
                             }
                             else
                             {
-                                <span class="text-muted">No Invoice available</span>
+                                <span class="unavailable-dash">—</span>
                             }
-
                         </td>
                     </tr>
                 }

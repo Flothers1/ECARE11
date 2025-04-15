@@ -1,3 +1,4 @@
+using ECARE.Helper;
 using ECARE.Interface;
 using ECARE.Interface.FileStorage;
 using ECARE.Models;
@@ -42,7 +43,8 @@ namespace ECARE
 
             builder.Services.AddScoped<IUsersService, UsersService>();
             builder.Services.AddScoped<IFileStorageService, FileStorageService>();
-
+            //Other Services
+            builder.Services.AddSignalR();
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -66,6 +68,11 @@ namespace ECARE
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Account}/{action=Login}/{id?}");
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+                endpoints.MapHub<NotificationHub>("/notificationHub");
+            });
             try
             {
                 app.Run();

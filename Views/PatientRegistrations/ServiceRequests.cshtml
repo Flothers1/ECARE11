@@ -170,9 +170,11 @@
     }
 
     /* Icon wrappers for warnings */
-    .icon-wrapper.warning {
-        background-color: rgba(255, 193, 7, 0.1);
-        color: #ffc107; /* warning color */
+    .unavailable-dash {
+        display: inline-block;
+        color: #6c757d; /* text-muted color */
+        font-weight: 400;
+        font-size: 1rem;
     }
 
     /* Hover effects for eVoucher (same as invoice) */
@@ -222,7 +224,7 @@
                 <th>E-Voucher PDF</th>
                 <th>National ID</th>
                 <th>Invoice</th>
-                <th>Payment</th>
+                <th>Invoiced</th>
             </tr>
         </thead>
         <tbody>
@@ -295,12 +297,7 @@
                                 }
                                 else
                                 {
-                                    <span class="unavailable-item">
-                                        <span class="warning-text">No eVoucher available</span>
-                                        <span class="icon-wrapper warning">
-                                            <i class="fa-solid fa-circle-exclamation"></i>
-                                        </span>
-                                    </span>
+                                    <span class="unavailable-dash">—</span>
                                 }
                             </td>
                             <td>@patient.NationalID</td>

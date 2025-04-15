@@ -153,7 +153,7 @@ namespace ECARE.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = AuthorizationConstants.Admin)]
+        //[Authorize(Roles = AuthorizationConstants.Admin)]
         public async Task<IActionResult> Create(PatientRegistrations patient)
         {
            

@@ -1,10 +1,12 @@
 ﻿using ECARE.Constants;
+using ECARE.Helper;
 using ECARE.Interface.FileStorage;
 using ECARE.Models;
 using ECARE.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting.Internal;
 
@@ -14,13 +16,17 @@ namespace ECARE.Controllers
     {
         private readonly ECAREContext _context;
         private readonly IWebHostEnvironment _hostingEnvironment;
-        private readonly IFileStorageService fileStorageService;
+        private readonly IHubContext<NotificationHub> _hubContext;
+        private readonly IFileStorageService _fileStorageService;
 
-        public ServiceRequestsController(ECAREContext context , IWebHostEnvironment hostingEnvironment, IFileStorageService fileStorageService)
+
+        public ServiceRequestsController(ECAREContext context , IWebHostEnvironment hostingEnvironment, IFileStorageService fileStorageService,
+            IHubContext<NotificationHub> hubContext)
         {
             _context = context;
             _hostingEnvironment = hostingEnvironment;
-            this.fileStorageService = fileStorageService;
+            this._hubContext = hubContext;
+            this._fileStorageService = fileStorageService;
         }
 
 
@@ -37,7 +43,7 @@ namespace ECARE.Controllers
 
 
         // GET: ServiceRequest/Create
-        [Authorize(Roles = AuthorizationConstants.Admin)]
+        //[Authorize(Roles = AuthorizationConstants.Admin)]
 
         public async Task<IActionResult> Create()
         {
@@ -59,7 +65,7 @@ namespace ECARE.Controllers
 
             if (ModelState.IsValid)
             {
-                var fileUrl =  await fileStorageService.SaveFile("uploads", serviceRequestViewModel.EVoucherPDFFile);
+                var fileUrl =  await _fileStorageService.SaveFile("uploads", serviceRequestViewModel.EVoucherPDFFile);
                  service_Request = new Service_Request
                 {
                    OTP = serviceRequestViewModel.OTP,
@@ -79,6 +85,18 @@ namespace ECARE.Controllers
                 };
                 _context.ServiceRequests.Add(service_Request);
                 await _context.SaveChangesAsync();
+                //notification 
+                var labBranch = await _context.LabBranch
+                   .Include(lb => lb.Lab)
+                   .FirstOrDefaultAsync(lb => lb.Id == service_Request.LabBranchId);
+
+                if (labBranch?.Lab != null)
+                {
+                    // Note: the group name should exactly match the one used when joining the group on the client
+                    await _hubContext.Clients.Group($"LabGroup-{labBranch.Lab.Id}")
+                        .SendAsync("ReceiveNotification", "A new service request has been added.");
+                }
+
                 return RedirectToAction("Indexadmin", "PatientRegistrations");
             }
 
@@ -100,7 +118,7 @@ namespace ECARE.Controllers
                 {
                     return RedirectToAction("ServiceRequests", "PatientRegistrations");
                 }
-                var filePath = await fileStorageService.SaveFile("invoices", file);
+                var filePath = await _fileStorageService.SaveFile("invoices", file);
                 serviceRequest.Invoice = filePath;
 
                 _context.Update(serviceRequest);
