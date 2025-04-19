@@ -4,30 +4,194 @@
     ViewData["Title"] = "Service Requests";
 }
 
-<header class="custom-gray-header text-white p-3 d-flex justify-content-between align-items-center mb-4">
-    <div class="d-flex justify-content-between align-items-center w-100 p-3 custom-header">
-        <h1 class="m-0 text-white">Admin Portal</h1>
-        <form asp-controller="Account" asp-action="Logout" method="post">
-            <button type="submit" class="btn btn-light fw-bold px-4 py-2">Logout</button>
-        </form>
+<header class="text-white mb-4">
+    <!-- Removed custom-gray-header class -->
+    <div class="container-fluid">
+        <div class="d-flex justify-content-between align-items-center p-3 custom-header">
+            <h1 class="m-0 text-white">Admin Portal</h1>
+            <form asp-controller="Account" asp-action="Logout" method="post">
+                <button type="submit" class="btn btn-light fw-bold px-4 py-2">Logout</button>
+            </form>
+        </div>
     </div>
-
-    <div class="dropdown">
-        @*   <div id="userIcon" class="rounded-circle d-flex align-items-center justify-content-center text-white bg-primary dropdown-toggle"
-        style="width: 40px; height: 40px; font-size: 16px; font-weight: bold; cursor: pointer; background:#957200 !important"
-        data-bs-toggle="dropdown" aria-expanded="false">
-        M
-        </div> *@
-        @*   <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userIcon">
-        <li><a class="dropdown-item text-danger" href="@Url.Action("Logout", "Account")">Logout</a></li>
-        </ul> *@
-    </div>
-
 </header>
+<div class="container-fluid">
+
+    <div class="d-flex gap-2 mb-3">
+        <a asp-controller="PatientRegistrations" asp-action="Create" class="btn text-white" style="background-color: #957200;">Register Patient</a>
+        <a asp-controller="ServiceRequests" asp-action="Create" class="btn text-white" style="background-color: #957200;">Create Lab Service Request</a>
+        <a asp-controller="Account" asp-action="Register" class="btn text-white" style="background-color: #957200;">Create New User</a>
+
+    </div>
+    <ul class="tab-container p-0 m-0 d-flex">
+        <li class="nav-item @(ViewContext.RouteData.Values["action"].ToString() == "Indexadmin" ? "active" : "")">
+            <a asp-action="Indexadmin" asp-controller="PatientRegistrations">
+                <i class="mdi mdi-ticket-account icon-side-bar"></i>
+                Patients List
+            </a>
+        </li>
+        <li class="nav-item @(ViewContext.RouteData.Values["action"].ToString() == "ServiceRequests" ? "active" : "")">
+            <a asp-action="ServiceRequests" asp-controller="PatientRegistrations">
+                <i class="mdi mdi-ticket-confirmation icon-side-bar"></i> Service Requests
+            </a>
+        </li>
+    </ul>
+    <div class="table-tab-container">
+        <table id="patientsTable" class="table table-tab d-block text-center border-bottom-0 table-overflow">
+            <thead>
+                <tr>
+                    <th>Request Date</th>
+                    <th>Patient Name</th>
+                    <th>Co Payment Percentage</th>
+                    <th>Required Tests</th>
+                    <th>Lab</th>
+                    <th>Lab Branch</th>
+                    <th>E-Voucher PDF</th>
+                    <th>National ID</th>
+                    <th>Invoice</th>
+                    <th>Invoiced</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    int counter = 1;
+                    @foreach (var patient in Model)
+                    {
+                        var labBranch = patient?.ServiceRequests?.FirstOrDefault()?.LabBranch?.LabBranchName;
+
+                        if (string.IsNullOrEmpty(labBranch))
+                        {
+                            continue;
+                        }
+
+                        @foreach (var request in patient.ServiceRequests)
+                        {
+                            <tr>
+                                <td>
+                                    @if (request.Date.HasValue)
+                                    {
+                                        <span>@request.Date.Value.ToString("yyyy-MM-dd HH:mm:ss")</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">No date</span>
+                                    }
+                                </td>
+
+                                <td>@patient.PatientName</td>
+
+                                <td>
+                                    @if (request.CoPaymentPercentage.HasValue)
+                                    {
+                                        <span>@request.CoPaymentPercentage</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">No CoPaymentPercentage available</span>
+                                    }
+                                </td>
+
+                                <td>
+                                    @if (!string.IsNullOrEmpty(request.RequiredTests))
+                                    {
+                                        <span>@request.RequiredTests</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">No Test available</span>
+                                    }
+                                </td>
+
+                                <td>
+                                    <span>@(request?.LabBranch?.Lab?.LabName ?? "No Lab")</span>
+                                </td>
+
+                                <td>
+                                    <span>@(request?.LabBranch?.LabBranchName ?? "No Branch")</span>
+                                </td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(request.EVoucherPDF))
+                                    {
+                                        <a href="@Url.Content(request.EVoucherPDF)" download target="_blank" class="evoucher-icon-link">
+                                            <span class="download-text">Download eVoucher</span>
+                                            <span class="icon-wrapper">
+                                                <i class="fa-solid fa-ticket"></i>
+                                            </span>
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span class="unavailable-dash">—</span>
+                                    }
+                                </td>
+                                <td>@patient.NationalID</td>
+
+                                <td class="text-center align-middle">
+                                    <div class="upload-container" data-request-id="@request.Service_RequestId">
+
+                                        <div class="position-relative">
+                                            <!-- Conditional display -->
+                                            @if (!string.IsNullOrEmpty(request.Invoice))
+                                            {
+                                                <div class="mb-2 upload-status-text">
+                                                    <i class="fas fa-check-circle"></i> Invoice uploaded
+                                                </div>
+                                            }
+
+                                            <!-- Styled upload button -->
+                                            <label class="btn btn-sm custom-btn @(string.IsNullOrEmpty(request.Invoice) ? "btn-filled" : "btn-outline")">
+                                                <i class="fas @(string.IsNullOrEmpty(request.Invoice) ? "fa-upload" : "fa-sync") me-1"></i>
+                                                @(string.IsNullOrEmpty(request.Invoice) ? "Upload Invoice" : "Update Invoice")
+                                                <input type="file"
+                                                       name="file"
+                                                       class="invoice-upload d-none"
+                                                       accept=".jpg,.jpeg,.png,.pdf"
+                                                       onchange="uploadInvoiceFile(event)" />
+                                            </label>
+
+                                            <div class="upload-feedback small mt-1"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex justify-content-center">
+                                        <div class="form-check form-switch">
+                                            <input type="checkbox"
+                                                   class="form-check-input payment-toggle"
+                                                   data-request-id="@request.Service_RequestId"
+                                            @(request.Payment ? "checked" : "")
+                                                   data-url="@Url.Action("TogglePayment", "PatientRegistrations")" />
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+
+                        counter++;
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="8" class="text-center">No patients found.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
 <style>
     .custom-header {
         background-color: #957200;
         border-radius: 8px;
+    }
+
+    .container-fluid {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
     }
 
     .btn-light {
@@ -36,14 +200,20 @@
         transition: all 0.3s ease;
     }
 
-        .btn-light:hover {
-            background-color: #957200;
-            color: white;
-        }
+    .table-responsive {
+        overflow-x: visible;
+        background-color: #eee;
+    }
+
+    .btn-light:hover {
+        background-color: #957200;
+        color: white;
+    }
 
 
     .table-tab-container {
         height: calc(100% - 120px);
+        background-color: #eee;
     }
 
     #tickets_wrapper {
@@ -53,6 +223,10 @@
     .table-overflow {
         height: 100%;
     }
+
+        .table-overflow tbody tr {
+            background-color: #eee;
+        }
 
     th {
         width: calc(100% / 7);
@@ -74,15 +248,15 @@
         cursor: pointer;
     }
 
-    .form-switch .form-check-input:checked {
-        background-color: #957200;
-        border-color: #957200;
-    }
+        .form-switch .form-check-input:checked {
+            background-color: #957200;
+            border-color: #957200;
+        }
 
-    .form-switch .form-check-input:focus {
-        box-shadow: 0 0 0 0.25rem rgba(149, 114, 0, 0.25);
-        border-color: #957200;
-    }
+        .form-switch .form-check-input:focus {
+            box-shadow: 0 0 0 0.25rem rgba(149, 114, 0, 0.25);
+            border-color: #957200;
+        }
 
     .upload-container form {
         display: flex;
@@ -157,17 +331,6 @@
         transition: color 0.3s ease;
     }
 
-    /* For unavailable items (warning states) */
-    .unavailable-item {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        color: #6c757d; /* text-muted color */
-    }
-
-    .warning-text {
-        font-size: 0.875rem;
-    }
 
     /* Icon wrappers for warnings */
     .unavailable-dash {
@@ -190,171 +353,6 @@
         text-decoration: underline;
     }
 </style>
-<div class="d-flex gap-2 mb-3">
-    <a asp-controller="PatientRegistrations" asp-action="Create" class="btn text-white" style="background-color: #957200;">Register Patient</a>
-    <a asp-controller="ServiceRequests" asp-action="Create" class="btn text-white" style="background-color: #957200;">Create Lab Service Request</a>
-    <a asp-controller="Account" asp-action="Register" class="btn text-white" style="background-color: #957200;">Create New User</a>
-
-</div>
-<ul class="tab-container p-0 m-0 d-flex">
-    <li class="nav-item @(ViewContext.RouteData.Values["action"].ToString() == "Index" ? "active" : "")">
-        <a asp-action="Indexadmin" asp-controller="PatientRegistrations">
-            <i class="mdi mdi-ticket-account icon-side-bar"></i>
-            Patients List
-        </a>
-    </li>
-    <li class="nav-item @(ViewContext.RouteData.Values["action"].ToString() == "ServiceRequests" ? "active" : "")">
-        <a asp-action="ServiceRequests" asp-controller="PatientRegistrations">
-            <i class="mdi mdi-ticket-confirmation icon-side-bar"></i> Service Requests
-        </a>
-    </li>
-</ul>
-
-
-<div class="table-tab-container">
-    <table id="patientsTable" class="table table-tab d-block text-center border-bottom-0 table-overflow">
-        <thead>
-            <tr>
-                <th>Request Date</th>
-                <th>Patient Name</th>
-                <th>Co Payment Percentage</th>
-                <th>Required Tests</th>
-                <th>Lab</th>
-                <th>Lab Branch</th>
-                <th>E-Voucher PDF</th>
-                <th>National ID</th>
-                <th>Invoice</th>
-                <th>Invoiced</th>
-            </tr>
-        </thead>
-        <tbody>
-            @if (Model != null && Model.Any())
-            {
-                int counter = 1;
-                @foreach (var patient in Model)
-                {
-                    var labBranch = patient?.ServiceRequests?.FirstOrDefault()?.LabBranch?.LabBranchName;
-
-                    if (string.IsNullOrEmpty(labBranch))
-                    {
-                        continue;
-                    }
-
-                    @foreach (var request in patient.ServiceRequests)
-                    {
-                        <tr>
-                            <td>
-                                @if (request.Date.HasValue)
-                                {
-                                    <span>@request.Date.Value.ToString("yyyy-MM-dd HH:mm:ss")</span>
-                                }
-                                else
-                                {
-                                    <span class="text-muted">No date</span>
-                                }
-                            </td>
-
-                            <td>@patient.PatientName</td>
-
-                            <td>
-                                @if (request.CoPaymentPercentage.HasValue)
-                                {
-                                    <span>@request.CoPaymentPercentage</span>
-                                }
-                                else
-                                {
-                                    <span class="text-muted">No CoPaymentPercentage available</span>
-                                }
-                            </td>
-
-                            <td>
-                                @if (!string.IsNullOrEmpty(request.RequiredTests))
-                                {
-                                    <span>@request.RequiredTests</span>
-                                }
-                                else
-                                {
-                                    <span class="text-muted">No Test available</span>
-                                }
-                            </td>
-
-                            <td>
-                                <span>@(request?.LabBranch?.Lab?.LabName ?? "No Lab")</span>
-                            </td>
-
-                            <td>
-                                <span>@(request?.LabBranch?.LabBranchName ?? "No Branch")</span>
-                            </td>
-                            <td>
-                                @if (!string.IsNullOrEmpty(request.EVoucherPDF))
-                                {
-                                    <a href="@Url.Content(request.EVoucherPDF)" download target="_blank" class="evoucher-icon-link">
-                                        <span class="download-text">Download eVoucher</span>
-                                        <span class="icon-wrapper">
-                                            <i class="fa-solid fa-ticket"></i>
-                                        </span>
-                                    </a>
-                                }
-                                else
-                                {
-                                    <span class="unavailable-dash">—</span>
-                                }
-                            </td>
-                            <td>@patient.NationalID</td>
-
-                            <td class="text-center align-middle">
-                                <div class="upload-container" data-request-id="@request.Service_RequestId">
-
-                                        <div class="position-relative">
-                                            <!-- Conditional display -->
-                                            @if (!string.IsNullOrEmpty(request.Invoice))
-                                            {
-                                                <div class="mb-2 upload-status-text">
-                                                    <i class="fas fa-check-circle"></i> Invoice uploaded
-                                                </div>
-                                            }
-
-                                            <!-- Styled upload button -->
-                                        <label class="btn btn-sm custom-btn @(string.IsNullOrEmpty(request.Invoice) ? "btn-filled" : "btn-outline")">
-                                            <i class="fas @(string.IsNullOrEmpty(request.Invoice) ? "fa-upload" : "fa-sync") me-1"></i>
-                                            @(string.IsNullOrEmpty(request.Invoice) ? "Upload Invoice" : "Update Invoice")
-                                            <input type="file"
-                                                   name="file"
-                                                   class="invoice-upload d-none"
-                                                   accept=".jpg,.jpeg,.png,.pdf"
-                                                   onchange="uploadInvoiceFile(event)" />
-                                        </label>
-
-                                            <div class="upload-feedback small mt-1"></div>
-                                        </div>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="d-flex justify-content-center">
-                                    <div class="form-check form-switch">
-                                        <input type="checkbox"
-                                               class="form-check-input payment-toggle"
-                                               data-request-id="@request.Service_RequestId"
-                                        @(request.Payment ? "checked" : "")
-                                               data-url="@Url.Action("TogglePayment", "PatientRegistrations")" />
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                    }
-
-                    counter++;
-                }
-            }
-            else
-            {
-                <tr>
-                    <td colspan="8" class="text-center">No patients found.</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-</div>
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

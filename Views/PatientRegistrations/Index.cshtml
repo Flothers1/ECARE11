@@ -7,14 +7,15 @@
 }
 
 
-<header class="custom-gray-header text-white p-3 d-flex justify-content-between align-items-center mb-4">
-    <!-- Notification container -->
-    <div id="notification-container" class="position-fixed top-0 end-0 p-3" style="z-index: 1050;"></div>
-    <div class="d-flex justify-content-between align-items-center w-100 p-3 custom-header">
+<header class="text-white mb-4">
+    <!-- Removed custom-gray-header class -->
+    <div class="container-fluid">
+        <div class="d-flex justify-content-between align-items-center p-3 custom-header">
         <h1 class="m-0 text-white">Elab Portal</h1>
-        <form asp-controller="Account" asp-action="Logout" method="post">
-            <button type="submit" class="btn btn-light fw-bold px-4 py-2">Logout</button>
-        </form>
+            <form asp-controller="Account" asp-action="Logout" method="post">
+                <button type="submit" class="btn btn-light fw-bold px-4 py-2">Logout</button>
+            </form>
+        </div>
     </div>
     <div class="dropdown">
         @* <div id="userIcon" class="rounded-circle d-flex align-items-center justify-content-center text-white bg-primary dropdown-toggle"
@@ -28,26 +29,211 @@
     </div>
 </header>
 
+<div class="container-fluid">
+    <ul class="tab-container p-0 m-0 d-flex">
+        <li class="nav-item @(ViewContext.RouteData.Values["action"].ToString() == "Index" ? "active" : "")">
+            <a asp-action="Index" asp-controller="PatientRegistrations">
+                <i class="mdi mdi-account-multiple icon-side-bar"></i> Current Requests
+            </a>
+        </li>
+
+        <li class="nav-item @(ViewContext.RouteData.Values["action"].ToString() == "ClosedRequests" ? "active" : "")">
+            <a asp-action="ClosedRequests" asp-controller="PatientRegistrations">
+                <i class="mdi mdi-ticket-confirmation icon-side-bar"></i> Closed Requests
+            </a>
+        </li>
+    </ul>
+
+    <div class="table-tab-container">
+         <div class="table-responsive">
+            <table id="patientsTable" class="table table-tab d-block text-center border-bottom-0 table-overflow">
+                <thead>
+                    <tr>
+                        <th>Patient Name</th>
+                        <th>Phone Number 1</th>
+                        <th>National ID</th>
+                        <th>Email</th>
+                        <th>Lab</th>
+                        <th>LabBranch</th>
+                        <th>Required Tests</th>
+                        <th>CoPaymentPercentage</th>
+                        <th>Payment</th>
+                        <th>EVoucherPDF</th>
+                        <th>Download Invoice</th>
+
+                        @if (ViewContext.RouteData.Values["action"]?.ToString() != "ClosedRequests")
+                        {
+                            <th>Mobile Verification</th>
+                            <th>Email Verification</th>
+                            <th>Mark Complete</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var patient in Model)
+                        {
+                            var filteredRequests = patient.ServiceRequests
+                            ?.Where(r => r.LabBranch?.LabId == userLabId && r.IsDeleted == null)
+                            .ToList();
+
+                            if (filteredRequests != null && filteredRequests.Any())
+                            {
+                                foreach (var request in filteredRequests)
+                                {
+                                    <tr>
+                                        <td>@patient.PatientName</td>
+                                        <td>@patient.PhoneNumber1</td>
+                                        <td>@patient.NationalID</td>
+                                        <td>@patient.Email</td>
+                                        <td>@(request?.LabBranch?.Lab?.LabName ?? "No Lab")</td>
+                                        <td>@(request?.LabBranch?.LabBranchName ?? "No Branch")</td>
+                                        <td>@(request?.RequiredTests ?? "No Test")</td>
+                                        <td>@(request?.CoPaymentPercentage?.ToString() ?? "No CoPayment")</td>
+                                        <td>@(request?.Payment.ToString() ?? "No Payment")</td>
+                                        <td>
+                                            @if (request.IsVerified.GetValueOrDefault())
+                                            {
+                                                if (!string.IsNullOrEmpty(request.EVoucherPDF))
+                                                {
+                                                    <a href="@Url.Content(request.EVoucherPDF)" download target="_blank" class="evoucher-icon-link">
+                                                        <span class="download-text">Download eVoucher</span>
+                                                        <span class="icon-wrapper">
+                                                            <i class="fa-solid fa-ticket"></i>
+                                                        </span>
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <span class="unavailable-dash">—</span>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <span class="unavailable-item danger">
+                                                    <span class="text-danger fw-bold">❌ Not Verified</span>
+                                                </span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(request.Invoice))
+                                            {
+                                                <a href="@Url.Content(request.Invoice)" download target="_blank" class="invoice-icon-link">
+                                                    <span class="download-text">Download Invoice</span>
+                                                    <span class="icon-wrapper">
+                                                        <i class="fa-solid fa-file-invoice-dollar"></i>
+                                                    </span>
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <span class="unavailable-dash">—</span>
+                                            }
+                                        </td>
+
+                                        @if (ViewContext.RouteData.Values["action"]?.ToString() != "ClosedRequests")
+                                        {
+                                            <td>
+                                                <form asp-action="SendOTP" asp-controller="PatientRegistrations" method="post" style="display: inline;">
+                                                    <input type="hidden" name="patientId" value="@patient.PatientRegistrationsId" />
+                                                    <input type="hidden" name="serviseRequstid" value="@request?.Service_RequestId" />
+                                                    <button type="submit" title="Send OTP" style="border: none; background: none; padding: 0;">
+                                                        <img src="~/img/otp_transparent.png" alt="Send OTP" style="width: 24px; height: 24px;">
+                                                    </button>
+                                                </form>
+
+                                                @if (request.IsVerified.GetValueOrDefault())
+                                                {
+                                                    <span class="text-success fw-bold">✔ Verified</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-danger fw-bold">❌ Not Verified</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(patient.Email))
+                                                {
+                                                    <a asp-action="SendVerificationCode"
+                                                       asp-controller="PatientRegistrations"
+                                                       asp-route-id="@patient.PatientRegistrationsId"
+                                                       asp-route-serviceRequestid="@request.Service_RequestId">
+                                                        <img src="~/img/MSG_transparent.png" alt="Verification Code" style="width: 24px; height: 24px;">
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <img src="~/img/MSG_transparent.png" alt="Email Not Available"
+                                                         style="width: 24px; height: 24px; opacity: 0.4; cursor: not-allowed;" title="Email not available" />
+                                                }
+
+                                                @if (request.IsVerified.GetValueOrDefault())
+                                                {
+                                                    <span class="text-success fw-bold">✔ Verified</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-danger fw-bold">❌ Not Verified</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <form asp-action="SoftDeletePatient" asp-controller="PatientRegistrations" method="post" style="display: inline;">
+                                                    <input type="hidden" name="patientId" value="@request.Service_RequestId" />
+                                                    <button type="submit" style="border: none; background: none; padding: 0;">
+                                                        <img src="~/img/resolve_transparent.png" alt="Close Request" style="width: 24px; height: 24px; cursor: pointer;">
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        }
+                                    </tr>
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="31" class="text-center">No patients found.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+         </div>
+    </div>
+</div>
+
 <style>
     .custom-header {
         background-color: #957200;
         border-radius: 8px;
     }
 
+    .container-fluid {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
     .btn-light {
         color: #957200;
         border: 2px solid #957200;
         transition: all 0.3s ease;
     }
 
-        .btn-light:hover {
-            background-color: #957200;
-            color: white;
-        }
+    .table-responsive {
+        overflow-x: visible;
+        background-color: #eee;
+    }
+
+    .btn-light:hover {
+        background-color: #957200;
+        color: white;
+    }
 
 
     .table-tab-container {
         height: calc(100% - 120px);
+        background-color: #eee;
     }
 
     #tickets_wrapper {
@@ -56,6 +242,10 @@
 
     .table-overflow {
         height: 100%;
+    }
+
+    .table-overflow tbody tr {
+        background-color: #eee;
     }
 
     th {
@@ -117,29 +307,6 @@
         transition: all 0.3s ease;
     }
 
-    /* For unavailable items (warning and danger states) */
-    .unavailable-item {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        color: #6c757d; /* text-muted color */
-    }
-
-        .unavailable-item.danger {
-            color: #dc3545; /* text-danger color */
-        }
-
-    /* Icon wrappers for warnings and danger */
-    .icon-wrapper.warning {
-        background-color: rgba(255, 193, 7, 0.1);
-        color: #ffc107; /* warning color */
-    }
-
-    .icon-wrapper.danger {
-        background-color: rgba(220, 53, 69, 0.1);
-        color: #dc3545; /* danger color */
-    }
-
     /* Hover effects for eVoucher (same as invoice) */
     .evoucher-icon-link:hover .icon-wrapper {
         color: white;
@@ -162,7 +329,7 @@
     /* The notification by SignalR */
     .small-swal-popup {
         width: 2500px !important; /* Small width */
-        height:200px;
+        height: 200px;
         font-size: 0.5rem !important; /* Reduced font size */
         padding: 0.5rem !important; /* Compact padding */
         border-radius: 5px !important; /* Slightly rounded corners */
@@ -172,176 +339,6 @@
         text-align: center;
     }
 </style>
-
-<ul class="tab-container p-0 m-0 d-flex">
-    <li class="nav-item @(ViewContext.RouteData.Values["action"].ToString() == "Index" ? "active" : "")">
-        <a asp-action="Index" asp-controller="PatientRegistrations">
-            <i class="mdi mdi-account-multiple icon-side-bar"></i> Current Requests
-        </a>
-    </li>
-
-    <li class="nav-item @(ViewContext.RouteData.Values["action"].ToString() == "ClosedRequests" ? "active" : "")">
-        <a asp-action="ClosedRequests" asp-controller="PatientRegistrations">
-            <i class="mdi mdi-ticket-confirmation icon-side-bar"></i> Closed Requests
-        </a>
-    </li>
-</ul>
-
-<div class="table-tab-container">
-    <table id="patientsTable" class="table table-tab d-block text-center border-bottom-0 table-overflow">
-        <thead>
-            <tr>
-                <th>Patient Name</th>
-                <th>Phone Number 1</th>
-                <th>National ID</th>
-                <th>Email</th>
-                <th>Lab</th>
-                <th>LabBranch</th>
-                <th>Required Tests</th>
-                <th>CoPaymentPercentage</th>
-                <th>Payment</th>
-                <th>EVoucherPDF</th>
-                <th>Download Invoice</th>
-
-                @if (ViewContext.RouteData.Values["action"]?.ToString() != "ClosedRequests")
-                {
-                    <th>Mobile Verification</th>
-                    <th>Email Verification</th>
-                    <th>Mark Complete</th>
-                }
-            </tr>
-        </thead>
-        <tbody>
-            @if (Model != null && Model.Any())
-            {
-                foreach (var patient in Model)
-                {
-                    var filteredRequests = patient.ServiceRequests
-                    ?.Where(r => r.LabBranch?.LabId == userLabId && r.IsDeleted == null)
-                    .ToList();
-
-                    if (filteredRequests != null && filteredRequests.Any())
-                    {
-                        foreach (var request in filteredRequests)
-                        {
-                            <tr>
-                                <td>@patient.PatientName</td>
-                                <td>@patient.PhoneNumber1</td>
-                                <td>@patient.NationalID</td>
-                                <td>@patient.Email</td>
-                                <td>@(request?.LabBranch?.Lab?.LabName ?? "No Lab")</td>
-                                <td>@(request?.LabBranch?.LabBranchName ?? "No Branch")</td>
-                                <td>@(request?.RequiredTests ?? "No Test")</td>
-                                <td>@(request?.CoPaymentPercentage?.ToString() ?? "No CoPayment")</td>
-                                <td>@(request?.Payment.ToString() ?? "No Payment")</td>
-                                <td>
-                                    @if (request.IsVerified.GetValueOrDefault())
-                                    {
-                                        if (!string.IsNullOrEmpty(request.EVoucherPDF))
-                                        {
-                                            <a href="@Url.Content(request.EVoucherPDF)" download target="_blank" class="evoucher-icon-link">
-                                                <span class="download-text">Download eVoucher</span>
-                                                <span class="icon-wrapper">
-                                                    <i class="fa-solid fa-ticket"></i>
-                                                </span>
-                                            </a>
-                                        }
-                                        else
-                                        {
-                                            <span class="unavailable-dash">—</span>
-                                        }
-                                    }
-                                    else
-                                    {
-                                        <span class="unavailable-item danger">
-                                            <span class="text-danger fw-bold">❌ Not Verified</span>
-                                        </span>
-                                    }
-                                </td>
-                                <td>
-                                    @if (!string.IsNullOrEmpty(request.Invoice))
-                                    {
-                                        <a href="@Url.Content(request.Invoice)" download target="_blank" class="invoice-icon-link">
-                                            <span class="download-text">Download Invoice</span>
-                                            <span class="icon-wrapper">
-                                                <i class="fa-solid fa-file-invoice-dollar"></i>
-                                            </span>
-                                        </a>
-                                    }
-                                    else
-                                    {
-                                        <span class="unavailable-dash">—</span>
-                                    }
-                                </td>
-
-                                @if (ViewContext.RouteData.Values["action"]?.ToString() != "ClosedRequests")
-                                {
-                                    <td>
-                                        <form asp-action="SendOTP" asp-controller="PatientRegistrations" method="post" style="display: inline;">
-                                            <input type="hidden" name="patientId" value="@patient.PatientRegistrationsId" />
-                                            <input type="hidden" name="serviseRequstid" value="@request?.Service_RequestId" />
-                                            <button type="submit" title="Send OTP" style="border: none; background: none; padding: 0;">
-                                                <img src="~/img/otp_transparent.png" alt="Send OTP" style="width: 24px; height: 24px;">
-                                            </button>
-                                        </form>
-
-                                        @if (request.IsVerified.GetValueOrDefault())
-                                        {
-                                            <span class="text-success fw-bold">✔ Verified</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="text-danger fw-bold">❌ Not Verified</span>
-                                        }
-                                    </td>
-                                    <td>
-                                        @if (!string.IsNullOrEmpty(patient.Email))
-                                        {
-                                            <a asp-action="SendVerificationCode"
-                                               asp-controller="PatientRegistrations"
-                                               asp-route-id="@patient.PatientRegistrationsId"
-                                               asp-route-serviceRequestid="@request.Service_RequestId">
-                                                <img src="~/img/MSG_transparent.png" alt="Verification Code" style="width: 24px; height: 24px;">
-                                            </a>
-                                        }
-                                        else
-                                        {
-                                            <img src="~/img/MSG_transparent.png" alt="Email Not Available"
-                                                 style="width: 24px; height: 24px; opacity: 0.4; cursor: not-allowed;" title="Email not available" />
-                                        }
-
-                                        @if (request.IsVerified.GetValueOrDefault())
-                                        {
-                                            <span class="text-success fw-bold">✔ Verified</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="text-danger fw-bold">❌ Not Verified</span>
-                                        }
-                                    </td>
-                                    <td>
-                                        <form asp-action="SoftDeletePatient" asp-controller="PatientRegistrations" method="post" style="display: inline;">
-                                            <input type="hidden" name="patientId" value="@request.Service_RequestId" />
-                                            <button type="submit" style="border: none; background: none; padding: 0;">
-                                                <img src="~/img/resolve_transparent.png" alt="Close Request" style="width: 24px; height: 24px; cursor: pointer;">
-                                            </button>
-                                        </form>
-                                    </td>
-                                }
-                            </tr>
-                        }
-                    }
-                }
-            }
-            else
-            {
-                <tr>
-                    <td colspan="31" class="text-center">No patients found.</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-</div>
 
 
 @section Scripts {
