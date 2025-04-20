@@ -21,17 +21,17 @@ namespace ECARE.Services
 
         public async Task<ApplicationUser> GetUserAfterLogin()
         {
-            var userId = _httpContextAccessor.HttpContext.User.Identity.IsAuthenticated ?
-                        _httpContextAccessor.HttpContext.User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value
-                        : Guid.Empty.ToString();
+            var httpContext = _httpContextAccessor.HttpContext;
 
-            var userIdGuid = Guid.Empty;
-            if (!Guid.TryParse(userId, out userIdGuid))
+            var principal = httpContext?.User;
+            if (principal?.Identity?.IsAuthenticated != true)
             {
                 return null;
             }
 
-            return await _userManager.FindByIdAsync(userIdGuid.ToString());
+            var user = await _userManager.GetUserAsync(principal);
+
+            return user;
         }
 
         public async Task<IList<string>> GetUserRole(ApplicationUser user)

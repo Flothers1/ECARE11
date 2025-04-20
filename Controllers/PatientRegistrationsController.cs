@@ -55,6 +55,12 @@ namespace ECARE.Controllers
         public async Task<IActionResult> Index()
         {
             var user = await _usersService.GetUserAfterLogin();
+            if (user == null)
+            {
+                // Handle unauthenticated user (e.g., redirect to login)
+                return Challenge();
+            }
+            var userRoles = await _usersService.GetUserRole(user);
 
             List<PatientRegistrations> filteredPatients;
 
@@ -64,13 +70,14 @@ namespace ECARE.Controllers
                             .ThenInclude(l => l.Lab);
 
 
-            if ((await _usersService.GetUserRole(user)).Contains("Admin"))
+            if (userRoles.Contains(AuthorizationConstants.Admin))
             {
                 filteredPatients = await patients.ToListAsync();
             }
-            else if((await _usersService.GetUserRole(user)).Contains("LabAdmin"))
+            else if(userRoles.Contains(AuthorizationConstants.LabAdmin))
             {
-                filteredPatients = await patients.Where(p => p.ServiceRequests.Any(sr => sr.LabBranch.LabId == user.LabId)).ToListAsync();
+                filteredPatients = await patients.Where(p => p.ServiceRequests
+                .Any(sr => sr.LabBranch.LabId == user.LabId)).ToListAsync();
             }
             else
             {
@@ -90,10 +97,10 @@ namespace ECARE.Controllers
                 .Select(p => new
                 {
                     MobileNumber = p.PhoneNumber1,
-                    ProgramName = p.ProgramName,
-                    ProgramSponsor = p.ProgramSponsor,
-                    NationalID = p.NationalID,
-                    MembershipNumber = p.MembershipNumber
+                    p.ProgramName,
+                    p.ProgramSponsor,
+                    p.NationalID,
+                    p.MembershipNumber
                 })
                 .FirstOrDefault();
 
@@ -275,11 +282,11 @@ namespace ECARE.Controllers
 
 
         [HttpPost]
-        public IActionResult VerifyOTP(int patientId, string otpCode , int serviceRequestid)
+        public IActionResult VerifyOTP(int patientId, string otpCode , int serviceRequestId)
         {
             
             var serviceRequest = _context.ServiceRequests
-                 .FirstOrDefault(sr => sr.PatientRegistrationsId == patientId && sr.Service_RequestId == serviceRequestid);
+                 .FirstOrDefault(sr => sr.PatientRegistrationsId == patientId && sr.Service_RequestId == serviceRequestId);
             if (serviceRequest == null)
             {
                 return RedirectToAction("Index", new { message = "Phone number not registered!" });
@@ -288,7 +295,7 @@ namespace ECARE.Controllers
             if (serviceRequest.OTP != otpCode)
             {
                 ViewBag.PatientId = patientId;
-                ViewBag.ServiceRequestid = serviceRequestid;
+                ViewBag.ServiceRequestid = serviceRequestId;
                 ViewBag.Error = "Invalid or expired OTP";
                 ViewData["ErrorMessage"] = "Incorrect OTP!";
                 return View();
@@ -309,7 +316,7 @@ namespace ECARE.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> SendOTP(int patientId, int serviseRequstid)
+        public async Task<IActionResult> SendOTP(int patientId, int serviceRequestId)
         {
             string apiUrl = "https://app.community-ads.com/SendSMSAPI/api/SMSSender/SendSMS";
 
@@ -320,7 +327,7 @@ namespace ECARE.Controllers
                 return RedirectToAction("Index", new { message = "Patient is not registered or does not have a phone number!" });
             }
             var latestRequest = await _context.ServiceRequests
-        .FirstOrDefaultAsync(sr => sr.Service_RequestId == serviseRequstid && sr.PatientRegistrationsId == patientId);
+        .FirstOrDefaultAsync(sr => sr.Service_RequestId == serviceRequestId && sr.PatientRegistrationsId == patientId);
 
 
             var otpCode = new Random().Next(100000, 999999).ToString();
@@ -347,7 +354,7 @@ namespace ECARE.Controllers
                 latestRequest.OTPExpiration = DateTime.Now.AddMinutes(20);
                 _context.SaveChanges();
 
-                return RedirectToAction("VerifyOTP", new { patientId = patientId, serviceRequestid = serviseRequstid }); 
+                return RedirectToAction("VerifyOTP", new { patientId = patientId, serviceRequestid = serviceRequestId }); 
             }
 
             return RedirectToAction("Index", new { message = "An error occurred during sending!" });
@@ -401,7 +408,7 @@ namespace ECARE.Controllers
 
 
 
-        public async Task<IActionResult> SendVerificationCode(int id, int serviceRequestid)
+        public async Task<IActionResult> SendVerificationCode(int id, int serviceRequestId)
         {
             var patient = await _context.PatientRegistrations
                 .FirstOrDefaultAsync(p => p.PatientRegistrationsId == id);
@@ -412,7 +419,7 @@ namespace ECARE.Controllers
             }
 
             var latestRequest = await _context.ServiceRequests
-                .FirstOrDefaultAsync(sr => sr.Service_RequestId == serviceRequestid && sr.PatientRegistrationsId == id);
+                .FirstOrDefaultAsync(sr => sr.Service_RequestId == serviceRequestId && sr.PatientRegistrationsId == id);
 
             if (latestRequest == null)
             {
@@ -429,7 +436,7 @@ namespace ECARE.Controllers
             var body = $"Your verification code is: <b>{verificationCode}</b>";
             await SendEmailAsync(patient.Email, subject, body);
 
-            return RedirectToAction("VerifyOTP", new { patientId = id, serviceRequestid = serviceRequestid });
+            return RedirectToAction("VerifyOTP", new { patientId = id, serviceRequestid = serviceRequestId });
         }
 
         [HttpPost]

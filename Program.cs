@@ -1,3 +1,5 @@
+// Ignore Spelling: ECARE
+
 using ECARE.Helper;
 using ECARE.Interface;
 using ECARE.Interface.FileStorage;
