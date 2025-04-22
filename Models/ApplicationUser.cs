@@ -7,5 +7,6 @@ namespace ECARE.Models
        public int? LabBranchId { get; set; }
        public int? LabId { get; set; }
         public LabBranch? LabBranch { get; set; }
+        public PharmacyBranch? PharmacyBranch { get; set; }
     }
 }

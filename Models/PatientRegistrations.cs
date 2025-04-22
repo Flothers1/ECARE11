@@ -111,8 +111,12 @@ namespace ECARE.Models
         [NotMapped]
         public IFormFile? Invoice { get; set; }
         public string? Invoice1 { get; set; }
+        public int ProgramId { get; set; }
+        [ForeignKey("ProgramId")]
+        public Program Program { get; set; }
 
-        public ICollection<Service_Request>? ServiceRequests { get; set; }
+        public ICollection<Service_Request>? ServiceRequests { get; set; } = new HashSet<Service_Request>();    
+        public ICollection<PharmacyServiceRequest>? PharmacyServiceRequests { get; set; } = new HashSet<PharmacyServiceRequest>();
     }
 
 }

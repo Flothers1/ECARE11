@@ -20,8 +20,6 @@ namespace ECARE.Models
 
         public double? CoPaymentPercentage { get; set; }
         public bool Payment { get; set; }
-        [Display(Name = "Patient Name")]
-
         public bool? IsDeleted { get; set; }
         public string? OTP { get; set; }
         public DateTime OTPExpiration { get; set; }
