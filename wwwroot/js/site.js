@@ -45,7 +45,7 @@
 //    if (searchForm) {
 //        document.querySelector(".search-form").classList.toggle("username-hide");
 //    }
-    
+
 
 //    showListSvg.forEach((svg) => {
 //        svg.classList.toggle("list-menu-svg");
@@ -69,7 +69,7 @@
 //    if (barIcon.classList.contains("show")) {
 //        window.localStorage.removeItem("show")
 //    }
-    
+
 //})
 
 //if (!window.localStorage.getItem("show")) {
@@ -103,3 +103,6 @@
 
 //    document.querySelector(".bar-icon").classList.add("onclick-bar-icon");
 //}
+$(document).ready(function () {
+    $('select').select2();
+});

@@ -15,10 +15,10 @@ namespace ECARE.Models
         public string? OTP { get; set; }
         public DateTime OTPExpiration { get; set; }
         public bool? IsVerified { get; set; }
-        public int ProgramId { get; set; }
-        [ForeignKey("ProgramId")]
+        public int CareProgramId { get; set; }
+        [ForeignKey("CareProgramId")]
 
-        public Program? Program { get; set; }
+        public CareProgram? CareProgram { get; set; }
         public int PRId { get; set; }
 
         [ForeignKey("PRId")]

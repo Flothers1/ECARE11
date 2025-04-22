@@ -1,0 +1,145 @@
+﻿@model CareProgramViewModel
+@{
+    ViewData["Title"] = "Create Care Program";
+}
+
+<header class="mb-4">
+    <div class="container-fluid">
+        <div class="d-flex justify-content-between align-items-center p-3 rounded" style="background-color: #957200;">
+            <h1 class="m-0 text-white">Elab Portal</h1>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2>Create Care Program</h2>
+            <hr class="border-2 border-top border-secondary">
+        </div>
+    </div>
+
+    <form asp-action="Create" method="post">
+        <div class="row g-4">
+            <!-- Left Column -->
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="StartDate" class="form-label fw-bold"></label>
+                    <input asp-for="StartDate" class="form-control" type="date" />
+                    <span asp-validation-for="StartDate" class="text-danger small"></span>
+                </div>
+
+                <div class="form-group mt-4">
+                    <label asp-for="MedicationName" class="form-label fw-bold"></label>
+                    <input asp-for="MedicationName" class="form-control" placeholder="Enter medication name" />
+                    <span asp-validation-for="MedicationName" class="text-danger small"></span>
+                </div>
+
+                <div class="form-group mt-4">
+                    <label asp-for="MedicationPackConsumptionDuration" class="form-label fw-bold"></label>
+                    <div class="input-group">
+                        <input asp-for="MedicationPackConsumptionDuration" class="form-control" placeholder="Days" />
+                        <span class="input-group-text">days</span>
+                    </div>
+                    <span asp-validation-for="MedicationPackConsumptionDuration" class="text-danger small"></span>
+                </div>
+
+                <div class="form-group mt-4">
+                    <label asp-for="OriginalPrice" class="form-label fw-bold"></label>
+                    <div class="input-group">
+                        <span class="input-group-text">$</span>
+                        <input asp-for="OriginalPrice" class="form-control" placeholder="0.00" />
+                    </div>
+                    <span asp-validation-for="OriginalPrice" class="text-danger small"></span>
+                </div>
+
+                <div class="form-group mt-4">
+                    <label asp-for="SelectedPharmacyIds" class="form-label fw-bold"></label>
+                    <select asp-for="SelectedPharmacyIds" asp-items="Model.PharmacyOptions"
+                            class="form-select" data-placeholder="Select Pharmacy"
+                            data-minimum-results-for-search="Infinity">
+                        <option value=""></option>
+                    </select>
+                    <span asp-validation-for="SelectedPharmacyIds" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="ProductManager" class="form-label fw-bold"></label>
+                    <input asp-for="ProductManager" class="form-control" placeholder="Enter product manager name" />
+                    <span asp-validation-for="ProductManager" class="text-danger small"></span>
+                </div>
+
+                <div class="form-group mt-4">
+                    <label asp-for="MedicationPackSize" class="form-label fw-bold"></label>
+                    <input asp-for="MedicationPackSize" class="form-control" placeholder="e.g., 30 tablets" />
+                    <span asp-validation-for="MedicationPackSize" class="text-danger small"></span>
+                </div>
+
+                <div class="form-group mt-4">
+                    <label asp-for="PriceAfterDiscount" class="form-label fw-bold"></label>
+                    <div class="input-group">
+                        <span class="input-group-text">$</span>
+                        <input asp-for="PriceAfterDiscount" class="form-control" placeholder="0.00" />
+                    </div>
+                    <span asp-validation-for="PriceAfterDiscount" class="text-danger small"></span>
+                </div>
+                <div class="form-group mt-4">
+                    <label asp-for="SelectedDistributorIds" class="form-label fw-bold"></label>
+                    <select asp-for="SelectedDistributorIds" asp-items="Model.DistributorOptions"
+                            class="form-select" data-placeholder="Select Pharmacy"
+                            data-minimum-results-for-search="Infinity">
+                        <option value=""></option>
+                    </select>
+                    <span asp-validation-for="SelectedDistributorIds" class="text-danger small"></span>
+                </div>   
+                
+                <div class="form-group mt-4">
+                    <label asp-for="HCPList" class="form-label fw-bold"></label>
+                    <input asp-for="HCPList" class="form-control" placeholder="Enter HCP names" />
+                    <span asp-validation-for="HCPList" class="text-danger small"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Footer -->
+        <div class="row mt-5">
+            <div class="col-12 text-center">
+                <button type="submit" class="btn btn-primary px-5 py-2">
+                    <i class="bi bi-save me-2"></i>Create Program
+                </button>
+                <a asp-action="Index" class="btn btn-outline-secondary px-5 py-2 ms-3">
+                    <i class="bi bi-x-circle me-2"></i>Cancel
+                </a>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Styles {
+    <style>
+        .form-control:focus, .form-select:focus {
+            border-color: #957200;
+            box-shadow: 0 0 0 0.25rem rgba(149, 114, 0, 0.25);
+        }
+
+        .btn-primary {
+            background-color: #957200;
+            border-color: #957200;
+        }
+
+       .btn-primary:hover {
+           background-color: #7a5e00;
+           border-color: #7a5e00;
+       }
+    </style>
+}
+
+@section Scripts {
+   
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

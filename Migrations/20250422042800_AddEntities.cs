@@ -8,13 +8,13 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ECARE.Migrations
 {
     /// <inheritdoc />
-    public partial class ADDPharmacyServiceRequestPharmacyBranchDistributorAndProgramEntities : Migration
+    public partial class AddEntities : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<int>(
-                name: "ProgramId",
+                name: "CareProgramId",
                 table: "PatientRegistrations",
                 type: "int",
                 nullable: false,
@@ -25,6 +25,26 @@ namespace ECARE.Migrations
                 table: "AspNetUsers",
                 type: "int",
                 nullable: true);
+
+            migrationBuilder.CreateTable(
+                name: "CarePrograms",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ProductManager = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    MedicationName = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    MedicationPackSize = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    MedicationPackConsumptionDuration = table.Column<int>(type: "int", nullable: false),
+                    OriginalPrice = table.Column<decimal>(type: "decimal(18,3)", precision: 18, scale: 3, nullable: false),
+                    PriceAfterDiscount = table.Column<decimal>(type: "decimal(18,3)", precision: 18, scale: 3, nullable: false),
+                    HCPList = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CarePrograms", x => x.Id);
+                });
 
             migrationBuilder.CreateTable(
                 name: "Distributors",
@@ -53,23 +73,59 @@ namespace ECARE.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Programs",
+                name: "PharmacyServiceRequests",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ProductManager = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    MedicationName = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    MedicationPackSize = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    MedicationPackConsumptionDuration = table.Column<int>(type: "int", nullable: false),
-                    OriginalPrice = table.Column<decimal>(type: "decimal(18,3)", precision: 18, scale: 3, nullable: false),
-                    PriceAfterDiscount = table.Column<decimal>(type: "decimal(18,3)", precision: 18, scale: 3, nullable: false),
-                    HCPList = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Payment = table.Column<bool>(type: "bit", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: true),
+                    EVoucherPDF = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    OTP = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    OTPExpiration = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsVerified = table.Column<bool>(type: "bit", nullable: true),
+                    CareProgramId = table.Column<int>(type: "int", nullable: false),
+                    PRId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Programs", x => x.Id);
+                    table.PrimaryKey("PK_PharmacyServiceRequests", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PharmacyServiceRequests_CarePrograms_CareProgramId",
+                        column: x => x.CareProgramId,
+                        principalTable: "CarePrograms",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_PharmacyServiceRequests_PatientRegistrations_PRId",
+                        column: x => x.PRId,
+                        principalTable: "PatientRegistrations",
+                        principalColumn: "PatientRegistrationsId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ProgramDistributors",
+                columns: table => new
+                {
+                    CareProgramId = table.Column<int>(type: "int", nullable: false),
+                    DistributorsId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProgramDistributors", x => new { x.CareProgramId, x.DistributorsId });
+                    table.ForeignKey(
+                        name: "FK_ProgramDistributors_CarePrograms_CareProgramId",
+                        column: x => x.CareProgramId,
+                        principalTable: "CarePrograms",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ProgramDistributors_Distributors_DistributorsId",
+                        column: x => x.DistributorsId,
+                        principalTable: "Distributors",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -93,84 +149,33 @@ namespace ECARE.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "PharmacyServiceRequests",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Payment = table.Column<bool>(type: "bit", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: true),
-                    EVoucherPDF = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    OTP = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    OTPExpiration = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IsVerified = table.Column<bool>(type: "bit", nullable: true),
-                    ProgramId = table.Column<int>(type: "int", nullable: false),
-                    PRId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PharmacyServiceRequests", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_PharmacyServiceRequests_PatientRegistrations_PRId",
-                        column: x => x.PRId,
-                        principalTable: "PatientRegistrations",
-                        principalColumn: "PatientRegistrationsId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_PharmacyServiceRequests_Programs_ProgramId",
-                        column: x => x.ProgramId,
-                        principalTable: "Programs",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ProgramDistributors",
-                columns: table => new
-                {
-                    DistributorsId = table.Column<int>(type: "int", nullable: false),
-                    ProgramId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ProgramDistributors", x => new { x.DistributorsId, x.ProgramId });
-                    table.ForeignKey(
-                        name: "FK_ProgramDistributors_Distributors_DistributorsId",
-                        column: x => x.DistributorsId,
-                        principalTable: "Distributors",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ProgramDistributors_Programs_ProgramId",
-                        column: x => x.ProgramId,
-                        principalTable: "Programs",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "ProgramPharmacies",
                 columns: table => new
                 {
-                    PharmaciesId = table.Column<int>(type: "int", nullable: false),
-                    ProgramId = table.Column<int>(type: "int", nullable: false)
+                    CareProgramId = table.Column<int>(type: "int", nullable: false),
+                    PharmaciesId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProgramPharmacies", x => new { x.PharmaciesId, x.ProgramId });
+                    table.PrimaryKey("PK_ProgramPharmacies", x => new { x.CareProgramId, x.PharmaciesId });
+                    table.ForeignKey(
+                        name: "FK_ProgramPharmacies_CarePrograms_CareProgramId",
+                        column: x => x.CareProgramId,
+                        principalTable: "CarePrograms",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ProgramPharmacies_Pharmacies_PharmaciesId",
                         column: x => x.PharmaciesId,
                         principalTable: "Pharmacies",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ProgramPharmacies_Programs_ProgramId",
-                        column: x => x.ProgramId,
-                        principalTable: "Programs",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.InsertData(
+                table: "AspNetRoles",
+                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
+                values: new object[] { "4", null, "PharmacyAdmin", "PHARMACYADMIN" });
 
             migrationBuilder.InsertData(
                 table: "Distributors",
@@ -225,9 +230,9 @@ namespace ECARE.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_PatientRegistrations_ProgramId",
+                name: "IX_PatientRegistrations_CareProgramId",
                 table: "PatientRegistrations",
-                column: "ProgramId");
+                column: "CareProgramId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetUsers_PharmacyBranchId",
@@ -240,24 +245,24 @@ namespace ECARE.Migrations
                 column: "PharmacyId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_PharmacyServiceRequests_CareProgramId",
+                table: "PharmacyServiceRequests",
+                column: "CareProgramId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PharmacyServiceRequests_PRId",
                 table: "PharmacyServiceRequests",
                 column: "PRId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PharmacyServiceRequests_ProgramId",
-                table: "PharmacyServiceRequests",
-                column: "ProgramId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ProgramDistributors_ProgramId",
+                name: "IX_ProgramDistributors_DistributorsId",
                 table: "ProgramDistributors",
-                column: "ProgramId");
+                column: "DistributorsId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProgramPharmacies_ProgramId",
+                name: "IX_ProgramPharmacies_PharmaciesId",
                 table: "ProgramPharmacies",
-                column: "ProgramId");
+                column: "PharmaciesId");
 
             migrationBuilder.AddForeignKey(
                 name: "FK_AspNetUsers_pharmacyBranches_PharmacyBranchId",
@@ -267,10 +272,10 @@ namespace ECARE.Migrations
                 principalColumn: "Id");
 
             migrationBuilder.AddForeignKey(
-                name: "FK_PatientRegistrations_Programs_ProgramId",
+                name: "FK_PatientRegistrations_CarePrograms_CareProgramId",
                 table: "PatientRegistrations",
-                column: "ProgramId",
-                principalTable: "Programs",
+                column: "CareProgramId",
+                principalTable: "CarePrograms",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Cascade);
         }
@@ -283,7 +288,7 @@ namespace ECARE.Migrations
                 table: "AspNetUsers");
 
             migrationBuilder.DropForeignKey(
-                name: "FK_PatientRegistrations_Programs_ProgramId",
+                name: "FK_PatientRegistrations_CarePrograms_CareProgramId",
                 table: "PatientRegistrations");
 
             migrationBuilder.DropTable(
@@ -302,21 +307,26 @@ namespace ECARE.Migrations
                 name: "Distributors");
 
             migrationBuilder.DropTable(
-                name: "Pharmacies");
+                name: "CarePrograms");
 
             migrationBuilder.DropTable(
-                name: "Programs");
+                name: "Pharmacies");
 
             migrationBuilder.DropIndex(
-                name: "IX_PatientRegistrations_ProgramId",
+                name: "IX_PatientRegistrations_CareProgramId",
                 table: "PatientRegistrations");
 
             migrationBuilder.DropIndex(
                 name: "IX_AspNetUsers_PharmacyBranchId",
                 table: "AspNetUsers");
 
+            migrationBuilder.DeleteData(
+                table: "AspNetRoles",
+                keyColumn: "Id",
+                keyValue: "4");
+
             migrationBuilder.DropColumn(
-                name: "ProgramId",
+                name: "CareProgramId",
                 table: "PatientRegistrations");
 
             migrationBuilder.DropColumn(

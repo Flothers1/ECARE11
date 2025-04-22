@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ECARE.ViewModel
 {
-    public class PharmacySericeRequestViewModel
+    public class PharmacyServiceRequestViewModel
     {
         [MaxLength(255)]
         public string Medication { get; set; }

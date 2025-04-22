@@ -17,7 +17,7 @@ namespace ECARE.Models
         public DbSet<Lab> Lab { get; set; }
         public DbSet<LabBranch> LabBranch { get; set; }
         public DbSet<PharmacyServiceRequest> PharmacyServiceRequests { get; set; }
-        public DbSet<Program> Programs { get; set; }
+        public DbSet<CareProgram> CarePrograms { get; set; }
         public DbSet<PharmacyBranch> pharmacyBranches { get; set; }
         public DbSet<Pharmacy> Pharmacies { get; set; }
         public DbSet<Distributor> Distributors { get; set; }
@@ -35,21 +35,21 @@ namespace ECARE.Models
                 }
                 );
                 
-            builder.Entity<Program>()
+            builder.Entity<CareProgram>()
                 .HasMany(psr => psr.Pharmacies)
                 .WithMany()
                 .UsingEntity(j => j.ToTable("ProgramPharmacies"));
 
-            builder.Entity<Program>()
+            builder.Entity<CareProgram>()
                 .HasMany(psr => psr.Distributors)
                 .WithMany()
                 .UsingEntity(j => j.ToTable("ProgramDistributors"));
 
             // Configure PatientRegistrations -> Program
             builder.Entity<PatientRegistrations>()
-                .HasOne(pr => pr.Program)
+                .HasOne(pr => pr.CareProgram)
                 .WithMany(p => p.PatientRegistrations)
-                .HasForeignKey(pr => pr.ProgramId)
+                .HasForeignKey(pr => pr.CareProgramId)
                 .OnDelete(DeleteBehavior.Cascade);
             // Seed Pharmacies and Branches
             var pharmacies = new List<Pharmacy>
@@ -63,9 +63,9 @@ namespace ECARE.Models
                   new Pharmacy { Id = 7, Name = "mohamed mahrous pharmacy" }
             };
             builder.Entity<PharmacyServiceRequest>()
-                .HasOne(psr => psr.Program)
+                .HasOne(psr => psr.CareProgram)
                 .WithMany(p => p.PharmaciesServiceRequests)
-                .HasForeignKey(psr => psr.ProgramId)
+                .HasForeignKey(psr => psr.CareProgramId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.NoAction);
 

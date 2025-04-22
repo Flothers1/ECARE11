@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ECARE.Migrations
 {
     [DbContext(typeof(ECAREContext))]
-    [Migration("20250422032452_ADDPharmacyServiceRequest,PharmacyBranch,DistributorAndProgramEntities")]
-    partial class ADDPharmacyServiceRequestPharmacyBranchDistributorAndProgramEntities
+    [Migration("20250422042800_AddEntities")]
+    partial class AddEntities
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,19 +25,34 @@ namespace ECARE.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("DistributorProgram", b =>
+            modelBuilder.Entity("CareProgramDistributor", b =>
                 {
+                    b.Property<int>("CareProgramId")
+                        .HasColumnType("int");
+
                     b.Property<int>("DistributorsId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ProgramId")
-                        .HasColumnType("int");
+                    b.HasKey("CareProgramId", "DistributorsId");
 
-                    b.HasKey("DistributorsId", "ProgramId");
-
-                    b.HasIndex("ProgramId");
+                    b.HasIndex("DistributorsId");
 
                     b.ToTable("ProgramDistributors", (string)null);
+                });
+
+            modelBuilder.Entity("CareProgramPharmacy", b =>
+                {
+                    b.Property<int>("CareProgramId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PharmaciesId")
+                        .HasColumnType("int");
+
+                    b.HasKey("CareProgramId", "PharmaciesId");
+
+                    b.HasIndex("PharmaciesId");
+
+                    b.ToTable("ProgramPharmacies", (string)null);
                 });
 
             modelBuilder.Entity("ECARE.Models.ApplicationUser", b =>
@@ -116,6 +131,52 @@ namespace ECARE.Migrations
                     b.HasIndex("PharmacyBranchId");
 
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("ECARE.Models.CareProgram", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("HCPList")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MedicationName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<int>("MedicationPackConsumptionDuration")
+                        .HasColumnType("int");
+
+                    b.Property<string>("MedicationPackSize")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<decimal>("OriginalPrice")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<decimal>("PriceAfterDiscount")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<string>("ProductManager")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CarePrograms");
                 });
 
             modelBuilder.Entity("ECARE.Models.Distributor", b =>
@@ -207,6 +268,9 @@ namespace ECARE.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("[Age Group]");
+
+                    b.Property<int>("CareProgramId")
+                        .HasColumnType("int");
 
                     b.Property<string>("CaregiverName")
                         .HasColumnType("nvarchar(max)")
@@ -303,9 +367,6 @@ namespace ECARE.Migrations
                     b.Property<string>("Prescription")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ProgramId")
-                        .HasColumnType("int");
-
                     b.Property<string>("ProgramName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -336,7 +397,7 @@ namespace ECARE.Migrations
 
                     b.HasKey("PatientRegistrationsId");
 
-                    b.HasIndex("ProgramId");
+                    b.HasIndex("CareProgramId");
 
                     b.ToTable("PatientRegistrations");
                 });
@@ -555,6 +616,9 @@ namespace ECARE.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("CareProgramId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
@@ -581,62 +645,13 @@ namespace ECARE.Migrations
                     b.Property<bool>("Payment")
                         .HasColumnType("bit");
 
-                    b.Property<int>("ProgramId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
+
+                    b.HasIndex("CareProgramId");
 
                     b.HasIndex("PRId");
 
-                    b.HasIndex("ProgramId");
-
                     b.ToTable("PharmacyServiceRequests");
-                });
-
-            modelBuilder.Entity("ECARE.Models.Program", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("HCPList")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("MedicationName")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<int>("MedicationPackConsumptionDuration")
-                        .HasColumnType("int");
-
-                    b.Property<string>("MedicationPackSize")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<decimal>("OriginalPrice")
-                        .HasPrecision(18, 3)
-                        .HasColumnType("decimal(18,3)");
-
-                    b.Property<decimal>("PriceAfterDiscount")
-                        .HasPrecision(18, 3)
-                        .HasColumnType("decimal(18,3)");
-
-                    b.Property<string>("ProductManager")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Programs");
                 });
 
             modelBuilder.Entity("ECARE.Models.Service_Request", b =>
@@ -720,6 +735,14 @@ namespace ECARE.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "4",
+                            Name = "PharmacyAdmin",
+                            NormalizedName = "PHARMACYADMIN"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -828,32 +851,32 @@ namespace ECARE.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("PharmacyProgram", b =>
+            modelBuilder.Entity("CareProgramDistributor", b =>
                 {
-                    b.Property<int>("PharmaciesId")
-                        .HasColumnType("int");
+                    b.HasOne("ECARE.Models.CareProgram", null)
+                        .WithMany()
+                        .HasForeignKey("CareProgramId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Property<int>("ProgramId")
-                        .HasColumnType("int");
-
-                    b.HasKey("PharmaciesId", "ProgramId");
-
-                    b.HasIndex("ProgramId");
-
-                    b.ToTable("ProgramPharmacies", (string)null);
-                });
-
-            modelBuilder.Entity("DistributorProgram", b =>
-                {
                     b.HasOne("ECARE.Models.Distributor", null)
                         .WithMany()
                         .HasForeignKey("DistributorsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
 
-                    b.HasOne("ECARE.Models.Program", null)
+            modelBuilder.Entity("CareProgramPharmacy", b =>
+                {
+                    b.HasOne("ECARE.Models.CareProgram", null)
                         .WithMany()
-                        .HasForeignKey("ProgramId")
+                        .HasForeignKey("CareProgramId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ECARE.Models.Pharmacy", null)
+                        .WithMany()
+                        .HasForeignKey("PharmaciesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -886,13 +909,13 @@ namespace ECARE.Migrations
 
             modelBuilder.Entity("ECARE.Models.PatientRegistrations", b =>
                 {
-                    b.HasOne("ECARE.Models.Program", "Program")
+                    b.HasOne("ECARE.Models.CareProgram", "CareProgram")
                         .WithMany("PatientRegistrations")
-                        .HasForeignKey("ProgramId")
+                        .HasForeignKey("CareProgramId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Program");
+                    b.Navigation("CareProgram");
                 });
 
             modelBuilder.Entity("ECARE.Models.PharmacyBranch", b =>
@@ -908,21 +931,21 @@ namespace ECARE.Migrations
 
             modelBuilder.Entity("ECARE.Models.PharmacyServiceRequest", b =>
                 {
+                    b.HasOne("ECARE.Models.CareProgram", "CareProgram")
+                        .WithMany("PharmaciesServiceRequests")
+                        .HasForeignKey("CareProgramId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("ECARE.Models.PatientRegistrations", "PatientRegistrations")
                         .WithMany("PharmacyServiceRequests")
                         .HasForeignKey("PRId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ECARE.Models.Program", "Program")
-                        .WithMany("PharmaciesServiceRequests")
-                        .HasForeignKey("ProgramId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                    b.Navigation("CareProgram");
 
                     b.Navigation("PatientRegistrations");
-
-                    b.Navigation("Program");
                 });
 
             modelBuilder.Entity("ECARE.Models.Service_Request", b =>
@@ -995,19 +1018,11 @@ namespace ECARE.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("PharmacyProgram", b =>
+            modelBuilder.Entity("ECARE.Models.CareProgram", b =>
                 {
-                    b.HasOne("ECARE.Models.Pharmacy", null)
-                        .WithMany()
-                        .HasForeignKey("PharmaciesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("PatientRegistrations");
 
-                    b.HasOne("ECARE.Models.Program", null)
-                        .WithMany()
-                        .HasForeignKey("ProgramId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("PharmaciesServiceRequests");
                 });
 
             modelBuilder.Entity("ECARE.Models.Lab", b =>
@@ -1035,13 +1050,6 @@ namespace ECARE.Migrations
             modelBuilder.Entity("ECARE.Models.PharmacyBranch", b =>
                 {
                     b.Navigation("ApplicationUsers");
-                });
-
-            modelBuilder.Entity("ECARE.Models.Program", b =>
-                {
-                    b.Navigation("PatientRegistrations");
-
-                    b.Navigation("PharmaciesServiceRequests");
                 });
 #pragma warning restore 612, 618
         }
