@@ -1,1 +1,111 @@
-﻿
+﻿@model PharmacyServiceRequestViewModel
+@{
+    ViewData["Title"] = "Create Pharmacy Service Request";
+}
+
+<header class="mb-4">
+    <div class="container-fluid">
+        <div class="d-flex justify-content-between align-items-center p-3 rounded" style="background-color: #957200;">
+            <h1 class="m-0 text-white">Admin Portal</h1>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2>Create Pharmacy Service Request</h2>
+            <hr class="border-2 border-top border-secondary">
+        </div>
+    </div>
+
+    <form asp-action="Create" method="post" enctype="multipart/form-data">
+        <div class="row g-4">
+            <!-- Left Column -->
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Program Name</label>
+                    <select asp-for="SelectedCareProgramId" asp-items="Model.CareProgramOptions" class="form-control" id="CareProgramSelect">
+                        <option value="">-- Select Program --</option>
+                    </select>
+
+                    <span asp-validation-for="PatientRegistrationsId" class="text-danger"></span>
+                </div>
+                <div class="form-group mt-4">
+                    <label asp-for="PatientRegistrationsId" class="form-label fw-bold"></label>
+                    <select asp-for="PatientRegistrationsId" class="form-control" id="patientId" placeholder="Select patient">
+                    <option value=""></option>
+                    </select>
+                    <span asp-validation-for="PatientRegistrationsId" class="text-danger small"></span>
+                </div>
+           
+            
+            </div>
+            <!-- Right Column -->
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="EVoucherPDF" class="form-label fw-bold"></label>
+                    <input asp-for="EVoucherPDF" class="form-control" type="file" />
+                    <span asp-validation-for="EVoucherPDF" class="text-danger small"></span>
+                </div>
+                <div class="form-group mt-4">
+                    <input asp-for="Payment" type="checkbox" class="form-check-input" />
+                    <label asp-for="Payment" class="form-check-label">Payment Completed</label>
+                </div>
+            </div>
+        </div>
+        <!-- Form Footer -->
+        <div class="row mt-5">
+            <div class="col-12 text-center">
+                <button type="submit" class="btn btn-primary px-5 py-2">
+                    <i class="bi bi-save me-2"></i>Create Program
+                </button>
+                <a asp-action="Index" class="btn btn-outline-secondary px-5 py-2 ms-3">
+                    <i class="bi bi-x-circle me-2"></i>Cancel
+                </a>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Styles {
+    <style>
+        .form-control:focus, .form-select:focus {
+            border-color: #957200;
+            box-shadow: 0 0 0 0.25rem rgba(149, 114, 0, 0.25);
+        }
+
+        .btn-primary {
+            background-color: #957200;
+            border-color: #957200;
+        }
+
+       .btn-primary:hover {
+           background-color: #7a5e00;
+           border-color: #7a5e00;
+       }
+    </style>
+}
+
+@section Scripts {
+    <script>
+         $('#CareProgramSelect').on('change', function () {
+            var CareProgramId = $(this).val();
+            var $PatientDropDown = $('#patientId');
+
+            $PatientDropDown.empty();
+            $PatientDropDown.append('<option value="">-- Select Patient --</option>');
+
+            if (CareProgramId) {
+                $.get('/PharmacyServiceRequestController/GetPatients', { CareProgramId: CareProgramId }, function (data) {
+                    $.each(data, function (index, patient) {
+                        $PatientDropDown.append('<option value="' + patient.id + '">' + patient.PatientName + '</option>');
+                    });
+                });
+            }
+        });
+    </script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -37,6 +37,7 @@ namespace ECARE.Controllers
             {
                 var careProgram = new CareProgram
                 {
+                    Name = viewModel.Name,
                     StartDate = viewModel.StartDate,
                     ProductManager = viewModel.ProductManager,
                     MedicationName = viewModel.MedicationName,

@@ -4,6 +4,7 @@ using ECARE.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ECARE.Migrations
 {
     [DbContext(typeof(ECAREContext))]
-    partial class ECAREContextModelSnapshot : ModelSnapshot
+    [Migration("20250422104348_AddNamePropertyToCareProgram")]
+    partial class AddNamePropertyToCareProgram
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -475,9 +478,6 @@ namespace ECARE.Migrations
                     b.Property<int>("PharmacyId")
                         .HasColumnType("int");
 
-                    b.Property<int>("PharmacyServiceRequestId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("PharmacyId");
@@ -489,148 +489,127 @@ namespace ECARE.Migrations
                         {
                             Id = 1,
                             Name = "maadi",
-                            PharmacyId = 1,
-                            PharmacyServiceRequestId = 0
+                            PharmacyId = 1
                         },
                         new
                         {
                             Id = 2,
                             Name = "mohandseen",
-                            PharmacyId = 1,
-                            PharmacyServiceRequestId = 0
+                            PharmacyId = 1
                         },
                         new
                         {
                             Id = 3,
                             Name = "Masr algadida",
-                            PharmacyId = 2,
-                            PharmacyServiceRequestId = 0
+                            PharmacyId = 2
                         },
                         new
                         {
                             Id = 4,
                             Name = "Zayed",
-                            PharmacyId = 2,
-                            PharmacyServiceRequestId = 0
+                            PharmacyId = 2
                         },
                         new
                         {
                             Id = 5,
                             Name = "Rehab",
-                            PharmacyId = 2,
-                            PharmacyServiceRequestId = 0
+                            PharmacyId = 2
                         },
                         new
                         {
                             Id = 6,
                             Name = "Nasr city",
-                            PharmacyId = 2,
-                            PharmacyServiceRequestId = 0
+                            PharmacyId = 2
                         },
                         new
                         {
                             Id = 7,
                             Name = "Madinty",
-                            PharmacyId = 2,
-                            PharmacyServiceRequestId = 0
+                            PharmacyId = 2
                         },
                         new
                         {
                             Id = 8,
                             Name = "Portsaid",
-                            PharmacyId = 2,
-                            PharmacyServiceRequestId = 0
+                            PharmacyId = 2
                         },
                         new
                         {
                             Id = 9,
                             Name = "Seuz",
-                            PharmacyId = 2,
-                            PharmacyServiceRequestId = 0
+                            PharmacyId = 2
                         },
                         new
                         {
                             Id = 10,
                             Name = "islamilia",
-                            PharmacyId = 2,
-                            PharmacyServiceRequestId = 0
+                            PharmacyId = 2
                         },
                         new
                         {
                             Id = 11,
                             Name = "zagazig",
-                            PharmacyId = 2,
-                            PharmacyServiceRequestId = 0
+                            PharmacyId = 2
                         },
                         new
                         {
                             Id = 12,
                             Name = "manzla",
-                            PharmacyId = 2,
-                            PharmacyServiceRequestId = 0
+                            PharmacyId = 2
                         },
                         new
                         {
                             Id = 13,
                             Name = "Damietta",
-                            PharmacyId = 2,
-                            PharmacyServiceRequestId = 0
+                            PharmacyId = 2
                         },
                         new
                         {
                             Id = 14,
                             Name = "mansoura",
-                            PharmacyId = 2,
-                            PharmacyServiceRequestId = 0
+                            PharmacyId = 2
                         },
                         new
                         {
                             Id = 15,
                             Name = "Masr algadida",
-                            PharmacyId = 3,
-                            PharmacyServiceRequestId = 0
+                            PharmacyId = 3
                         },
                         new
                         {
                             Id = 16,
                             Name = "Fifth settelment",
-                            PharmacyId = 3,
-                            PharmacyServiceRequestId = 0
+                            PharmacyId = 3
                         },
                         new
                         {
                             Id = 17,
                             Name = "mansoura",
-                            PharmacyId = 3,
-                            PharmacyServiceRequestId = 0
+                            PharmacyId = 3
                         },
                         new
                         {
                             Id = 18,
                             Name = "Alex",
-                            PharmacyId = 4,
-                            PharmacyServiceRequestId = 0
+                            PharmacyId = 4
                         },
                         new
                         {
                             Id = 19,
                             Name = "Alex",
-                            PharmacyId = 5,
-                            PharmacyServiceRequestId = 0
+                            PharmacyId = 5
                         },
                         new
                         {
                             Id = 20,
                             Name = "Alex",
-                            PharmacyId = 6,
-                            PharmacyServiceRequestId = 0
+                            PharmacyId = 6
                         },
                         new
                         {
                             Id = 21,
                             Name = "Alex",
-                            PharmacyId = 7,
-                            PharmacyServiceRequestId = 0
+                            PharmacyId = 7
                         });
                 });
 
@@ -671,17 +650,11 @@ namespace ECARE.Migrations
                     b.Property<bool>("Payment")
                         .HasColumnType("bit");
 
-                    b.Property<int>("PharmacyBranchId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CareProgramId");
 
                     b.HasIndex("PRId");
-
-                    b.HasIndex("PharmacyBranchId")
-                        .IsUnique();
 
                     b.ToTable("PharmacyServiceRequests");
                 });
@@ -975,17 +948,9 @@ namespace ECARE.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ECARE.Models.PharmacyBranch", "PharmacyBranch")
-                        .WithOne("PharmacyServiceRequest")
-                        .HasForeignKey("ECARE.Models.PharmacyServiceRequest", "PharmacyBranchId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("CareProgram");
 
                     b.Navigation("PatientRegistrations");
-
-                    b.Navigation("PharmacyBranch");
                 });
 
             modelBuilder.Entity("ECARE.Models.Service_Request", b =>
@@ -1090,9 +1055,6 @@ namespace ECARE.Migrations
             modelBuilder.Entity("ECARE.Models.PharmacyBranch", b =>
                 {
                     b.Navigation("ApplicationUsers");
-
-                    b.Navigation("PharmacyServiceRequest")
-                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

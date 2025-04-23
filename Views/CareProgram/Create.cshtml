@@ -24,6 +24,11 @@
             <!-- Left Column -->
             <div class="col-md-6">
                 <div class="form-group">
+                    <label asp-for="Name" class="form-label fw-bold"></label>
+                    <input asp-for="Name" class="form-control" placeholder="Enter program name" />
+                    <span asp-validation-for="Name" class="text-danger small"></span>
+                </div>
+                <div class="form-group mt-4">
                     <label asp-for="StartDate" class="form-label fw-bold"></label>
                     <input asp-for="StartDate" class="form-control" type="date" />
                     <span asp-validation-for="StartDate" class="text-danger small"></span>
@@ -36,21 +41,21 @@
                 </div>
 
                 <div class="form-group mt-4">
-                    <label asp-for="MedicationPackConsumptionDuration" class="form-label fw-bold"></label>
-                    <div class="input-group">
-                        <input asp-for="MedicationPackConsumptionDuration" class="form-control" placeholder="Days" />
-                        <span class="input-group-text">days</span>
-                    </div>
-                    <span asp-validation-for="MedicationPackConsumptionDuration" class="text-danger small"></span>
-                </div>
-
-                <div class="form-group mt-4">
                     <label asp-for="OriginalPrice" class="form-label fw-bold"></label>
                     <div class="input-group">
                         <span class="input-group-text">$</span>
                         <input asp-for="OriginalPrice" class="form-control" placeholder="0.00" />
                     </div>
                     <span asp-validation-for="OriginalPrice" class="text-danger small"></span>
+                </div>
+
+                <div class="form-group mt-4">
+                    <label asp-for="PriceAfterDiscount" class="form-label fw-bold"></label>
+                    <div class="input-group">
+                        <span class="input-group-text">$</span>
+                        <input asp-for="PriceAfterDiscount" class="form-control" placeholder="0.00" />
+                    </div>
+                    <span asp-validation-for="PriceAfterDiscount" class="text-danger small"></span>
                 </div>
 
                 <div class="form-group mt-4">
@@ -79,13 +84,14 @@
                 </div>
 
                 <div class="form-group mt-4">
-                    <label asp-for="PriceAfterDiscount" class="form-label fw-bold"></label>
+                    <label asp-for="MedicationPackConsumptionDuration" class="form-label fw-bold"></label>
                     <div class="input-group">
-                        <span class="input-group-text">$</span>
-                        <input asp-for="PriceAfterDiscount" class="form-control" placeholder="0.00" />
+                        <input asp-for="MedicationPackConsumptionDuration" class="form-control" placeholder="Days" />
+                        <span class="input-group-text">days</span>
                     </div>
-                    <span asp-validation-for="PriceAfterDiscount" class="text-danger small"></span>
+                    <span asp-validation-for="MedicationPackConsumptionDuration" class="text-danger small"></span>
                 </div>
+
                 <div class="form-group mt-4">
                     <label asp-for="SelectedDistributorIds" class="form-label fw-bold"></label>
                     <select asp-for="SelectedDistributorIds" asp-items="Model.DistributorOptions"

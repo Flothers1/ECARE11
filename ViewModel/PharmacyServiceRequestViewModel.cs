@@ -6,25 +6,25 @@ namespace ECARE.ViewModel
 {
     public class PharmacyServiceRequestViewModel
     {
-        [MaxLength(255)]
-        public string Medication { get; set; }
-        [MaxLength(500)]
-        public string MedicationPackSize { get; set; }
-        public decimal PriceAfterDiscount { get; set; }
+        public int Id { get; set; }
+        [Display(Name = "Request Date")]
         public DateTime Date { get; set; } = DateTime.UtcNow.AddHours(2);
+        [Display(Name = "Payment Status")]
         public bool Payment { get; set; }
         public bool? IsDeleted { get; set; }
         public IFormFile EVoucherPDF { get; set; }
         [MaxLength(100)]
         public string? OTP { get; set; }
         public DateTime OTPExpiration { get; set; }
+        [Display(Name = "Verification Status")]
         public bool? IsVerified { get; set; }
-        public List<string> Pharmacies { get; set; }
-        public List<SelectListItem> PharmacyOptions { get; set; } = new List<SelectListItem>();
-        public List<string> Distributors { get; set; }
-        public List<SelectListItem> DistributorOptions { get; set; } = new List<SelectListItem>();
+        [Display(Name = "Select Care Program")]
+        public int SelectedCareProgramId { get; set; }
+        public SelectList CareProgramOptions { get; set; }
+        [Display(Name = "Select Patient")]
         public int PatientRegistrationsId { get; set; }
-        public PatientRegistrations? PatientRegistrations { get; set; }
+        public SelectList PatientRegistrationOptions { get; set; }
+
 
     }
 }

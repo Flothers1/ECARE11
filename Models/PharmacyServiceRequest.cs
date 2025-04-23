@@ -22,8 +22,11 @@ namespace ECARE.Models
         public int PRId { get; set; }
 
         [ForeignKey("PRId")]
-
         public PatientRegistrations? PatientRegistrations { get; set; }
+        public int PharmacyBranchId { get; set; }
+        [ForeignKey("PharmacyBranchId")]
+        public PharmacyBranch PharmacyBranch { get; set; }
+
 
     }
 }

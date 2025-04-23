@@ -7,6 +7,9 @@ namespace ECARE.ViewModel
     public class CareProgramViewModel
     {
         public int Id { get; set; }
+        [Required]
+        [StringLength(255)]
+        public string Name { get; set; }
 
         [Required(ErrorMessage = "Start date is required")]
         [Display(Name = "Start Date")]

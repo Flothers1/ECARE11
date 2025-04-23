@@ -1,0 +1,342 @@
+﻿@model List<PharmacyIndexViewModel>
+@{
+    ViewData["Title"] = "Pharmacy Portal";
+}
+
+
+<header class="text-white mb-4">
+    <!-- Removed custom-gray-header class -->
+    <div class="container-fluid">
+        <div class="d-flex justify-content-between align-items-center p-3 custom-header">
+            <h1 class="m-0 text-white">Pharmacy Portal</h1>
+            <form asp-controller="Account" asp-action="Logout" method="post">
+                <button type="submit" class="btn btn-light fw-bold px-4 py-2">Logout</button>
+            </form>
+        </div>
+    </div>
+</header>
+
+<div class="container-fluid">
+    <ul class="tab-container p-0 m-0 d-flex">
+        <li class="nav-item @(ViewContext.RouteData.Values["action"].ToString() == "Index" ? "active" : "")">
+            <a asp-action="Index" asp-controller="Pharmacy">
+                <i class="mdi mdi-account-multiple icon-side-bar"></i> Current Requests
+            </a>
+        </li>
+
+        <li class="nav-item @(ViewContext.RouteData.Values["action"].ToString() == "ClosedRequests" ? "active" : "")">
+            <a asp-action="ClosedRequests" asp-controller="PharmacyServiceRequest">
+                <i class="mdi mdi-ticket-confirmation icon-side-bar"></i> Closed Requests
+            </a>
+        </li>
+    </ul>
+
+    <div class="table-tab-container">
+        <div class="table-responsive">
+            <table id="patientsTable" class="table table-tab d-block text-center border-bottom-0 table-overflow">
+                <thead>
+                    <tr>
+                        <th>Patient Name</th>
+                        <th>Phone Number 1</th>
+                        <th>National ID</th>
+                        <th>Email</th>
+                        <th>Pharmacy</th>
+                        <th>Pharmacy Branch</th>
+                        <th>Medication</th>
+                        <th>Price after discount</th>
+                        <th>Payment</th>
+                        <th>EVoucherPDF</th>
+
+                        @if (ViewContext.RouteData.Values["action"]?.ToString() != "ClosedRequests")
+                        {
+                            <th>Mobile Verification</th>
+                            <th>Email Verification</th>
+                            <th>Mark Complete</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var serviceRequest in Model)
+                        {
+                                    <tr>
+                                        <td>@serviceRequest.PatientName</td>
+                                        <td>@serviceRequest.PhoneNumber1</td>
+                                        <td>@serviceRequest.NationalID</td>
+                                        <td>@serviceRequest.Email</td>
+                                        <td>@(serviceRequest?.PharmacyName ?? "No Pharmacy")</td>
+                                        <td>@(serviceRequest?.BranchName ?? "No Branch")</td>
+                                        <td>@(serviceRequest?.MedicationName ?? "No Medication")</td>
+                                        <td>@(serviceRequest?.PriceAfterDiscount.ToString() ?? "No Price After Discount")</td>
+                                        <td>@(serviceRequest?.Payment.ToString() ?? "No Payment")</td>
+                                        <td>
+                                            @if (serviceRequest.IsVerified.GetValueOrDefault())
+                                            {
+                                                if (!string.IsNullOrEmpty(serviceRequest.EVoucherPDF))
+                                                {
+                                                    <a href="@Url.Content(serviceRequest.EVoucherPDF)" download target="_blank" class="evoucher-icon-link">
+                                                        <span class="download-text">Download eVoucher</span>
+                                                        <span class="icon-wrapper">
+                                                            <i class="fa-solid fa-ticket"></i>
+                                                        </span>
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <span class="unavailable-dash">—</span>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <span class="unavailable-item danger">
+                                                    <span class="text-danger fw-bold">❌ Not Verified</span>
+                                                </span>
+                                            }
+                                        </td>
+                                        @if (ViewContext.RouteData.Values["action"]?.ToString() != "ClosedRequests")
+                                        {
+                                    <td>
+                                        <form asp-action="SendOTP" asp-controller="Pharmacy" method="post" style="display: inline;">
+                                            <input type="hidden" name="pharmacyServiceRequestId"
+                                                   value="serviceRequest.Id" />
+                                            <button type="submit" title="Send OTP" class="btn btn-link p-0">
+                                                <img src="~/img/otp_transparent.png" alt="Send OTP" style="width: 24px; height: 24px;">
+                                            </button>
+                                        </form>
+
+                                        @if (serviceRequest.IsVerified.GetValueOrDefault())
+                                        {
+                                            <span class="text-success fw-bold">✔ Verified</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-danger fw-bold">❌ Not Verified</span>
+                                        }
+                                    </td>
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(serviceRequest.Email))
+                                                {
+                                                    <a asp-action="SendVerificationCode"
+                                                       asp-controller="Pharmacy"
+                                                       asp-route-id="@serviceRequest.PatientRegistrationsId"
+                                                       asp-route-serviceRequestid="@serviceRequest.PharmacyServiceRequestId">
+                                                        <img src="~/img/MSG_transparent.png" alt="Email Verification" style="width: 24px; height: 24px;">
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <img src="~/img/MSG_transparent.png" alt="Email Not Available"
+                                                         style="width: 24px; height: 24px; opacity: 0.4; cursor: not-allowed;" title="Email not available" />
+                                                }
+
+                                                @if (serviceRequest.IsVerified.GetValueOrDefault())
+                                                {
+                                                    <span class="text-success fw-bold">✔ Verified</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-danger fw-bold">❌ Not Verified</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <form asp-action="SoftDeletePatient" asp-controller="Pharmacy" method="post" style="display: inline;">
+                                                    <input type="hidden" name="patientId" value="@serviceRequest.PharmacyServiceRequestId" />
+                                                    <button type="submit" style="border: none; background: none; padding: 0;">
+                                                        <img src="~/img/resolve_transparent.png" alt="Close Request" style="width: 24px; height: 24px; cursor: pointer;">
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        }
+                                    </tr>
+                                }
+                            }
+                    else
+                    {
+                        <tr>
+                            <td colspan="31" class="text-center">No patients found.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</div>
+
+<style>
+    .custom-header {
+        background-color: #957200;
+        border-radius: 8px;
+    }
+
+    .container-fluid {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
+
+    .btn-light {
+        color: #957200;
+        border: 2px solid #957200;
+        transition: all 0.3s ease;
+    }
+
+    .table-responsive {
+        overflow-x: visible;
+        background-color: #eee;
+    }
+
+    .btn-light:hover {
+        background-color: #957200;
+        color: white;
+    }
+
+
+    .table-tab-container {
+        height: calc(100% - 120px);
+        background-color: #eee;
+    }
+
+    #tickets_wrapper {
+        height: calc(100% - 80px);
+    }
+
+    .table-overflow {
+        height: 100%;
+    }
+
+        .table-overflow tbody tr {
+            background-color: #eee;
+        }
+
+    th {
+        width: calc(100% / 7);
+    }
+
+    .assing-btn {
+        font-size: 13px;
+        padding: 5px;
+    }
+
+    .btn-gray2 {
+        float: left;
+        margin-right: 40px;
+    }
+    /* invoice */
+    .invoice-icon-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px; /* Reduced from 10px to 5px */
+        text-decoration: none;
+        color: #957200;
+        transition: all 0.3s ease;
+    }
+
+    .icon-wrapper {
+        display: flex;
+        font-size: 1.5rem;
+        padding: 8px;
+        border-radius: 50%;
+        background-color: rgba(149, 114, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .download-text {
+        font-size: 0.875rem;
+        margin-right: 0; /* Removed the 4px margin */
+        transition: color 0.3s ease;
+    }
+
+    .invoice-icon-link:hover .icon-wrapper {
+        color: white;
+        background-color: #957200;
+        transform: scale(1.1);
+        box-shadow: 0 2px 8px rgba(149, 114, 0, 0.3);
+    }
+
+    .invoice-icon-link:hover .download-text {
+        color: #957200;
+        text-decoration: underline;
+    }
+    /* IVoucher */
+    .evoucher-icon-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        text-decoration: none;
+        color: #957200;
+        transition: all 0.3s ease;
+    }
+
+        /* Hover effects for eVoucher (same as invoice) */
+        .evoucher-icon-link:hover .icon-wrapper {
+            color: white;
+            background-color: #957200;
+            transform: scale(1.1);
+            box-shadow: 0 2px 8px rgba(149, 114, 0, 0.3);
+        }
+
+        .evoucher-icon-link:hover .download-text {
+            color: #957200;
+            text-decoration: underline;
+        }
+    /* dash of unavailable */
+    .unavailable-dash {
+        display: inline-block;
+        color: #6c757d; /* text-muted color */
+        font-weight: 400;
+        font-size: 1rem;
+    }
+    /* The notification by SignalR */
+    .small-swal-popup {
+        width: 250px !important; /* Small width */
+        height: 200px;
+        font-size: 0.5rem !important; /* Reduced font size */
+        padding: 0.5rem !important; /* Compact padding */
+        border-radius: 5px !important; /* Slightly rounded corners */
+        /* Uses default background */
+        color: #333 !important; /* Dark gray text for good contrast */
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2) !important; /* Subtle shadow for depth */
+        text-align: center;
+    }
+</style>
+
+
+@section Scripts {
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js"
+            integrity="sha512-7SRCYIJtR6F8ocwW7UxW6wGKqbSyqREDbfCORCbGLatU0iugBLwyOXpzhkPyHIFdBO0K2VCu57fvP2Twgx1o2A=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script>
+        $(document).ready(function(){
+
+              $(function () {
+            var table = $('#patientsTable').DataTable({
+                "columnDefs": [{ "type": "date", "targets": 1 }],
+                "order": [[1, "desc"]]
+            });
+
+            var buttonElement = $('<button>', {
+                type: 'submit',
+                class: 'btn-gray2 mb-3',
+                id: 'data2excel',
+                text: 'Export to Excel'
+            });
+
+            $('#patientsTable_wrapper').prepend(buttonElement);
+
+            $('#data2excel').click(function (e) {
+                var currentPageLength = table.page.len();
+                table.page.len(-1).draw();
+                $("#patientsTable").table2excel({ filename: "PatientRegistrations.xls" });
+                table.page.len(currentPageLength).draw();
+            });
+        });
+
+        });
+
+    </script>
+
+
+}
