@@ -20,11 +20,15 @@ namespace ECARE.ViewModel
         [Display(Name = "Product Manager")]
         public string ProductManager { get; set; }
 
-
+        [MaxLength(100)]
+        [Required]
+        public string SponsorCompany { get; set; }
         [Required(ErrorMessage = "Medication name is required")]
         [StringLength(255, ErrorMessage = "Medication name cannot exceed 255 characters")]
         [Display(Name = "Medication Name")]
         public string MedicationName { get; set; }
+        [ValidateNever]
+        public MultiSelectList MedicationOptions { get; set; }
 
         [StringLength(255, ErrorMessage = "Pack size cannot exceed 255 characters")]
         [Display(Name = "Pack Size")]

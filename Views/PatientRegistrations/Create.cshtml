@@ -36,14 +36,11 @@
             </div>
             <div class="col-md-6">
                 <div class="form-group">
-                    <label for="ProgramName">Program Name</label>
-                    <select asp-for="ProgramName" class="form-control">
+                    <label asp-for="CareProgram">Program Name</label>
+                    <select asp-for="CareProgramId" asp-items="ViewBag.CarePrograms" class="form-control">
                         <option value="">-- Select a Program --</option>
-                        <option value="Nesmet Hawa">Nesmet Hawa (AZ)</option>
-                        <option value="Mesh Rehletak Le Wahdak">Mesh Rehletak Le Wahdak (AZ)</option>
-                        <option value="Ghaly Alena Erleada">Ghaly Alena Erleada (Janssen)</option>
                     </select>
-                    <span asp-validation-for="ProgramName" class="text-danger"></span>
+                    <span asp-validation-for="CareProgramId" class="text-danger"></span>
                 </div>
             </div>
         </div>
@@ -56,18 +53,7 @@
                     <span asp-validation-for="PatientName" class="text-danger"></span>
                 </div>
             </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label>Program Sponsor</label>
-                    <select asp-for="ProgramSponsor" asp-items="ViewBag.Sponsors" class="form-control">
-                        <option value="">-- Select Sponsor --</option>
-                    </select>
-                    <span asp-validation-for="ProgramSponsor" class="text-danger"></span>
-                </div>
-            </div>
-        </div>
 
-        <div class="row">
             <div class="col-md-6">
                 <div class="form-group">
                     <div class="form-group">
@@ -77,20 +63,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label asp-for="Medication">Medication</label>
-                    <select asp-for="Medication" class="form-control" required>
-                        <option value="">-- Select Medication --</option>
-                        <option value="Erleada">Erleada</option>
-                        <option value="NA">NA</option>
-                    </select>
-                    <span asp-validation-for="Medication" class="text-danger"></span>
-                </div>
-
-            </div>
         </div>
-
         <div class="row"> 
             <div class="col-md-6">
                 <div class="form-group">

@@ -14,6 +14,9 @@ namespace ECARE.Models
         [MaxLength(100)]
         [Required]
         public string ProductManager { get; set; }
+        [MaxLength(100)]
+        [Required]
+        public string  SponsorCompany { get; set; }
         [MaxLength(255)]
         [Required]
         public string MedicationName { get; set; }

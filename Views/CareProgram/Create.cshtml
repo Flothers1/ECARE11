@@ -6,7 +6,7 @@
 <header class="mb-4">
     <div class="container-fluid">
         <div class="d-flex justify-content-between align-items-center p-3 rounded" style="background-color: #957200;">
-            <h1 class="m-0 text-white">Elab Portal</h1>
+            <h1 class="m-0 text-white">Admin Portal</h1>
         </div>
     </div>
 </header>
@@ -36,7 +36,10 @@
 
                 <div class="form-group mt-4">
                     <label asp-for="MedicationName" class="form-label fw-bold"></label>
-                    <input asp-for="MedicationName" class="form-control" placeholder="Enter medication name" />
+                    <select asp-for="MedicationName" class="medication-select form-control"
+                            asp-items="Model.MedicationOptions">
+                        <option value="">Select or type a medication</option>
+                    </select>
                     <span asp-validation-for="MedicationName" class="text-danger small"></span>
                 </div>
 
@@ -75,6 +78,12 @@
                     <label asp-for="ProductManager" class="form-label fw-bold"></label>
                     <input asp-for="ProductManager" class="form-control" placeholder="Enter product manager name" />
                     <span asp-validation-for="ProductManager" class="text-danger small"></span>
+                </div>
+
+                <div class="form-group mt-4">
+                    <label asp-for="SponsorCompany" class="form-label fw-bold"></label>
+                    <input asp-for="SponsorCompany" class="form-control" placeholder="Enter Sponsor Company name" />
+                    <span asp-validation-for="SponsorCompany" class="text-danger small"></span>
                 </div>
 
                 <div class="form-group mt-4">
@@ -144,7 +153,15 @@
 }
 
 @section Scripts {
-   
+    <script>
+        $(document).ready(function() {
+            $('.medication-select').select2({
+                placeholder: 'Select or type a medication',
+                allowClear: true,
+                tags: true // This allows entering custom values
+            });
+        });
+    </script>
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }

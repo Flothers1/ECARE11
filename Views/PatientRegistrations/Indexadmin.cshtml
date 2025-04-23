@@ -20,6 +20,7 @@
     <div class="d-flex gap-2 mb-3">
         <a asp-controller="PatientRegistrations" asp-action="Create" class="btn text-white" style="background-color: #957200;">Register Patient</a>
         <a asp-controller="ServiceRequests" asp-action="Create" class="btn text-white" style="background-color: #957200;">Create Lab Service Request</a>
+        <a asp-controller="CareProgram" asp-action="Create" class="btn text-white" style="background-color: #957200;">Create New Program</a>
         <a asp-controller="Account" asp-action="Register" class="btn text-white" style="background-color: #957200;">Create New User</a>
 
     </div>
@@ -29,6 +30,12 @@
             <a class="active" asp-action="Indexadmin">
                 <i class="mdi mdi-ticket-account icon-side-bar"></i>
                 Patients List
+            </a>
+        </li>
+        <li class="nav-item @(ViewContext.RouteData.Values["action"].ToString() == "Index" ? "active" : "")">
+            <a class="active" asp-action="Index" asp-controller="CareProgram">
+                <i class="mdi mdi-ticket-account icon-side-bar"></i>
+                Program List
             </a>
         </li>
         <li class="nav-item @(ViewContext.RouteData.Values["action"].ToString() == "ServiceRequests" ? "active" : "")">
@@ -63,8 +70,6 @@
                         <th>Caregiver Phone</th>
                         <th>Program Name</th>
                         <th>Membership Number</th>
-                        <th>Program Sponsor</th>
-                        <th>Medication</th>
                         <th>Indication</th>
                         <th>Comment</th>
                         <th>Start Date Of Medication</th>
@@ -140,10 +145,8 @@
                                 <td>@patient.Territory</td>
                                 <td>@patient.CaregiverName</td>
                                 <td>@patient.CaregiverPhone</td>
-                                <td>@patient.ProgramName</td>
+                                <td>@patient.CareProgram.Name</td>
                                 <td>@patient.MembershipNumber</td>
-                                <td>@patient.ProgramSponsor</td>
-                                <td>@patient.Medication</td>
                                 <td>@patient.Indication</td>
                                 <td>@patient.Comment</td>
                                 <td>@patient.StartDateOfMedication.ToString("yyyy-MM-dd")</td>

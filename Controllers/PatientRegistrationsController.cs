@@ -30,27 +30,6 @@ namespace ECARE.Controllers
             _hostingEnvironment = hostingEnvironment;
         }
 
-
-        //public async Task<IActionResult> Index()
-        //{
-        //    var user = await _usersService.GetUserAfterLogin();
-        //    List<PatientRegistrations> patients;
-
-        //    if ((await _usersService.GetUserRole(user)).Contains("Admin"))
-        //    {
-        //        patients = await _context.PatientRegistrations.ToListAsync();
-        //    }
-        //    else
-        //    {
-        //        patients = await _context.PatientRegistrations
-        //            .Include(p => p.ServiceRequests)
-        //            .Where(p => p.IsDeleted == null &&
-        //                        p.ServiceRequests.Any(l => l.LabBranchId == user.LabBranchId))
-        //            .ToListAsync();
-        //    }
-
-        //    return View(patients);
-        //}
         [Authorize(Roles = AuthorizationConstants.LabAdmin) ]
         public async Task<IActionResult> Index()
         {
@@ -97,8 +76,6 @@ namespace ECARE.Controllers
                 .Select(p => new
                 {
                     MobileNumber = p.PhoneNumber1,
-                    p.ProgramName,
-                    p.ProgramSponsor,
                     p.NationalID,
                     p.MembershipNumber
                 })
@@ -111,11 +88,11 @@ namespace ECARE.Controllers
 
             return Json(patient);
         }
-
+        [HttpGet]
         public IActionResult Create()
         {
             
-    var countryHelper = new CountryHelper();
+            var countryHelper = new CountryHelper();
             var regionsByCountry = countryHelper.GetRegionByCountryCode("EG");
 
             List<string> regions = new List<string>();
@@ -125,7 +102,6 @@ namespace ECARE.Controllers
 
                 regions.Add(region.Name);
             }
-            var medications = new List<string> { "Erleada", "NA"};
             var indications = new List<string>
     {
         "COPD",
@@ -145,13 +121,15 @@ namespace ECARE.Controllers
     {
         "18-36", "37-46", "47-56", "57-66", "67-76", "77-86", "87-95"
     };
+            var carePrograms = _context.CarePrograms.ToList();
             ViewBag.AgeGroups = new SelectList(ageGroups);
 
             ViewBag.Sponsors = new SelectList(sponsors);
 
             ViewBag.Indications = new SelectList(indications);
 
-            ViewBag.Medications = new SelectList(medications, "Erleada");
+            ViewBag.CarePorgrams = new SelectList(carePrograms, "Id", "Name");
+          //  ViewBag.Medications = new SelectList(medications, "Erleada");
 
             ViewBag.Governorates = new SelectList(regions);
             ViewBag.TodayDate = DateTime.Today.ToString("yyyy-MM-dd"); 

@@ -1,7 +1,176 @@
-﻿
+﻿@model IEnumerable<CareProgramViewModel>
+
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Care Programs";
 }
 
-<h1>Index</h1>
+<header class="text-white mb-4">
+    <div class="container-fluid">
+        <div class="d-flex justify-content-between align-items-center p-3 custom-header">
+            <h1 class="m-0 text-white">Admin Portal</h1>
+            <form asp-controller="Account" asp-action="Logout" method="post">
+                <button type="submit" class="btn btn-light fw-bold px-4 py-2">Logout</button>
+            </form>
+        </div>
+    </div>
+</header>
+<div class="container-fluid">
+    <div class="d-flex gap-2 mb-3">
+        <a asp-controller="PatientRegistrations" asp-action="Create" class="btn text-white" style="background-color: #957200;">Register Patient</a>
+        <a asp-controller="ServiceRequests" asp-action="Create" class="btn text-white" style="background-color: #957200;">Create Lab Service Request</a>
+        <a asp-controller="CareProgram" asp-action="Create" class="btn text-white" style="background-color: #957200;">Create New Program</a>
+        <a asp-controller="Account" asp-action="Register" class="btn text-white" style="background-color: #957200;">Create New User</a>
 
+    </div>
+    <ul class="tab-container p-0 m-0 d-flex">
+        <li class="nav-item @(ViewContext.RouteData.Values["action"].ToString() == "Indexadmin" ? "active" : "")">
+            <a class="active" asp-action="Indexadmin" asp-controller="PatientRegistrations">
+                <i class="mdi mdi-ticket-account icon-side-bar"></i>
+                Patients List
+            </a>
+        </li>
+        <li class="nav-item @((ViewContext.RouteData.Values["action"].ToString() == "Index") ? "active" : "")">
+            <a class="active" asp-action="Index" asp-controller="CareProgram">
+                <i class="mdi mdi-ticket-account icon-side-bar"></i>
+                Program List
+            </a>
+        </li>
+        <li class="nav-item @(ViewContext.RouteData.Values["action"].ToString() == "ServiceRequests" ? "active" : "")">
+            <a asp-action="ServiceRequests" asp-controller="PatientRegistrations">
+                <i class="mdi mdi-ticket-confirmation icon-side-bar"></i> Service Requests
+            </a>
+        </li>
+    </ul>
+    <div class="table-tab-container">
+        <div class="table-responsive">
+            <table id="programsTable" class="table table-tab d-block text-center border-bottom-0 table-overflow">
+                <thead>
+                    <tr>
+                        <th>Program Name</th>
+                        <th>Start Date</th>
+                        <th>Product Manager</th>
+                        <th>Sponsor Company</th>
+                        <th>Medication</th>
+                        <th>Pack Size</th>
+                        <th>Duration (Days)</th>
+                        <th>Original Price</th>
+                        <th>Discounted Price</th>
+                        <th>HCP List</th>
+                        <th>Pharmacies</th>
+                        <th>Distributors</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.Name</td>
+                                <td>@item.StartDate.ToString("yyyy-MM-dd")</td>
+                                <td>@item.ProductManager</td>
+                                <td>@item.SponsorCompany</td>
+                                <td>@item.MedicationName</td>
+                                <td>@item.MedicationPackSize</td>
+                                <td>@item.MedicationPackConsumptionDuration</td>
+                                <td>@item.OriginalPrice.ToString("C")</td>
+                                <td>@item.PriceAfterDiscount.ToString("C")</td>
+                                <td>@item.HCPList</td>
+                                <td>
+                                    @if (item.SelectedPharmacyIds.Any())
+                                    {
+                                        @string.Join(", ", item.PharmacyOptions.Where(p => item.SelectedPharmacyIds.Contains(int.Parse(p.Value))).Select(p => p.Text))
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">None selected</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (item.SelectedDistributorIds.Any())
+                                    {
+                                        @string.Join(", ", item.DistributorOptions.Where(d => item.SelectedDistributorIds.Contains(int.Parse(d.Value))).Select(d => d.Text))
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">None selected</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="12" class="text-center">No programs found</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    .custom-header {
+        background-color: #957200;
+        border-radius: 8px;
+    }
+
+    .btn-light {
+        color: #957200;
+        border: 2px solid #957200;
+        transition: all 0.3s ease;
+    }
+
+        .btn-light:hover {
+            background-color: #957200;
+            color: white;
+        }
+
+    .table-tab-container {
+        height: calc(100% - 120px);
+    }
+
+    .table-overflow {
+        max-height: 600px;
+        overflow-y: auto;
+    }
+
+    th {
+        background-color: #f8f9fa;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+        margin: 2px;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('#programsTable').DataTable({
+                "columnDefs": [
+                    { "orderable": false, "targets": [11] },
+                    { "type": "date", "targets": 1 }
+                ],
+                "order": [[1, "desc"]],
+                "pageLength": 25
+            });
+
+            $('#exportExcel').click(function() {
+                var table = $('#programsTable').DataTable();
+                var currentPage = table.page();
+                table.page.len(-1).draw();
+                $("#programsTable").table2excel({ filename: "CarePrograms.xls" });
+                table.page.len(25).draw();
+                table.page(currentPage).draw(false);
+            });
+        });
+    </script>
+}

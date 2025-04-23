@@ -22,21 +22,25 @@
 </header>
 <div class="container-fluid">
     <ul class="tab-container p-0 m-0 d-flex">
-        <li class="nav-item @(ViewContext.RouteData.Values["action"].ToString() == "Index" ? "active" : "")">
-            <a asp-action="Index" asp-controller="PatientRegistrations">
-                <i class="mdi mdi-account-multiple icon-side-bar"></i> Current Requests
+        <li class="nav-item @(ViewContext.RouteData.Values["action"].ToString() == "Indexadmin" ? "active" : "")">
+            <a class="active" asp-action="Indexadmin">
+                <i class="mdi mdi-ticket-account icon-side-bar"></i>
+                Patients List
             </a>
         </li>
-
-        <li class="nav-item @(ViewContext.RouteData.Values["action"].ToString() == "ClosedRequests" ? "active" : "")">
-            <a asp-action="ClosedRequests" asp-controller="PatientRegistrations">
-                <i class="mdi mdi-ticket-confirmation icon-side-bar"></i> Closed Requests
+        <li class="nav-item @((ViewContext.RouteData.Values["action"].ToString() == "Index" &&
+              ViewContext.RouteData.Values["action"].ToString() != "Indexadmin") ? "active" : "")">
+            <a class="active" asp-action="Index" asp-controller="CareProgram">
+                <i class="mdi mdi-ticket-account icon-side-bar"></i>
+                Program List
             </a>
         </li>
-
-
+        <li class="nav-item @(ViewContext.RouteData.Values["action"].ToString() == "ServiceRequests" ? "active" : "")">
+            <a asp-action="ServiceRequests" asp-controller="PatientRegistrations">
+                <i class="mdi mdi-ticket-confirmation icon-side-bar"></i> Service Requests
+            </a>
+        </li>
     </ul>
-
     <div class="table-tab-container">
         <table class="table table-tab d-block text-center border-bottom-0 table-overflow" id="patientsTable">
             <thead>
