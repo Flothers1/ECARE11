@@ -43,25 +43,26 @@ namespace ECARE.Controllers
 
             List<PatientRegistrations> filteredPatients;
 
-            var patients = _context.PatientRegistrations
-                            .Include(p => p.ServiceRequests)
+            var patients =await _context.PatientRegistrations!
+                            .Include(p => p.CareProgram)!
+                            .Include(p => p.ServiceRequests)!
                             .ThenInclude(s => s.LabBranch)
-                            .ThenInclude(l => l.Lab);
+                            .ThenInclude(l => l!.Lab).ToListAsync();
 
 
             if (userRoles.Contains(AuthorizationConstants.Admin))
             {
-                filteredPatients = await patients.ToListAsync();
+                filteredPatients =  patients;
             }
             else if(userRoles.Contains(AuthorizationConstants.LabAdmin))
             {
-                filteredPatients = await patients.Where(p => p.ServiceRequests
-                .Any(sr => sr.LabBranch.LabId == user.LabId)).ToListAsync();
+                filteredPatients =  patients.Where(p => p.ServiceRequests
+                .Any(sr => sr.LabBranch.LabId == user.LabId)).ToList();
             }
             else
             {
-                filteredPatients = await patients.Where(p => 
-                                p.ServiceRequests.Any(l => l.LabBranchId == user.LabBranchId)).ToListAsync();
+                filteredPatients =  patients.Where(p => 
+                                p.ServiceRequests.Any(l => l.LabBranchId == user.LabBranchId)).ToList();
             }
 
             ViewBag.UserLabId = user.LabId;
@@ -227,6 +228,43 @@ namespace ECARE.Controllers
 
                 return RedirectToAction(nameof(Indexadmin));
             }
+            var countryHelper = new CountryHelper();
+            var regionsByCountry = countryHelper.GetRegionByCountryCode("EG");
+
+            List<string> regions = new List<string>();
+            foreach (var region in regionsByCountry)
+            {
+                if (region == null) { continue; }
+
+                regions.Add(region.Name);
+            }
+            var indications = new List<string>
+    {
+        "COPD",
+        "Ovarian Cancer",
+        "Breast Cancer",
+        "Prostate Cancer",
+        "NA"
+    };
+            var sponsors = new List<string>
+    {
+        "Janssen", "AstraZeneca", "BMS", "EVA", "Pfizer", "Sanofi",
+        "Roche", "Novartis", "GSK", "Buyer", "Takeda",
+        "Boehringer Ingelheim", "Apex Pharma", "GYPTO Pharma",
+        "Astellas", "Parkville", "Orchidia"
+    };
+            var ageGroups = new List<string>
+    {
+        "18-36", "37-46", "47-56", "57-66", "67-76", "77-86", "87-95"
+    };
+            var carePrograms = _context.CarePrograms.ToList();
+            ViewBag.AgeGroups = new SelectList(ageGroups);
+
+            ViewBag.Sponsors = new SelectList(sponsors);
+
+            ViewBag.Indications = new SelectList(indications);
+
+            ViewBag.CarePorgrams = new SelectList(carePrograms, "Id", "Name");
 
             return View(patient);
         }
@@ -234,7 +272,9 @@ namespace ECARE.Controllers
 
         public async Task<IActionResult> Indexadmin()
         {
-            var patients = await _context.PatientRegistrations.Include(p => p.ServiceRequests)
+            var patients = await _context.PatientRegistrations
+                           .Include(p => p.CareProgram)
+                           .Include(p => p.ServiceRequests)
                            .ThenInclude(s => s.LabBranch)
                            .ThenInclude(l => l.Lab).ToListAsync();
             return View(patients);

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ECARE.Models
@@ -108,6 +109,7 @@ namespace ECARE.Models
         public string? Invoice1 { get; set; }
         public int CareProgramId { get; set; }
         [ForeignKey("CareProgramId")]
+        [ValidateNever]
         public CareProgram CareProgram { get; set; }
 
         public ICollection<Service_Request>? ServiceRequests { get; set; } = new HashSet<Service_Request>();    
