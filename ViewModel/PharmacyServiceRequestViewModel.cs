@@ -1,4 +1,5 @@
 ﻿using ECARE.Models;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
@@ -20,10 +21,16 @@ namespace ECARE.ViewModel
         public bool? IsVerified { get; set; }
         [Display(Name = "Select Care Program")]
         public int SelectedCareProgramId { get; set; }
+        [ValidateNever]
         public SelectList CareProgramOptions { get; set; }
         [Display(Name = "Select Patient")]
         public int PatientRegistrationsId { get; set; }
+        [ValidateNever]
         public SelectList PatientRegistrationOptions { get; set; }
+        public int pharmacyId { get; set; }
+        [ValidateNever]
+        public SelectList PharmaciesOptions { get; set; }
+        public int PharmacyBranchId { get; set; }
 
 
     }

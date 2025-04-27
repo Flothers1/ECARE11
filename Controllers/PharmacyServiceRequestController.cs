@@ -23,6 +23,7 @@ namespace ECARE.Controllers
         {
             var requests = _context.PharmacyServiceRequests
                 .Include(r => r.CareProgram)
+                .Include(r => r.PharmacyBranch)
                 .Include(r => r.PatientRegistrations)
                 .Select(r => new PharmacyServiceRequestViewModel
                 {
@@ -40,6 +41,7 @@ namespace ECARE.Controllers
         {
             var pharmacySRViewModel = new PharmacyServiceRequestViewModel();
             pharmacySRViewModel.CareProgramOptions = new SelectList(_context.CarePrograms, "Id", "Name");
+            pharmacySRViewModel.PharmaciesOptions = new SelectList(_context.Pharmacies, "Id", "Name");
             pharmacySRViewModel.PatientRegistrationOptions = new SelectList(_context.PatientRegistrations, "PatientRegistrationsId", "PatientName");
 
             return View(pharmacySRViewModel);
@@ -60,7 +62,9 @@ namespace ECARE.Controllers
                 PRId = model.PatientRegistrationsId,
                 Payment = model.Payment,
                 Date = model.Date,
-                Id = model.Id            
+                Id = model.Id,
+                PharmacyBranchId = model.PharmacyBranchId,
+                
             };
             if (model.EVoucherPDF != null)
             {
@@ -82,19 +86,40 @@ namespace ECARE.Controllers
 
                 return RedirectToAction("Indexadmin", "PatientRegistrations");
             }
+            model.CareProgramOptions = new SelectList(_context.CarePrograms, "Id", "Name");
+            model.PharmaciesOptions = new SelectList(_context.Pharmacies, "Id", "Name");
+            model.PatientRegistrationOptions = new SelectList(_context.PatientRegistrations, "PatientRegistrationsId", "PatientName");
             return View(model);
 
         }
 
         [HttpGet]
-        public JsonResult GetPatients(int careProgramId)
+        public async Task<JsonResult> GetPatients(int CareProgramId)
         {
-            var Patients = _context.PatientRegistrations
-                .Where(b => b.CareProgramId == careProgramId)
-                .Select(b => new { b.PatientRegistrationsId, b.PatientName })
-                .ToList();
+            var patients = await _context.PatientRegistrations
+                .Where(pr => pr.CareProgramId == CareProgramId)
+                .OrderBy(pr => pr.PatientName)    // or whatever property holds the name
+                .Select(pr => new {
+                    id = pr.PatientRegistrationsId,
+                    PatientName = pr.PatientName
+                })
+                .ToListAsync();
 
-            return Json(Patients);
+            return Json(patients);
+        }
+        [HttpGet]
+        public async Task<JsonResult> GetBranches(int pharmacyId)
+        {
+            var branches = await _context.pharmacyBranches
+                .Where(pb => pb.PharmacyId == pharmacyId)
+                .OrderBy(pb => pb.Name)
+                .Select(pb => new {
+                    id = pb.Id,
+                    name = pb.Name
+                })
+                .ToListAsync();
+
+            return Json(branches);
         }
     }
 }

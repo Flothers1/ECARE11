@@ -32,6 +32,13 @@
                     <span asp-validation-for="PatientRegistrationsId" class="text-danger"></span>
                 </div>
                 <div class="form-group mt-4">
+                    <label>Pharmacy</label>
+                    <select id="pharmacy" asp-for="pharmacyId" asp-items="Model.PharmaciesOptions" class="form-control">
+                        <option value="">-- Select Lab --</option>
+                    </select>
+                </div>
+
+                <div class="form-group mt-4">
                     <label asp-for="PatientRegistrationsId" class="form-label fw-bold"></label>
                     <select asp-for="PatientRegistrationsId" class="form-control" id="patientId" placeholder="Select patient">
                     <option value=""></option>
@@ -48,6 +55,15 @@
                     <input asp-for="EVoucherPDF" class="form-control" type="file" />
                     <span asp-validation-for="EVoucherPDF" class="text-danger small"></span>
                 </div>
+
+                <div class="form-group mt-4">
+                    <label>Pharmacy Branch</label>
+                    <select id="pharmacyBranch" asp-for="PharmacyBranchId" class="form-control">
+                        <option value="">-- Select Pharmacy branch --</option>
+                    </select>
+                    <span asp-validation-for="PharmacyBranchId" class="text-danger"></span>
+                </div>
+
                 <div class="form-group mt-4">
                     <input asp-for="Payment" type="checkbox" class="form-check-input" />
                     <label asp-for="Payment" class="form-check-label">Payment Completed</label>
@@ -89,20 +105,60 @@
 
 @section Scripts {
     <script>
-         $('#CareProgramSelect').on('change', function () {
-            var CareProgramId = $(this).val();
-            var $PatientDropDown = $('#patientId');
+        $(document).ready(function() {
+          $('#CareProgramSelect').on('change', function () {
+            var careProgramId = $(this).val(),
+                $patient     = $('#patientId');
 
-            $PatientDropDown.empty();
-            $PatientDropDown.append('<option value="">-- Select Patient --</option>');
+            $patient.empty()
+                    .append('<option value="">-- Select Patient --</option>');
 
-            if (CareProgramId) {
-                $.get('/PharmacyServiceRequestController/GetPatients', { CareProgramId: CareProgramId }, function (data) {
-                    $.each(data, function (index, patient) {
-                        $PatientDropDown.append('<option value="' + patient.id + '">' + patient.PatientName + '</option>');
-                    });
-                });
-            }
+            if (!careProgramId) return;
+
+            $.get(
+              '@Url.Action("GetPatients", "PharmacyServiceRequest")',
+              { CareProgramId: careProgramId }
+            ).done(function(data) {
+              data.forEach(function(p) {
+                // handle either camel- or Pascal-case
+                var name = p.patientName || p.PatientName;
+                $patient.append(
+                  '<option value="' + p.id + '">' + name + '</option>'
+                );
+              });
+            });
+          });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function() {
+          // existing CareProgram→Patients code here…
+
+          // PHARMACY → BRANCH cascader
+          $('#pharmacy').on('change', function() {
+            var pharmacyId = $(this).val(),
+                $branch    = $('#pharmacyBranch');
+
+            $branch
+              .empty()
+              .append('<option value="">-- Select Pharmacy branch --</option>');
+
+            if (!pharmacyId) return;
+
+            $.get(
+              '@Url.Action("GetBranches", "PharmacyServiceRequest")',
+              { pharmacyId: pharmacyId }
+            ).done(function(data) {
+              data.forEach(function(b) {
+                $branch.append(
+                  '<option value="' + b.id + '">'
+                    + (b.name || b.Name)
+                    + '</option>'
+                );
+              });
+            });
+          });
         });
     </script>
     @{

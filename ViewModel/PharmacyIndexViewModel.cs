@@ -7,6 +7,7 @@ namespace ECARE.ViewModel
         // Identifiers
         public int PharmacyServiceRequestId { get; set; }
         public int PatientRegistrationsId { get; set; }
+        public int PharmacyId { get; set; }
         // From PatientRegistrations
         public string PatientName { get; set; }
         public string PhoneNumber1 { get; set; }

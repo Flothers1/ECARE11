@@ -1,9 +1,14 @@
-﻿using ECARE.Interface.FileStorage;
+﻿using Azure;
+using ECARE.Constants;
+using ECARE.Interface;
+using ECARE.Interface.FileStorage;
 using ECARE.Models;
 using ECARE.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Net;
 using System.Net.Http;
+using System.Net.Mail;
 using System.Text;
 using System.Text.Json;
 
@@ -14,20 +19,23 @@ namespace ECARE.Controllers
         private readonly ECAREContext _context;
         private readonly IFileStorageService _fileStorageService;
         private readonly HttpClient _httpClient;
+        private readonly IUsersService _usersService;
 
-        public PharmacyController(ECAREContext context, IFileStorageService fileStorageService, HttpClient httpClient)
+        public PharmacyController(ECAREContext context, IFileStorageService fileStorageService,
+            HttpClient httpClient, IUsersService usersService)
         {
             this._context = context;
             this._fileStorageService = fileStorageService;
             this._httpClient = httpClient;
+            this._usersService = usersService;
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var data = _context.PharmacyServiceRequests
+            var data =await _context.PharmacyServiceRequests
              .Include(psr => psr.PatientRegistrations)
              .Include(psr => psr.CareProgram)
-                 .ThenInclude(cp => cp.Pharmacies)
              .Include(psr => psr.PharmacyBranch)
+             .ThenInclude(pb => pb.Pharmacy)
              .Select(psr => new PharmacyIndexViewModel
       {
           PatientRegistrationsId = psr.PatientRegistrations.PatientRegistrationsId,
@@ -38,7 +46,7 @@ namespace ECARE.Controllers
           Email = psr.PatientRegistrations.Email!,
           MedicationName = psr.CareProgram!.MedicationName,
           PriceAfterDiscount = psr.CareProgram.PriceAfterDiscount,
-          PharmacyName = psr.CareProgram.Pharmacies.Where(p => p.Id == psr.PharmacyBranch.PharmacyId).FirstOrDefault()!.Name,
+          PharmacyName = psr.PharmacyBranch.Pharmacy.Name,
           BranchName = psr.PharmacyBranch.Name,
           Payment = psr.Payment,
           RequestDate = psr.Date,
@@ -47,15 +55,65 @@ namespace ECARE.Controllers
           OTP = psr.OTP,
           OTPExpiration = psr.OTPExpiration,
           EVoucherPDF = psr.EVoucherPDF,
-          }).ToList();
+          }).ToListAsync();
 
             return View(data);
         }
+        public async Task<IActionResult> ClosedPharmacyServiceRequests()
+        {
+            var user = await _usersService.GetUserAfterLogin();
+
+
+            var closedRequests =await  _context.PharmacyServiceRequests
+            .Include(psr => psr.PatientRegistrations)
+            .Include(psr => psr.CareProgram)
+            .Include(psr => psr.PharmacyBranch)
+            .ThenInclude(pb => pb.Pharmacy)
+            .Where(s => s.IsDeleted == true)
+            .Select(psr => new PharmacyIndexViewModel
+            {
+                PatientRegistrationsId = psr.PatientRegistrations.PatientRegistrationsId,
+                PharmacyServiceRequestId = psr.Id,
+                PatientName = psr.PatientRegistrations!.PatientName,
+                PhoneNumber1 = psr.PatientRegistrations.PhoneNumber1,
+                NationalID = psr.PatientRegistrations.NationalID,
+                Email = psr.PatientRegistrations.Email!,
+                MedicationName = psr.CareProgram!.MedicationName,
+                PriceAfterDiscount = psr.CareProgram.PriceAfterDiscount,
+                PharmacyName = psr.PharmacyBranch.Pharmacy.Name,
+                BranchName = psr.PharmacyBranch.Name,
+                Payment = psr.Payment,
+                RequestDate = psr.Date,
+                IsDeleted = psr.IsDeleted,
+                IsVerified = psr.IsVerified,
+                OTP = psr.OTP,
+                OTPExpiration = psr.OTPExpiration,
+                EVoucherPDF = psr.EVoucherPDF,
+                PharmacyId = psr.PharmacyBranch.PharmacyId
+            }).ToListAsync();
+            List<PharmacyIndexViewModel> filteredClosedRequests;
+
+            if ((await _usersService.GetUserRole(user)).Contains(AuthorizationConstants.Admin))
+            {
+                filteredClosedRequests = closedRequests;
+            }
+            else if ((await _usersService.GetUserRole(user)).Contains(AuthorizationConstants.PharmacyAdmin))
+            {
+                filteredClosedRequests = closedRequests.Where(s =>
+                                s.PharmacyId == user.PharmacyId).ToList();
+            }
+            else
+            {
+                filteredClosedRequests = new List<PharmacyIndexViewModel> { };
+            }
+            return View(filteredClosedRequests);
+        }
+
         [HttpPost]
-        public IActionResult SoftDeletePatient(int serviceRequestId)
+        public IActionResult SoftDeletePharmacyServiceRequest(int pharmacyServiceRequestId)
         {
             var request = _context.PharmacyServiceRequests
-                .FirstOrDefault(p => p.Id == serviceRequestId);
+                .FirstOrDefault(p => p.Id == pharmacyServiceRequestId);
 
             if (request == null) return NotFound();
 
@@ -64,77 +122,98 @@ namespace ECARE.Controllers
             return RedirectToAction("Index");
         }
 
-        // PharmacyController.cs
+
+        // Add these new actions to your controller
         [HttpGet]
-        public IActionResult VerifyOTP(int pharmacyServiceRequestId)
+        public IActionResult VerifyPharmacyOTP(int id)
         {
-            return View(pharmacyServiceRequestId);
+            return View(id);
         }
 
         [HttpPost]
-        public IActionResult VerifyOTP(int pharmacyServiceRequestId, string otpCode)
+        public IActionResult VerifyPharmacyOTP(int patientId, string otpCode, int pharmacyServiceRequestId)
         {
-            var request = _context.PharmacyServiceRequests
-                .Include(psr => psr.PatientRegistrations)
-                .FirstOrDefault(psr => psr.Id == pharmacyServiceRequestId);
+            var pharmacyRequest = _context.PharmacyServiceRequests
+                .FirstOrDefault(psr => psr.PRId == patientId && psr.Id == pharmacyServiceRequestId);
 
-            if (request == null)
+            if (pharmacyRequest == null)
             {
-                return RedirectToAction("Index", new { message = "Invalid request!" });
+                return RedirectToAction("Index", new { message = "Phone number not registered!" });
             }
 
-            if (request.OTP != otpCode)
+            if (pharmacyRequest.OTP != otpCode)
             {
-                ViewBag.Error = "Invalid or expired OTP";
+                ViewBag.PatientId = patientId;
+                ViewBag.PharmacyServiceRequestId = pharmacyServiceRequestId;
                 ViewData["ErrorMessage"] = "Incorrect OTP!";
-                return View(pharmacyServiceRequestId);
+                return View();
             }
 
-            if (request.OTPExpiration < DateTime.Now)
+            if (pharmacyRequest.OTPExpiration < DateTime.Now)
             {
-                ViewData["ErrorMessage"] = "The verification code has expired. Please request a new one.";
-                return View(pharmacyServiceRequestId);
+                ViewData["ErrorMessage"] = "Expired OTP!";
+                return View(patientId);
             }
 
-            request.IsVerified = true;
+            pharmacyRequest.IsVerified = true;
             _context.SaveChanges();
 
             return RedirectToAction("Index", new { message = "Verification successful!" });
         }
 
         [HttpPost]
-        public async Task<IActionResult> SendOTP(int pharmacyServiceRequestId)
+        public async Task<IActionResult> SendPharmacyOTP(int patientId, int pharmacyServiceRequestId)
         {
-            var request = await _context.PharmacyServiceRequests
-                .Include(psr => psr.PatientRegistrations)
-                .FirstOrDefaultAsync(psr => psr.Id == pharmacyServiceRequestId);
+            string apiUrl = "https://app.community-ads.com/SendSMSAPI/api/SMSSender/SendSMS";
 
-            if (request?.PatientRegistrations == null || string.IsNullOrEmpty(request.PatientRegistrations.PhoneNumber1))
+            var patient = await _context.PatientRegistrations
+                .FirstOrDefaultAsync(p => p.PatientRegistrationsId == patientId);
+
+            var pharmacyRequest = await _context.PharmacyServiceRequests
+                .FirstOrDefaultAsync(psr => psr.Id == pharmacyServiceRequestId && psr.PRId == patientId);
+
+            if (patient == null || pharmacyRequest == null)
             {
-                return RedirectToAction("Index", new { message = "Invalid patient or missing phone number!" });
+                return RedirectToAction("PharmacyIndex", new { message = "Invalid request!" });
             }
 
             var otpCode = new Random().Next(100000, 999999).ToString();
-
-            // SMS sending logic (keep your existing implementation)
-            var sendResult = await SendSMS(
-                request.PatientRegistrations.PhoneNumber1,
-                otpCode
-            );
-
-            if (sendResult)
+            var requestData = new
             {
-                request.OTP = otpCode;
-                request.OTPExpiration = DateTime.Now.AddMinutes(20);
+                UserName = "InnovaxcessAPI",
+                Password = "Oh$|&L-bON",
+                SMSText = $"Your OTP Code: {otpCode}",
+                SMSLang = "E",
+                SMSSender = "Innovaxcess",
+                SMSReceiver = patient.PhoneNumber1,
+                SMSID = Guid.NewGuid().ToString(),
+            };
+
+            string jsonContent = JsonSerializer.Serialize(requestData);
+            var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+            HttpResponseMessage response = await _httpClient.PostAsync(apiUrl, content);
+
+
+            if (response.IsSuccessStatusCode)
+            {
+                pharmacyRequest.OTP = otpCode;
+                pharmacyRequest.OTPExpiration = DateTime.Now.AddMinutes(20);
                 await _context.SaveChangesAsync();
+
+                return RedirectToAction("VerifyPharmacyOTP", new
+                {
+                    patientId = patientId,
+                    pharmacyServiceRequestId = pharmacyServiceRequestId
+                });
             }
 
-            return RedirectToAction("VerifyOTP", new { pharmacyServiceRequestId = pharmacyServiceRequestId });
+            return RedirectToAction("PharmacyIndex", new { message = "Error sending OTP" });
         }
 
         private async Task<bool> SendSMS(string phoneNumber, string otpCode)
         {
-            // Your existing SMS sending implementation
+            //Your existing SMS sending implementation
             try
             {
                 string apiUrl = "https://app.community-ads.com/SendSMSAPI/api/SMSSender/SendSMS";
@@ -161,5 +240,64 @@ namespace ECARE.Controllers
                 return false;
             }
         }
+
+        public async Task<IActionResult> SendVerificationCode(int patientId, int pharmacyServiceRequestId)
+        {
+            var patient = await _context.PatientRegistrations
+               .FirstOrDefaultAsync(p => p.PatientRegistrationsId == patientId);
+
+            var pharmacyRequest = await _context.PharmacyServiceRequests
+                .FirstOrDefaultAsync(psr => psr.Id == pharmacyServiceRequestId && psr.PRId == patientId);
+
+            if (patient == null || pharmacyRequest == null)
+            {
+                return NotFound("Patient or Service Request not found.");
+            }
+
+            var verificationCode = new Random().Next(100000, 999999).ToString();
+
+            pharmacyRequest.OTP = verificationCode;
+            pharmacyRequest.OTPExpiration = DateTime.Now.AddMinutes(20);
+            await _context.SaveChangesAsync();
+
+            var subject = "Your Verification Code";
+            var body = $"Your verification code is: <b>{verificationCode}</b>";
+            await SendEmailAsync(patient.Email, subject, body);
+
+            return RedirectToAction("VerifyPharmacyOTP", new { patientId = patientId, serviceRequestid = pharmacyServiceRequestId });
+        }
+        private async Task SendEmailAsync(string toEmail, string subject, string body)
+        {
+            try
+            {
+                using (var smtpClient = new SmtpClient("Mail.innovaxcess.com", 587))
+                {
+                    smtpClient.Credentials = new NetworkCredential("ecare@innovaxcess.com", "Ecare@132@324");
+                    smtpClient.EnableSsl = true;
+                    smtpClient.UseDefaultCredentials = false;
+                    smtpClient.DeliveryMethod = SmtpDeliveryMethod.Network;
+
+                    ServicePointManager.ServerCertificateValidationCallback =
+                        (s, certificate, chain, sslPolicyErrors) => true;
+
+                    using (var mailMessage = new MailMessage())
+                    {
+                        mailMessage.From = new MailAddress("ecare@innovaxcess.com");
+                        mailMessage.To.Add(toEmail);
+                        mailMessage.Subject = subject;
+                        mailMessage.Body = body;
+                        mailMessage.IsBodyHtml = true;
+
+                        await smtpClient.SendMailAsync(mailMessage);
+                        Console.WriteLine("Email sent successfully!");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error sending email: {ex.Message}");
+            }
+        }
+
     }
 }

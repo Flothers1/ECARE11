@@ -97,10 +97,10 @@
                                         @if (ViewContext.RouteData.Values["action"]?.ToString() != "ClosedRequests")
                                         {
                                     <td>
-                                        <form asp-action="SendOTP" asp-controller="Pharmacy" method="post" style="display: inline;">
-                                            <input type="hidden" name="pharmacyServiceRequestId"
-                                                   value="serviceRequest.Id" />
-                                            <button type="submit" title="Send OTP" class="btn btn-link p-0">
+                                        <form asp-action="SendPharmacyOTP" method="post" style="display: inline;">
+                                            <input type="hidden" name="patientId" value="@serviceRequest.PatientRegistrationsId" />
+                                            <input type="hidden" name="pharmacyServiceRequestId" value="@serviceRequest.PharmacyServiceRequestId" />
+                                            <button type="submit" title="Send OTP">
                                                 <img src="~/img/otp_transparent.png" alt="Send OTP" style="width: 24px; height: 24px;">
                                             </button>
                                         </form>
@@ -119,8 +119,8 @@
                                                 {
                                                     <a asp-action="SendVerificationCode"
                                                        asp-controller="Pharmacy"
-                                                       asp-route-id="@serviceRequest.PatientRegistrationsId"
-                                                       asp-route-serviceRequestid="@serviceRequest.PharmacyServiceRequestId">
+                                                       asp-route-patientId="@serviceRequest.PatientRegistrationsId"
+                                                       asp-route-pharmacyServiceRequestId="@serviceRequest.PharmacyServiceRequestId">
                                                         <img src="~/img/MSG_transparent.png" alt="Email Verification" style="width: 24px; height: 24px;">
                                                     </a>
                                                 }
@@ -140,8 +140,8 @@
                                                 }
                                             </td>
                                             <td>
-                                                <form asp-action="SoftDeletePatient" asp-controller="Pharmacy" method="post" style="display: inline;">
-                                                    <input type="hidden" name="patientId" value="@serviceRequest.PharmacyServiceRequestId" />
+                                        <form asp-action="SoftDeletePharmacyServiceRequest" asp-controller="Pharmacy" method="post" style="display: inline;">
+                                            <input type="hidden" name="pharmacyServiceRequestId" value="@serviceRequest.PharmacyServiceRequestId" />
                                                     <button type="submit" style="border: none; background: none; padding: 0;">
                                                         <img src="~/img/resolve_transparent.png" alt="Close Request" style="width: 24px; height: 24px; cursor: pointer;">
                                                     </button>
@@ -337,6 +337,5 @@
         });
 
     </script>
-
 
 }

@@ -1,4 +1,5 @@
-﻿using ECARE.Models;
+﻿using ECARE.Constants;
+using ECARE.Models;
 using ECARE.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -27,7 +28,9 @@ namespace ECARE.Controllers
             //ViewBag.Labs = new SelectList(await _context.Lab.ToListAsync(), "Id", "LabName");
             var model = new RegisterViewModel
             {
-                Labs = new SelectList(await _context.Lab.ToListAsync(), "Id", "LabName")
+                Labs = new SelectList(await _context.Lab.ToListAsync(), "Id", "LabName"),
+                Pharmacies = new SelectList(await _context.Pharmacies.ToListAsync(), "Id", "Name")
+
             };
             return View(model);
         }
@@ -35,49 +38,58 @@ namespace ECARE.Controllers
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
             model.Labs = new SelectList(await _context.Lab.ToListAsync(), "Id", "LabName");
+            model.Pharmacies = new SelectList(await _context.Pharmacies.ToListAsync(), "Id", "Name");
 
             if (!ModelState.IsValid)
             {
                 // ViewBag.Labs = new SelectList(await _context.Lab.ToListAsync(), "Id", "LabName");
+
                 ModelState.AddModelError("", "All fields are required.");
                 return View(model);
             }
 
-            ApplicationUser user = null;
-
-            //if (model.Role == "LabUser" && !model.LabBranchId.HasValue)
-            //{
-            //    ModelState.AddModelError("LabBranchId", "Lab branch must be selected for LabUser.");
-            //    return View(model);
-            //}
-            //else
-            //{
-            //    user = new ApplicationUser { UserName = model.Username, Email = model.Email, LabBranchId = model.LabBranchId.Value };
-            //}
-            if (model.Role == "LabAdmin" && !model.LabId.HasValue)
+            if (model.Role == AuthorizationConstants.LabAdmin && !model.LabId.HasValue)
             {
-                ModelState.AddModelError("LabId", "Lab must be selected for LabAdmin.");
+                ModelState.AddModelError("LabId", "Lab must be selected for Lab Admin.");
+            }
+            else if (model.Role == AuthorizationConstants.PharmacyAdmin && !model.PharmacyId.HasValue)
+            {
+                ModelState.AddModelError("PharmacyId", "Pharmacy must be selected for Pharmacy Admin.");
+            }
+
+            if (!ModelState.IsValid)
+            {
                 return View(model);
             }
-            else
+            if ((await _userManager.FindByNameAsync(model.Username) != null))
             {
-                user = new ApplicationUser { UserName = model.Username, Email = model.Email, LabId = model.LabId.Value };
-
+                ModelState.AddModelError("UserName", "User name is already taken.");
+                return View(model);
             }
-            if((await _userManager.FindByNameAsync(model.Username) != null))
+            var user = new ApplicationUser
             {
-                ModelState.AddModelError("UserName", "Username is already taken.");
-                return View(model); 
-            }
+                UserName = model.Username,
+                Email = model.Email,
+                LabId = model.Role == AuthorizationConstants.LabAdmin ? model.LabId : null,
+                PharmacyId = model.Role == AuthorizationConstants.PharmacyAdmin ? model.PharmacyId : null
+            };
             var result = await _userManager.CreateAsync(user, model.Password);
-
             if (result.Succeeded)
             {
-                await _userManager.AddToRoleAsync(user, model.Role);
+                try
+                {
+                    await _userManager.AddToRoleAsync(user, model.Role);
 
-                return RedirectToAction("Indexadmin", "PatientRegistrations");
+                    return RedirectToAction("IndexAdmin", "PatientRegistrations");
+                }
+                catch (Exception ex)
+                {
+                    // Rollback user creation if role assignment fails
+                    await _userManager.DeleteAsync(user);
+                    ModelState.AddModelError("", $"Role assignment failed: {ex.Message}");
+                    return View(model);
+                }
             }
-
             foreach (var error in result.Errors)
             {
                 ModelState.AddModelError("", error.Description);
@@ -119,17 +131,21 @@ namespace ECARE.Controllers
             {
                 var roles = await _userManager.GetRolesAsync(user);
 
-                if (roles.Contains("Admin"))
+                if (roles.Contains(AuthorizationConstants.Admin))
                 {
                     return RedirectToAction("Indexadmin", "PatientRegistrations");
                 }
-                else if (roles.Contains("LabUser") || roles.Contains("LabAdmin"))
+                else if (roles.Contains(AuthorizationConstants.LabUser) || roles.Contains(AuthorizationConstants.LabAdmin))
                 {
                     return RedirectToAction("Index", "PatientRegistrations");
                 }
-                
+                else if (roles.Contains(AuthorizationConstants.PharmacyAdmin))
+                {
+                    return RedirectToAction("Index", "Pharmacy");
+                }
 
-                return RedirectToAction("Index", "Home"); 
+
+                return RedirectToAction("Index", "Home");
             }
 
             ModelState.AddModelError("", "Invalid username or password.");
@@ -142,7 +158,7 @@ namespace ECARE.Controllers
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
-            return RedirectToAction("Login", "Account"); 
+            return RedirectToAction("Login", "Account");
         }
     }
 

@@ -382,13 +382,13 @@ namespace ECARE.Controllers
         [HttpPost]
         public IActionResult SoftDeletePatient(int patientId)
         {
-            var patient = _context.ServiceRequests.FirstOrDefault(p => p.Service_RequestId == patientId);
-            if (patient == null)
+            var serviceRequest = _context.ServiceRequests.FirstOrDefault(p => p.Service_RequestId == patientId);
+            if (serviceRequest == null)
             {
                 return NotFound();
             }
 
-            patient.IsDeleted = true;
+            serviceRequest.IsDeleted = true;
             _context.SaveChanges();
 
             return RedirectToAction("Index");

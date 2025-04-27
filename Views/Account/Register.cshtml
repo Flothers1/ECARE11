@@ -132,9 +132,10 @@
                 <label for="role">Select Role</label>
                 <select asp-for="Role" required data-val-required="Please select a Role from the list." class="form-control form-select" id="Role">
                     <option value="">-- Select Role --</option>
-                    <option value="Admin">Admin</option>
+                    <option value="@AuthorizationConstants.Admin">Admin</option>
 @*                     <option value="LabUser">Lab User</option>
- *@                    <option  value="LabAdmin">LabAdmin</option>
+ *@                    <option  value="@AuthorizationConstants.LabAdmin">Lab Admin</option>
+                     <option  value="@AuthorizationConstants.PharmacyAdmin">Pharmacy Admin</option>
                 </select>
             </div>
 
@@ -142,6 +143,12 @@
                 <label>Lab</label>
                 <select id="LabId" asp-for="LabId" asp-items="@Model.Labs" >
                     <option value="">-- Select Lab --</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label asp-for="PharmacyId"></label>
+                <select id="PharmacyId" asp-for="PharmacyId" asp-items="@Model.Pharmacies">
+                    <option value="">-- Select Pharmacy --</option>
                 </select>
             </div>
 
@@ -160,7 +167,7 @@
     </div>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script>
+@*     <script>
         $('#LabId').on('change', function () {
             var labId = $(this).val();
             var $labBranchDropdown = $('#LabBranchId');
@@ -201,8 +208,70 @@
             toggleFields();
         });
 
+    </script> *@
+    <script>
+        // Lab Branch Population (keep existing)
+        $('#LabId').on('change', function () {
+            var labId = $(this).val();
+            var $labBranchDropdown = $('#LabBranchId');
+            $labBranchDropdown.empty().append('<option value="">-- Select Lab Branch --</option>');
+
+            if (labId) {
+                $.get('/ServiceRequests/GetLabBranches', { labId: labId }, function (data) {
+                    $.each(data, function (index, branch) {
+                        $labBranchDropdown.append('<option value="' + branch.id + '">' + branch.labBranchName + '</option>');
+                    });
+                });
+            }
+        });
+
+        // Role-based Field Toggling
+        $(document).ready(function () {
+            function toggleFields() {
+                var selectedRole = $('#Role').val();
+
+                // Hide all role-specific fields initially
+                $('#LabId').closest('.form-group').hide();
+                $('#LabBranchId').closest('.form-group').hide();
+                $('#PharmacyId').closest('.form-group').hide();
+
+                switch(selectedRole) {
+                    case 'LabAdmin':
+                        $('#LabId').closest('.form-group').show();
+                        break;
+
+                    case 'LabUser':
+                        $('#LabId').closest('.form-group').show();
+                        $('#LabBranchId').closest('.form-group').show();
+                        break;
+
+                    case 'PharmacyAdmin':
+                        $('#PharmacyId').closest('.form-group').show();
+                        break;
+
+                    case 'Admin':
+                        // All fields remain hidden
+                        break;
+
+                    default:
+                        // Handle other roles if needed
+                }
+            }
+
+            // Initial setup
+            toggleFields();
+
+            // Role change handler
+            $('#Role').on('change', function() {
+                toggleFields();
+
+                // Clear hidden fields when role changes
+                if($(this).val() !== 'LabAdmin') $('#LabId').val('');
+                if($(this).val() !== 'PharmacyAdmin') $('#PharmacyId').val('');
+                if($(this).val() !== 'LabUser') $('#LabBranchId').val('');
+            });
+        });
     </script>
- 
 </body>
 
 </html>
