@@ -31,6 +31,12 @@ namespace ECARE.Controllers
         }
         public async Task<IActionResult> Index()
         {
+            var user = await _usersService.GetUserAfterLogin();
+            if (user == null)
+            {
+                return Challenge();
+            }
+
             var data =await _context.PharmacyServiceRequests
              .Include(psr => psr.PatientRegistrations)
              .Include(psr => psr.CareProgram)
@@ -55,9 +61,10 @@ namespace ECARE.Controllers
           OTP = psr.OTP,
           OTPExpiration = psr.OTPExpiration,
           EVoucherPDF = psr.EVoucherPDF,
-          }).ToListAsync();
+          PharmacyId = psr.PharmacyBranch.PharmacyId
+             }).ToListAsync();
 
-            return View(data);
+            return View(data.Where(psr => psr.PharmacyId == user.PharmacyId).ToList());
         }
         public async Task<IActionResult> ClosedPharmacyServiceRequests()
         {

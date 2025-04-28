@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+﻿using ECARE.Models;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -17,8 +18,8 @@ namespace ECARE.ViewModel
         public int? PharmacyId { get; set; }
         public int? LabBranchId { get; set; }
         [ValidateNever]
-        public IEnumerable<SelectListItem> Labs { get; set; }
+        public IEnumerable<SelectListItem> Labs { get; set; } = new SelectList(new List<Lab>());
         [ValidateNever]
-        public IEnumerable<SelectListItem> Pharmacies { get; set; }
+        public IEnumerable<SelectListItem> Pharmacies { get; set; } = new SelectList(new List<Pharmacy>());
     }
 }

@@ -1,1 +1,221 @@
-﻿
+﻿@model List<PharmacyIndexViewModel>
+
+<header class="text-white mb-4">
+    <div class="container-fluid">
+        <div class="d-flex justify-content-between align-items-center w-100 p-3 custom-header">
+            <h1 class="m-0 text-white">Pharmacy Portal</h1>
+            <form asp-controller="Account" asp-action="Logout" method="post">
+                <button type="submit" class="btn btn-light fw-bold px-4 py-2">Logout</button>
+            </form>
+        </div>
+    </div>
+</header>
+<div class="container-fluid">
+    <ul class="tab-container p-0 m-0 d-flex">
+        <li class="nav-item @(ViewContext.RouteData.Values["action"].ToString() == "Index" ? "active" : "")">
+            <a asp-action="Index" asp-controller="Pharmacy">
+                <i class="mdi mdi-account-multiple icon-side-bar"></i> Current Requests
+            </a>
+        </li>
+
+        <li class="nav-item @(ViewContext.RouteData.Values["action"].ToString() == "ClosedPharmacyServiceRequests" ? "active" : "")">
+            <a asp-action="ClosedPharmacyServiceRequests" asp-controller="Pharmacy">
+                <i class="mdi mdi-ticket-confirmation icon-side-bar"></i> Closed Requests
+            </a>
+        </li>
+    </ul>
+    <div class="table-tab-container">
+        <table class="table table-tab d-block text-center border-bottom-0 table-overflow" id="patientsTable">
+            <thead>
+                <tr>
+                    <th>Patient Name</th>
+                    <th>Phone Number 1</th>
+                    <th>National ID</th>
+                    <th>Email</th>
+                    <th>Pharmacy</th>
+                    <th>Pharmacy Branch</th>
+                    <th>Medication</th>
+                    <th>Price after discount</th>
+                    <th>Payment</th>
+                    <th>EVoucherPDF</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var serviceRequest in Model)
+                    {
+                        <tr>
+                            <td>@serviceRequest.PatientName</td>
+                            <td>@serviceRequest.PhoneNumber1</td>
+                            <td>@serviceRequest.NationalID</td>
+                            <td>@serviceRequest.Email</td>
+                            <td>@(serviceRequest?.PharmacyName ?? "No Pharmacy")</td>
+                            <td>@(serviceRequest?.BranchName ?? "No Branch")</td>
+                            <td>@(serviceRequest?.MedicationName ?? "No Medication")</td>
+                            <td>@(serviceRequest?.PriceAfterDiscount.ToString() ?? "No Price After Discount")</td>
+                            <td>@(serviceRequest?.Payment.ToString() ?? "No Payment")</td>
+                            <td>
+                                @if (serviceRequest?.IsVerified == true)
+                                {
+                                    if (!string.IsNullOrEmpty(serviceRequest.EVoucherPDF))
+                                    {
+                                        <a href="@Url.Content(serviceRequest.EVoucherPDF)" download target="_blank">Download eVoucher</a>
+                                    }
+                                    else
+                                    {
+                                        <span class="unavailable-dash">—</span>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="unavailable-item danger">
+                                        <span class="text-danger fw-bold">❌ Not Verified</span>
+                                    </span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="9" class="text-center">No closed requests found.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    .custom-header {
+        background-color: #957200;
+        border-radius: 8px;
+    }
+
+    .container-fluid {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
+
+    .btn-light {
+        color: #957200;
+        border: 2px solid #957200;
+        transition: all 0.3s ease;
+    }
+
+    .table-responsive {
+        overflow-x: visible;
+        background-color: #eee;
+    }
+
+    .btn-light:hover {
+        background-color: #957200;
+        color: white;
+    }
+
+
+    .table-tab-container {
+        height: calc(100% - 120px);
+        background-color: #eee;
+    }
+
+    #tickets_wrapper {
+        height: calc(100% - 80px);
+    }
+
+    .table-overflow {
+        height: 100%;
+    }
+
+        .table-overflow tbody tr {
+            background-color: #eee;
+        }
+
+    th {
+        width: calc(100% / 7);
+    }
+
+    .assing-btn {
+        font-size: 13px;
+        padding: 5px;
+    }
+
+    .btn-gray2 {
+        float: left;
+        margin-right: 40px;
+    }
+    /* Document download styling */
+    .invoice-icon-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        text-decoration: none;
+        color: #957200;
+        transition: all 0.3s ease;
+    }
+
+    .icon-wrapper {
+        display: flex;
+        font-size: 1.5rem;
+        padding: 8px;
+        border-radius: 50%;
+        background-color: rgba(149, 114, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .download-text {
+        font-size: 0.875rem;
+        transition: color 0.3s ease;
+    }
+
+    .invoice-icon-link:hover .icon-wrapper {
+        color: white;
+        background-color: #957200;
+        transform: scale(1.1);
+        box-shadow: 0 2px 8px rgba(149, 114, 0, 0.3);
+    }
+
+    .invoice-icon-link:hover .download-text {
+        color: #957200;
+        text-decoration: underline;
+    }
+    /* Icon wrappers for warnings */
+    .unavailable-dash {
+        display: inline-block;
+        color: #6c757d; /* text-muted color */
+        font-weight: 400;
+        font-size: 1rem;
+    }
+</style>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/jquery.table2excel.min.js"></script>
+    <script src="~/js/jquery.dataTables.min.js"></script>
+    <script>
+        $(function () {
+            var table = $('#patientsTable').DataTable({
+                "columnDefs": [{ "type": "date", "targets": 1 }],
+                "order": [[1, "desc"]]
+            });
+
+            var buttonElement = $('<button>', {
+                type: 'submit',
+                class: 'btn-gray2 mb-3',
+                id: 'data2excel',
+                text: 'Export to Excel'
+            });
+
+            $('#patientsTable_wrapper').prepend(buttonElement);
+
+            $('#data2excel').click(function (e) {
+                var currentPageLength = table.page.len();
+                table.page.len(-1).draw();
+                $("#patientsTable").table2excel({ filename: "PatientRegistrations.xls" });
+                table.page.len(currentPageLength).draw();
+            });
+        });
+    </script>
+}

@@ -18,6 +18,7 @@
     <div class="d-flex gap-2 mb-3">
         <a asp-controller="PatientRegistrations" asp-action="Create" class="btn text-white" style="background-color: #957200;">Register Patient</a>
         <a asp-controller="ServiceRequests" asp-action="Create" class="btn text-white" style="background-color: #957200;">Create Lab Service Request</a>
+        <a asp-controller="PharmacyServiceRequest" asp-action="Create" class="btn text-white" style="background-color: #957200;">Create Pharmacy Service Request</a>
         <a asp-controller="CareProgram" asp-action="Create" class="btn text-white" style="background-color: #957200;">Create New Program</a>
         <a asp-controller="Account" asp-action="Register" class="btn text-white" style="background-color: #957200;">Create New User</a>
 
@@ -117,21 +118,29 @@
         border-radius: 8px;
     }
 
+    .container-fluid {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
+
     .btn-light {
         color: #957200;
         border: 2px solid #957200;
         transition: all 0.3s ease;
     }
 
-        .btn-light:hover {
-            background-color: #957200;
-            color: white;
-        }
+    .btn-light:hover {
+        background-color: #957200;
+        color: white;
+    }
 
     .table-tab-container {
         height: calc(100% - 120px);
     }
 
+    .table-responsive {
+        overflow-x: visible;
+    }
     .table-overflow {
         max-height: 600px;
         overflow-y: auto;
@@ -149,27 +158,134 @@
         font-size: 0.875rem;
         margin: 2px;
     }
+
+    #tickets_wrapper {
+        height: calc(100% - 80px);
+    }
+
+    .assing-btn {
+        font-size: 13px;
+        padding: 5px;
+    }
+
+    /* Export to Excel */
+    .btn-gray2 {
+        float: left;
+        margin-right: 40px;
+    }
+
+    /* Document Links */
+    .document-icon-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        text-decoration: none;
+        color: #957200;
+        transition: all 0.3s ease;
+    }
+
+    .icon-wrapper {
+        display: flex;
+        font-size: 1.5rem;
+        padding: 8px;
+        border-radius: 50%;
+        background-color: rgba(149, 114, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .download-text {
+        font-size: 0.875rem;
+        transition: color 0.3s ease;
+    }
+
+    /* Status Indicators */
+    .unavailable-dash {
+        display: inline-block;
+        color: #6c757d;
+        font-weight: 400;
+        font-size: 1rem;
+    }
+
+    .warning-text {
+        font-size: 0.875rem;
+    }
+    /* Hover Effects */
+    .document-icon-link:hover .icon-wrapper {
+        color: white;
+        background-color: #957200;
+        transform: scale(1.1);
+        box-shadow: 0 2px 8px rgba(149, 114, 0, 0.3);
+    }
+
+    .document-icon-link:hover .download-text {
+        color: #957200;
+        text-decoration: underline;
+    }
+
+    /* Mobile Styles */
+    @@media (max-width: 768px) {
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .document-icon-link {
+            flex-direction: column;
+        }
+
+        .download-text {
+            font-size: 0.75rem;
+        }
+
+        .custom-header {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+    }
 </style>
 
 @section Scripts {
     <script>
-        $(document).ready(function() {
-            $('#programsTable').DataTable({
-                "columnDefs": [
-                    { "orderable": false, "targets": [11] },
-                    { "type": "date", "targets": 1 }
-                ],
-                "order": [[1, "desc"]],
-                "pageLength": 25
+        // $(document).ready(function() {
+        //     $('#programsTable').DataTable({
+        //         "columnDefs": [
+        //             { "orderable": false, "targets": [11] },
+        //             { "type": "date", "targets": 1 }
+        //         ],
+        //         "order": [[1, "desc"]],
+        //         "pageLength": 25
+        //     });
+
+        //     $('#exportExcel').click(function() {
+        //         var table = $('#programsTable').DataTable();
+        //         var currentPage = table.page();
+        //         table.page.len(-1).draw();
+        //         $("#programsTable").table2excel({ filename: "CarePrograms.xls" });
+        //         table.page.len(25).draw();
+        //         table.page(currentPage).draw(false);
+        //     });
+        // });
+
+          $(function () {
+            var table = $('#programsTable').DataTable({
+                "columnDefs": [{ "type": "date", "targets": 0 }],
+                "order": [[0, "desc"]]
             });
 
-            $('#exportExcel').click(function() {
-                var table = $('#programsTable').DataTable();
-                var currentPage = table.page();
+            var buttonElement = $('<button>', {
+                type: 'submit',
+                class: 'btn-gray2 mb-3',
+                id: 'data2excel',
+                text: 'Export to Excel'
+            });
+
+            $('#programsTable_wrapper').prepend(buttonElement);
+
+            $('#data2excel').click(function (e) {
+                var currentPageLength = table.page.len();
                 table.page.len(-1).draw();
                 $("#programsTable").table2excel({ filename: "CarePrograms.xls" });
-                table.page.len(25).draw();
-                table.page(currentPage).draw(false);
+                table.page.len(currentPageLength).draw();
             });
         });
     </script>

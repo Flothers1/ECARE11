@@ -19,7 +19,7 @@
         </div>
     </div>
 
-    <form asp-action="Create" method="post">
+    <form autocomplete="on" asp-action="Create" method="post">
         <div class="row g-4">
             <!-- Left Column -->
             <div class="col-md-6">
@@ -36,9 +36,9 @@
 
                 <div class="form-group mt-4">
                     <label asp-for="MedicationName" class="form-label fw-bold"></label>
-                    <select asp-for="MedicationName" class="medication-select form-control"
+                    <select asp-for="MedicationName" class="medication-select form-select"
                             asp-items="Model.MedicationOptions">
-                        <option value="">Select or type a medication</option>
+                        <option value=""></option>
                     </select>
                     <span asp-validation-for="MedicationName" class="text-danger small"></span>
                 </div>
@@ -46,7 +46,7 @@
                 <div class="form-group mt-4">
                     <label asp-for="OriginalPrice" class="form-label fw-bold"></label>
                     <div class="input-group">
-                        <span class="input-group-text">$</span>
+                        <span class="input-group-text">EGP</span>
                         <input asp-for="OriginalPrice" class="form-control" placeholder="0.00" />
                     </div>
                     <span asp-validation-for="OriginalPrice" class="text-danger small"></span>
@@ -55,7 +55,7 @@
                 <div class="form-group mt-4">
                     <label asp-for="PriceAfterDiscount" class="form-label fw-bold"></label>
                     <div class="input-group">
-                        <span class="input-group-text">$</span>
+                        <span class="input-group-text">EGP</span>
                         <input asp-for="PriceAfterDiscount" class="form-control" placeholder="0.00" />
                     </div>
                     <span asp-validation-for="PriceAfterDiscount" class="text-danger small"></span>
@@ -82,7 +82,9 @@
 
                 <div class="form-group mt-4">
                     <label asp-for="SponsorCompany" class="form-label fw-bold"></label>
-                    <input asp-for="SponsorCompany" class="form-control" placeholder="Enter Sponsor Company name" />
+                    <select asp-for="SponsorCompany" class="sponsor-select form-select" asp-items="Model.SponsorOptions">
+                        <option  value=""></option>
+                    </select>
                     <span asp-validation-for="SponsorCompany" class="text-danger small"></span>
                 </div>
 
@@ -149,16 +151,35 @@
            background-color: #7a5e00;
            border-color: #7a5e00;
        }
+        /* Select2 height and padding matching Bootstrap */
+        .select2-container .select2-selection--single {
+            height: 38px !important;
+            border-radius: 0.375rem !important;
+            border: 1px solid #ced4da !important;
+            padding: 0.375rem 0.75rem !important;
+        }
+
+        /* Select2 focus state to match Bootstrap */
+        .select2-container--focus .select2-selection--single {
+            border-color: #957200 !important;
+            box-shadow: 0 0 0 0.25rem rgba(149, 114, 0, 0.25) !important;
+        }
+
+        /* Ensure Select2 dropdown matches input width */
+        .select2-container {
+            width: 100% !important;
+        }
     </style>
 }
 
 @section Scripts {
     <script>
         $(document).ready(function() {
-            $('.medication-select').select2({
-                placeholder: 'Select or type a medication',
+            $('.medication-select, .sponsor-select').select2({
+                placeholder: 'Select or type a value',
                 allowClear: true,
-                tags: true // This allows entering custom values
+                tags: true, // This allows entering custom values
+                width: '100%'
             });
         });
     </script>

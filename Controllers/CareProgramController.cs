@@ -1,11 +1,14 @@
-﻿using ECARE.Models;
+﻿using ECARE.Constants;
+using ECARE.Models;
 using ECARE.ViewModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace ECARE.Controllers
 {
+    [Authorize(Roles = AuthorizationConstants.Admin)]
     public class CareProgramController : Controller
     {
         private readonly ECAREContext _context;
@@ -22,22 +25,12 @@ namespace ECARE.Controllers
                 .ToListAsync();
 
             var pharmacyList = await _context.Pharmacies
-           .Select(ph => new SelectListItem
-           {
-               Value = ph.Id.ToString(),
-               Text = ph.Name
-           })
-           .ToListAsync();
+                .ToListAsync();
+
 
             var distributorList = await _context.Distributors
-          .Select(d => new SelectListItem
-          {
-              Value = d.Id.ToString(),
-              Text = d.Name
-          })
-          .ToListAsync();
-
-            var vm = carePrograms.Select(p => new CareProgramViewModel
+                .ToListAsync();
+            var vm = carePrograms.Select( p => new CareProgramViewModel
             {
                 Id = p.Id,
                 Name = p.Name,
@@ -59,8 +52,8 @@ namespace ECARE.Controllers
                 SelectedDistributorIds = p.Distributors.Select(d => d.Id).ToList(),
 
                 // Provide the full set of options, with the current ones pre-selected
-                PharmacyOptions = new MultiSelectList(pharmacyList, "Value", "Text", p.Pharmacies.Select(ph => ph.Id)),
-                DistributorOptions = new MultiSelectList(distributorList, "Value", "Text", p.Distributors.Select(d => d.Id))
+                PharmacyOptions = new MultiSelectList(pharmacyList, "Id", "Name", p.Pharmacies.Select(ph => ph.Id)),
+                DistributorOptions = new MultiSelectList(distributorList, "Id", "Name", p.Distributors.Select(d => d.Id))
             }).ToList();
             return View(vm);
         }
@@ -68,12 +61,24 @@ namespace ECARE.Controllers
         public IActionResult Create()
         {
             var medications = new List<string> { "Erleada", "NA" };
+            var sponsors = new List<string>
+            {
+                "Janssen", "AstraZeneca", "BMS", "EVA", "Pfizer", "Sanofi",
+                "Roche", "Novartis", "GSK", "Buyer", "Takeda",
+                "Boehringer Ingelheim", "Apex Pharma", "GYPTO Pharma",
+                "Astellas", "Parkville", "Orchidia"
+            };
             var viewModel = new CareProgramViewModel
             {
                 PharmacyOptions = new MultiSelectList(_context.Pharmacies, "Id", "Name"),
 
                 DistributorOptions = new MultiSelectList(_context.Distributors, "Id", "Name"),
-                MedicationOptions = new MultiSelectList( medications )
+                MedicationOptions = new MultiSelectList( medications ),
+                SponsorOptions = sponsors.Select(s => new SelectListItem
+                {
+                    Value = s,
+                    Text = s 
+                }).ToList()
             };
 
             return View(viewModel);
@@ -98,7 +103,6 @@ namespace ECARE.Controllers
                     HCPList = viewModel.HCPList?.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>()
 
                 };
-                var pharmacies = await _context.Pharmacies.Where(p => viewModel.SelectedPharmacyIds.Contains(p.Id)).ToListAsync();
                 // Add relationships
                 careProgram.Pharmacies = await _context.Pharmacies
                 .Where(p => viewModel.SelectedPharmacyIds.Contains(p.Id))
@@ -112,13 +116,24 @@ namespace ECARE.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-
+            var sponsors = new List<string>
+            {
+                "Janssen", "AstraZeneca", "BMS", "EVA", "Pfizer", "Sanofi",
+                "Roche", "Novartis", "GSK", "Buyer", "Takeda",
+                "Boehringer Ingelheim", "Apex Pharma", "GYPTO Pharma",
+                "Astellas", "Parkville", "Orchidia"
+            };
             // Repopulate dropdowns if validation fails
             viewModel.PharmacyOptions = new MultiSelectList(_context.Pharmacies, "Id", "Name");
             viewModel.DistributorOptions  = new MultiSelectList(_context.Distributors, "Id", "Name");
             viewModel.MedicationOptions = new MultiSelectList(new List<string> { "Erleada", "NA" });
+            viewModel.SponsorOptions = sponsors.Select(s => new SelectListItem
+            {
+                Value = s,
+                Text = s
+            }).ToList();
 
-            return View();
+            return View(viewModel);
         }
     }
 }

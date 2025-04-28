@@ -20,16 +20,6 @@ namespace ECARE.ViewModel
         [Display(Name = "Product Manager")]
         public string ProductManager { get; set; }
 
-        [MaxLength(100)]
-        [Required]
-        public string SponsorCompany { get; set; }
-        [Required(ErrorMessage = "Medication name is required")]
-        [StringLength(255, ErrorMessage = "Medication name cannot exceed 255 characters")]
-        [Display(Name = "Medication Name")]
-        public string MedicationName { get; set; }
-        [ValidateNever]
-        public MultiSelectList MedicationOptions { get; set; }
-
         [StringLength(255, ErrorMessage = "Pack size cannot exceed 255 characters")]
         [Display(Name = "Pack Size")]
         public string MedicationPackSize { get; set; }
@@ -51,6 +41,21 @@ namespace ECARE.ViewModel
 
         [Display(Name = "HCP List (comma-separated)")]
         public string HCPList { get; set; }
+
+        [MaxLength(100)]
+        [Required(ErrorMessage = "Sponsor name is required")]
+        [Display(Name = "Sponsor Company Name")]
+        public string SponsorCompany { get; set; }
+
+        [ValidateNever]
+        public IEnumerable<SelectListItem> SponsorOptions { get; set; }
+
+        [Required(ErrorMessage = "Medication name is required")]
+        [StringLength(255, ErrorMessage = "Medication name cannot exceed 255 characters")]
+        [Display(Name = "Medication Name")]
+        public string MedicationName { get; set; }
+        [ValidateNever]
+        public MultiSelectList MedicationOptions { get; set; }
         [Display(Name = "Pharmacies")]
         public List<int> SelectedPharmacyIds { get; set; } = new List<int>();
         [ValidateNever]

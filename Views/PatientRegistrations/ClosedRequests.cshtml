@@ -8,36 +8,19 @@
                 <button type="submit" class="btn btn-light fw-bold px-4 py-2">Logout</button>
             </form>
         </div>
-        <div class="dropdown">
-            @* <div id="userIcon" class="rounded-circle d-flex align-items-center justify-content-center text-white bg-primary dropdown-toggle"
-        style="width: 40px; height: 40px; font-size: 16px; font-weight: bold; cursor: pointer; background:#D4AF37 !important"
-        data-bs-toggle="dropdown" aria-expanded="false">
-        M
-        </div> *@
-            @*  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userIcon">
-        <li><a class="dropdown-item text-danger" href="@Url.Action("Logout", "Account")">Logout</a></li>
-        </ul> *@
-        </div>
     </div>
 </header>
 <div class="container-fluid">
     <ul class="tab-container p-0 m-0 d-flex">
-        <li class="nav-item @(ViewContext.RouteData.Values["action"].ToString() == "Indexadmin" ? "active" : "")">
-            <a class="active" asp-action="Indexadmin">
-                <i class="mdi mdi-ticket-account icon-side-bar"></i>
-                Patients List
+        <li class="nav-item @(ViewContext.RouteData.Values["action"].ToString() == "Index" ? "active" : "")">
+            <a asp-action="Index" asp-controller="PatientRegistrations">
+                <i class="mdi mdi-account-multiple icon-side-bar"></i> Current Requests
             </a>
         </li>
-        <li class="nav-item @((ViewContext.RouteData.Values["action"].ToString() == "Index" &&
-              ViewContext.RouteData.Values["action"].ToString() != "Indexadmin") ? "active" : "")">
-            <a class="active" asp-action="Index" asp-controller="CareProgram">
-                <i class="mdi mdi-ticket-account icon-side-bar"></i>
-                Program List
-            </a>
-        </li>
-        <li class="nav-item @(ViewContext.RouteData.Values["action"].ToString() == "ServiceRequests" ? "active" : "")">
-            <a asp-action="ServiceRequests" asp-controller="PatientRegistrations">
-                <i class="mdi mdi-ticket-confirmation icon-side-bar"></i> Service Requests
+
+        <li class="nav-item @(ViewContext.RouteData.Values["action"].ToString() == "ClosedRequests" ? "active" : "")">
+            <a asp-action="ClosedRequests" asp-controller="PatientRegistrations">
+                <i class="mdi mdi-ticket-confirmation icon-side-bar"></i> Closed Requests
             </a>
         </li>
     </ul>

@@ -35,6 +35,7 @@ namespace ECARE.Controllers
             return View(model);
         }
         [HttpPost]
+        //TODO:Fix the trailing space at the end
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
             model.Labs = new SelectList(await _context.Lab.ToListAsync(), "Id", "LabName");
@@ -95,7 +96,7 @@ namespace ECARE.Controllers
                 ModelState.AddModelError("", error.Description);
             }
 
-            return View();
+            return View(model);
         }
 
 

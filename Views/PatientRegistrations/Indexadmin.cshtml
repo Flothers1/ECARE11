@@ -20,19 +20,20 @@
     <div class="d-flex gap-2 mb-3">
         <a asp-controller="PatientRegistrations" asp-action="Create" class="btn text-white" style="background-color: #957200;">Register Patient</a>
         <a asp-controller="ServiceRequests" asp-action="Create" class="btn text-white" style="background-color: #957200;">Create Lab Service Request</a>
+        <a asp-controller="PharmacyServiceRequest" asp-action="Create" class="btn text-white" style="background-color: #957200;">Create Pharmacy Service Request</a>
         <a asp-controller="CareProgram" asp-action="Create" class="btn text-white" style="background-color: #957200;">Create New Program</a>
         <a asp-controller="Account" asp-action="Register" class="btn text-white" style="background-color: #957200;">Create New User</a>
 
     </div>
 
     <ul class="tab-container p-0 m-0 d-flex">
-        <li class="nav-item @(ViewContext.RouteData.Values["action"].ToString() == "Indexadmin" ? "active" : "")">
+        <li class="nav-item @(ViewContext.RouteData.Values["action"].ToString() == "PatientRegistrations/Indexadmin" ? "active" : "")">
             <a class="active" asp-action="Indexadmin">
                 <i class="mdi mdi-ticket-account icon-side-bar"></i>
                 Patients List
             </a>
         </li>
-        <li class="nav-item @(ViewContext.RouteData.Values["action"].ToString() == "Index" ? "active" : "")">
+        <li class="nav-item @(ViewContext.RouteData.Values["action"].ToString() == "CareProgram/Index" ? "active" : "")">
             <a class="active" asp-action="Index" asp-controller="CareProgram">
                 <i class="mdi mdi-ticket-account icon-side-bar"></i>
                 Program List
@@ -318,21 +319,17 @@
         border: 2px solid #957200;
         transition: all 0.3s ease;
     }
-    .table-responsive {
-        overflow-x: visible;
-    }
 
     .btn-light:hover {
         background-color: #957200;
         color: white;
     }
-
     .table-tab-container {
         height: calc(100% - 120px);
     }
 
-    #tickets_wrapper {
-        height: calc(100% - 80px);
+    .table-responsive {
+        overflow-x: visible;
     }
 
     .table-overflow {
@@ -343,6 +340,9 @@
         width: calc(100% / 7);
     }
 
+    #tickets_wrapper {
+        height: calc(100% - 80px);
+    }
     .assing-btn {
         font-size: 13px;
         padding: 5px;
