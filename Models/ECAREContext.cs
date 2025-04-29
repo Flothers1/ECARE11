@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection.Emit;
+using System.Text.Json;
 
 namespace ECARE.Models
 {
@@ -29,7 +30,7 @@ namespace ECARE.Models
             builder.Entity<IdentityRole>().HasData(
                 new IdentityRole
                 {
-                    Id = "4",
+                    Id = Guid.NewGuid().ToString(),
                     Name = "PharmacyAdmin",
                     NormalizedName = "PHARMACYADMIN"
                 }
@@ -45,12 +46,19 @@ namespace ECARE.Models
                 .WithMany()
                 .UsingEntity(j => j.ToTable("ProgramDistributors"));
 
+            //builder.Entity<CareProgram>()
+            //    .Property(cp => cp.HCPList)
+            //    .HasConversion(
+            //        v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
+            //        v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions)null)!)
+            //    .HasColumnType("nvarchar(max)");
+
             // Configure PatientRegistrations -> Program
             builder.Entity<PatientRegistrations>()
                 .HasOne(pr => pr.CareProgram)
                 .WithMany(p => p.PatientRegistrations)
                 .HasForeignKey(pr => pr.CareProgramId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.SetNull);
             // Seed Pharmacies and Branches
             var pharmacies = new List<Pharmacy>
             {

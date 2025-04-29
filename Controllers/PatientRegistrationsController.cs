@@ -14,7 +14,7 @@ using System.Text.Json;
 
 namespace ECARE.Controllers
 {
-    [Authorize]
+    //[Authorize]
     public class PatientRegistrationsController : Controller
     {
         private readonly ECAREContext _context;
@@ -30,7 +30,7 @@ namespace ECARE.Controllers
             _hostingEnvironment = hostingEnvironment;
         }
 
-        [Authorize(Roles = AuthorizationConstants.LabAdmin) ]
+        //[Authorize(Roles = AuthorizationConstants.LabAdmin) ]
         public async Task<IActionResult> Index()
         {
             var user = await _usersService.GetUserAfterLogin();
@@ -69,16 +69,19 @@ namespace ECARE.Controllers
             return View(filteredPatients);
 
         }
-
+        //TODO:
         public IActionResult GetPatientDetails(int id)
         {
-            var patient = _context.PatientRegistrations
+            var patient = _context.PatientRegistrations.Include(p => p.CareProgram)
                 .Where(p => p.PatientRegistrationsId == id)
                 .Select(p => new
                 {
                     MobileNumber = p.PhoneNumber1,
+                    ProgramName = p.CareProgram.Name,
+                    ProgramSponsor = p.CareProgram.SponsorCompany,
                     p.NationalID,
-                    p.MembershipNumber
+                    p.MembershipNumber,
+
                 })
                 .FirstOrDefault();
 

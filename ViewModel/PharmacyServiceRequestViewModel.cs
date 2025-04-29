@@ -27,9 +27,11 @@ namespace ECARE.ViewModel
         public int PatientRegistrationsId { get; set; }
         [ValidateNever]
         public SelectList PatientRegistrationOptions { get; set; }
+        [Display(Name = "Select Pharmacy")]
         public int pharmacyId { get; set; }
         [ValidateNever]
         public SelectList PharmaciesOptions { get; set; }
+        [Display(Name = "Select Pharmacy Branch")]
         public int PharmacyBranchId { get; set; }
 
 

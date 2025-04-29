@@ -36,10 +36,10 @@ namespace ECARE.Controllers
             {
                 return Challenge();
             }
-
             var data =await _context.PharmacyServiceRequests
              .Include(psr => psr.PatientRegistrations)
              .Include(psr => psr.CareProgram)
+             .ThenInclude(cp =>cp.Distributors)
              .Include(psr => psr.PharmacyBranch)
              .ThenInclude(pb => pb.Pharmacy)
              .Select(psr => new PharmacyIndexViewModel
@@ -54,6 +54,9 @@ namespace ECARE.Controllers
           PriceAfterDiscount = psr.CareProgram.PriceAfterDiscount,
           PharmacyName = psr.PharmacyBranch.Pharmacy.Name,
           BranchName = psr.PharmacyBranch.Name,
+          Distributer = psr.CareProgram != null
+           ? string.Join(", ", psr.CareProgram.Distributors.Select(d => d.Name))
+           : string.Empty,
           Payment = psr.Payment,
           RequestDate = psr.Date,
           IsDeleted = psr.IsDeleted,
@@ -74,6 +77,7 @@ namespace ECARE.Controllers
             var closedRequests =await  _context.PharmacyServiceRequests
             .Include(psr => psr.PatientRegistrations)
             .Include(psr => psr.CareProgram)
+            .ThenInclude(cp => cp.Distributors)
             .Include(psr => psr.PharmacyBranch)
             .ThenInclude(pb => pb.Pharmacy)
             .Where(s => s.IsDeleted == true)
@@ -88,6 +92,9 @@ namespace ECARE.Controllers
                 MedicationName = psr.CareProgram!.MedicationName,
                 PriceAfterDiscount = psr.CareProgram.PriceAfterDiscount,
                 PharmacyName = psr.PharmacyBranch.Pharmacy.Name,
+                Distributer = psr.CareProgram != null
+                  ? string.Join(", ", psr.CareProgram.Distributors.Select(d => d.Name))
+                  : string.Empty,
                 BranchName = psr.PharmacyBranch.Name,
                 Payment = psr.Payment,
                 RequestDate = psr.Date,

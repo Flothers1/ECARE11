@@ -3,99 +3,38 @@
     ViewData["Title"] = "Create Service Request";
 }
 
-<header class="custom-gray-header text-white p-3 d-flex justify-content-between align-items-center mb-4">
-    <div class="d-flex justify-content-between align-items-center w-100 p-3 custom-header">
-        <h1 class="m-0 text-white">Admin Portal</h1>
+<header class="mb-4">
+    <div class="container-fluid">
+        <div class="d-flex justify-content-between align-items-center p-3 rounded" style="background-color: #957200;">
+            <h1 class="m-0 text-white">Admin Portal</h1>
+        </div>
     </div>
 </header>
-<h2>Create Service Request</h2>
-<style>
-    .custom-header {
-        background-color: #957200;
-        border-radius: 8px;
-    }
 
-    .btn-light {
-        color: #957200;
-        border: 2px solid #957200;
-        transition: all 0.3s ease;
-    }
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2>Create Service Request</h2>
+            <hr class="border-2 border-top border-secondary">
+        </div>
+    </div>
 
-    .btn-light:hover {
-        background-color: #957200;
-        color: white;
-    }
-
-
-</style>
-
-<form asp-action="Create" method="post" enctype="multipart/form-data">
-    <div class="container">
-        <div class="row">
+    <form asp-action="Create" method="post" enctype="multipart/form-data">
+        <div class="row g-4">
+            <!-- Left Column -->
             <div class="col-md-6">
                 <div class="form-group">
-                    <label>Patient Name</label>
-                    <select asp-for="PatientRegistrationsId" asp-items="ViewBag.Patients" class="form-control" id="PatientSelect">
+                    <label asp-for="PatientRegistrationsId" class="form-label fw-bold"></label>
+                    <select asp-for="PatientRegistrationsId" asp-items="ViewBag.Patients"
+                            class="form-select" id="PatientSelect">
                         <option value="">-- Select Patient --</option>
                     </select>
-
-                    <span asp-validation-for="PatientRegistrationsId" class="text-danger"></span>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label>E-Voucher PDF File</label>
-                    <input type="file" asp-for="EVoucherPDFFile" class="form-control" />
-                    <span asp-validation-for="EVoucherPDFFile" class="text-danger"></span>
+                    <span asp-validation-for="PatientRegistrationsId" class="text-danger small"></span>
                 </div>
 
-            </div>
-        </div>
-
-        <div id="patientDetails" style="display: none;">
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>Mobile Number</label>
-                        <input type="text" id="MobileNumber" class="form-control" readonly />
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>Program Name</label>
-                        <input type="text" id="ProgramName" class="form-control" readonly />
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>Program Sponsor</label>
-                        <input type="text" id="ProgramSponsor" class="form-control" readonly />
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>National ID</label>
-                        <input type="text" id="NationalID" class="form-control" readonly />
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>Membership Number</label>
-                        <input type="text" id="MembershipNumber" class="form-control" readonly />
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label for="RequiredTests">Required Tests</label>
-                    <select asp-for="RequiredTests" class="form-control select2-test" id="RequiredTests">
+                <div class="form-group mt-4">
+                    <label for="RequiredTests" class="form-label fw-bold">Required Tests</label>
+                    <select asp-for="RequiredTests" class="form-select select2-test" id="RequiredTests">
                         <option value="">-- Select Test --</option>
                         <option value="Germline BRCA">Germline BRCA</option>
                         <option value="Tissue BRCA">Tissue BRCA</option>
@@ -104,82 +43,123 @@
                         <option value="COPD">COPD</option>
                     </select>
                 </div>
-            </div>
 
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label>Lab</label>
-                    <select id="LabId" asp-items="@ViewBag.Labs" class="form-control">
+                <div class="form-group mt-4">
+                    <label class="form-label fw-bold">Lab</label>
+                    <select id="LabId" asp-items="@ViewBag.Labs" class="form-select">
                         <option value="">-- Select Lab --</option>
                     </select>
                 </div>
             </div>
-        </div>
 
-        <div class="row">
+            <!-- Right Column -->
             <div class="col-md-6">
                 <div class="form-group">
-                    <label>Lab Branch</label>
-                    <select id="LabBranchId" asp-for="LabBranchId" class="form-control">
-                        <option value="">-- Select LabBranch --</option>
-                    </select>
-                    <span asp-validation-for="LabBranchId" class="text-danger"></span>
+                    <label asp-for="EVoucherPDFFile" class="form-label fw-bold"></label>
+                    <input type="file" asp-for="EVoucherPDFFile" class="form-control" />
+                    <span asp-validation-for="EVoucherPDFFile" class="text-danger small"></span>
                 </div>
-            </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label>CoPayment Percentage</label>
-                    <select asp-for="CoPaymentPercentage" class="form-control">
+
+                <div class="form-group mt-4">
+                    <label class="form-label fw-bold">Lab Branch</label>
+                    <select id="LabBranchId" asp-for="LabBranchId" class="form-select">
+                        <option value="">-- Select Lab Branch --</option>
+                    </select>
+                    <span asp-validation-for="LabBranchId" class="text-danger small"></span>
+                </div>
+
+                <div class="form-group mt-4">
+                    <label class="form-label fw-bold">CoPayment Percentage</label>
+                    <select asp-for="CoPaymentPercentage" class="form-select">
                         <option value="0">-- Select CoPayment Percentage --</option>
                         <option value="0">0%</option>
                         <option value="30">30%</option>
                     </select>
-                    <span asp-validation-for="CoPaymentPercentage" class="text-danger"></span>
-                </div>
-
-            </div>
-        </div>
-
-        <div class="row">
-           @*  <div class="col-md-6">
-                <div class="form-group">
-                    <label>Service Provider</label>
-                    <select asp-for="OwnerType" class="form-control">
-                        <option value="">-- Select Service Provider --</option>
-                        <option value="Scan">Scan</option>
-                        <option value="Pharmacy">Pharmacy</option>
-                        <option value="Labs">Labs</option>
-                    </select>
-                    <span asp-validation-for="OwnerType" class="text-danger"></span>
-                </div>
-            </div> *@
-            <div class="col-md-6">
-                <div class="form-group form-check">
-                    <input type="checkbox" asp-for="Payment" class="form-check-input" />
-                    <label class="form-check-label" asp-for="Payment">Payment Completed</label>
+                    <span asp-validation-for="CoPaymentPercentage" class="text-danger small"></span>
                 </div>
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-md-12 text-center mt-3">
-                <button type="submit" class="btn text-white" style="background-color: #957200;">Submit</button>
-                <a asp-action="Indexadmin" asp-controller="PatientRegistrations" class="btn btn-secondary">Back</a>
+        <!-- Patient Details Section -->
+        <div id="patientDetails" class="mt-4" style="display: none;">
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label fw-bold">Mobile Number</label>
+                        <input type="text" id="MobileNumber" class="form-control" readonly />
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label fw-bold">Program Name</label>
+                        <input type="text" id="ProgramName" class="form-control" readonly />
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label fw-bold">Program Sponsor</label>
+                        <input type="text" id="ProgramSponsor" class="form-control" readonly />
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label fw-bold">National ID</label>
+                        <input type="text" id="NationalID" class="form-control" readonly />
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label fw-bold">Membership Number</label>
+                        <input type="text" id="MembershipNumber" class="form-control" readonly />
+                    </div>
+                </div>
             </div>
         </div>
 
-    </div>
-</form>
+        <!-- Form Footer -->
+        <div class="row mt-5">
+            <div class="col-12 text-center">
+                <button type="submit" class="btn btn-primary px-5 py-2">
+                    <i class="bi bi-save me-2"></i>Submit
+                </button>
+                <a asp-action="Indexadmin" asp-controller="PatientRegistrations"
+                   class="btn btn-outline-secondary px-5 py-2 ms-3">
+                    <i class="bi bi-x-circle me-2"></i>Cancel
+                </a>
+            </div>
+        </div>
+    </form>
+</div>
 
+@section Styles {
+    <style>
+        .form-control:focus, .form-select:focus {
+            border-color: #957200;
+            box-shadow: 0 0 0 0.25rem rgba(149, 114, 0, 0.25);
+        }
 
+        .btn-primary {
+            background-color: #957200;
+            border-color: #957200;
+        }
+
+            .btn-primary:hover {
+                background-color: #7a5e00;
+                border-color: #7a5e00;
+            }
+
+        .form-check-input:checked {
+            background-color: #957200;
+            border-color: #957200;
+        }
+    </style>
+}
 
 @section Scripts {
     <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
-
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
 
-    <script>
+  <script>
         $(document).ready(function () {
             $("#PatientSelect").select2({
                 placeholder: "-- Select Patient --",
@@ -219,4 +199,8 @@
             });
         });
     </script>
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

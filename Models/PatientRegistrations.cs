@@ -68,8 +68,6 @@ namespace ECARE.Models
         [Column("[Membership Number]")]
         [RegularExpression(@"^\d+$", ErrorMessage = "Patient Membership Number must contain numbers only")]
         public string MembershipNumber { get; set; }
-        [Column("[Program Sponsor]")]
-
 
         public string Indication { get; set; }
 

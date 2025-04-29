@@ -36,6 +36,7 @@
                     <th>Pharmacy Branch</th>
                     <th>Medication</th>
                     <th>Price after discount</th>
+                    <th>Distributer</th>
                     <th>Payment</th>
                     <th>EVoucherPDF</th>
                 </tr>
@@ -54,6 +55,7 @@
                             <td>@(serviceRequest?.BranchName ?? "No Branch")</td>
                             <td>@(serviceRequest?.MedicationName ?? "No Medication")</td>
                             <td>@(serviceRequest?.PriceAfterDiscount.ToString() ?? "No Price After Discount")</td>
+                            <td>@(serviceRequest?.Distributer ?? "No Distributer")</td>
                             <td>@(serviceRequest?.Payment.ToString() ?? "No Payment")</td>
                             <td>
                                 @if (serviceRequest?.IsVerified == true)

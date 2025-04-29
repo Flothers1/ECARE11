@@ -336,8 +336,7 @@ namespace ECARE.Migrations
 
                     b.Property<string>("Indication")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("[Program Sponsor]");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Invoice1")
                         .HasColumnType("nvarchar(max)");
@@ -742,7 +741,7 @@ namespace ECARE.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "4",
+                            Id = "2b2e7b7f-1e19-4de9-9f7e-1b89cd83ea7e",
                             Name = "PharmacyAdmin",
                             NormalizedName = "PHARMACYADMIN"
                         });
@@ -915,7 +914,7 @@ namespace ECARE.Migrations
                     b.HasOne("ECARE.Models.CareProgram", "CareProgram")
                         .WithMany("PatientRegistrations")
                         .HasForeignKey("CareProgramId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.SetNull)
                         .IsRequired();
 
                     b.Navigation("CareProgram");

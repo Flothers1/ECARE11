@@ -24,46 +24,45 @@
             <!-- Left Column -->
             <div class="col-md-6">
                 <div class="form-group">
-                    <label>Program Name</label>
-                    <select asp-for="SelectedCareProgramId" asp-items="Model.CareProgramOptions" class="form-control" id="CareProgramSelect">
-                        <option value="">-- Select Program --</option>
+                    <label asp-for="SelectedCareProgramId"></label>
+                    <select asp-for="SelectedCareProgramId" asp-items="Model.CareProgramOptions" class="form-select"
+                            id="CareProgramSelect" data-placeholder="Select Program">
+                        <option value=""></option>
                     </select>
-
-                    <span asp-validation-for="PatientRegistrationsId" class="text-danger"></span>
-                </div>
-                <div class="form-group mt-4">
-                    <label>Pharmacy</label>
-                    <select id="pharmacy" asp-for="pharmacyId" asp-items="Model.PharmaciesOptions" class="form-control">
-                        <option value="">-- Select Lab --</option>
-                    </select>
+                    <span asp-validation-for="SelectedCareProgramId" class="text-danger"></span>
                 </div>
 
                 <div class="form-group mt-4">
                     <label asp-for="PatientRegistrationsId" class="form-label fw-bold"></label>
-                    <select asp-for="PatientRegistrationsId" class="form-control" id="patientId" placeholder="Select patient">
-                    <option value=""></option>
+                    <select asp-for="PatientRegistrationsId" class="form-select" id="patientId" data-placeholder="Select Patient">
+                        <option value=""></option>
                     </select>
                     <span asp-validation-for="PatientRegistrationsId" class="text-danger small"></span>
                 </div>
-           
-            
+
+                <div class="form-group mt-4">
+                    <label asp-for="pharmacyId"></label>
+                    <select id="pharmacy" asp-for="pharmacyId" asp-items="Model.PharmaciesOptions"
+                            class="form-select" data-placeholder="Select Pharmacy">
+                        <option value=""></option>
+                    </select>
+                </div>
+
             </div>
             <!-- Right Column -->
             <div class="col-md-6">
                 <div class="form-group">
-                    <label asp-for="EVoucherPDF" class="form-label fw-bold"></label>
-                    <input asp-for="EVoucherPDF" class="form-control" type="file" />
-                    <span asp-validation-for="EVoucherPDF" class="text-danger small"></span>
-                </div>
-
-                <div class="form-group mt-4">
-                    <label>Pharmacy Branch</label>
-                    <select id="pharmacyBranch" asp-for="PharmacyBranchId" class="form-control">
+                    <label asp-for="PharmacyBranchId"></label>
+                    <select id="pharmacyBranch" asp-for="PharmacyBranchId" class="form-select">
                         <option value="">-- Select Pharmacy branch --</option>
                     </select>
                     <span asp-validation-for="PharmacyBranchId" class="text-danger"></span>
                 </div>
-
+                <div class="form-group mt-4">
+                    <label asp-for="EVoucherPDF" class="form-label fw-bold"></label>
+                    <input asp-for="EVoucherPDF" class="form-select" type="file" />
+                    <span asp-validation-for="EVoucherPDF" class="text-danger small"></span>
+                </div>
                 <div class="form-group mt-4">
                     <input asp-for="Payment" type="checkbox" class="form-check-input" />
                     <label asp-for="Payment" class="form-check-label">Payment Completed</label>

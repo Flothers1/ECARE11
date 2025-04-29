@@ -24,13 +24,18 @@ namespace ECARE.Controllers
             var requests = _context.PharmacyServiceRequests
                 .Include(r => r.CareProgram)
                 .Include(r => r.PharmacyBranch)
+                .ThenInclude(pb => pb.Pharmacy)
                 .Include(r => r.PatientRegistrations)
-                .Select(r => new PharmacyServiceRequestViewModel
+                .Select(psr => new PharmacyServiceRequestIndexViewModel
                 {
-                    Id = r.Id,
-                    Date = r.Date,
-                    Payment = r.Payment,
-                    IsVerified = r.IsVerified,
+                    Date = psr.Date,
+                    PatientName = psr.PatientRegistrations.PatientName,
+                    NationalId = psr.PatientRegistrations.NationalID,
+                    PriceAfterDiscount = psr.CareProgram.PriceAfterDiscount,
+                    MedicationName = psr.CareProgram.MedicationName,
+                    Pharmacy = psr.PharmacyBranch.Pharmacy.Name,
+                    PharmacyBranch = psr.PharmacyBranch.Name,
+                    EVoucherPDF = psr.EVoucherPDF,
                 }).ToList();
 
             return View(requests);

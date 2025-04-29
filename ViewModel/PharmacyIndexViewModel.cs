@@ -24,6 +24,7 @@ namespace ECARE.ViewModel
 
         // From PharmacyServiceRequest
         public bool Payment { get; set; }
+        public string Distributer { get; set; }
         public string EVoucherPDF { get; set; }
         [MaxLength(100)]
         public string? OTP { get; set; }

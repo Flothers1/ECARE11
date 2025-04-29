@@ -22,7 +22,7 @@ namespace ECARE.Controllers
             _context = context;
         }
 
-        [HttpGet, Authorize(Roles = "Admin")]
+        //[HttpGet, Authorize(Roles = "Admin")]
         public async Task<IActionResult> Register()
         {
             //ViewBag.Labs = new SelectList(await _context.Lab.ToListAsync(), "Id", "LabName");
