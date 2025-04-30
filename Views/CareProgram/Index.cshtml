@@ -27,20 +27,26 @@
         <li class="nav-item @(ViewContext.RouteData.Values["Controller"].ToString() == "PatientRegistrations" 
         && ViewContext.RouteData.Values["Action"].ToString() == "Indexadmin" ? "active" : "")">
             <a asp-action="Indexadmin" asp-controller="PatientRegistrations">
-                <i class="mdi mdi-ticket-account icon-side-bar"></i>
+                <i class="mdi mdi-ticket-confirmation icon-side-bar"></i>
                 Patients List
             </a>
         </li>
         <li class="nav-item @(ViewContext.RouteData.Values["Controller"].ToString() == "CareProgram" && ViewContext.RouteData.Values["Action"].ToString() == "Index" ? "active" : "")">
             <a asp-action="Index" asp-controller="CareProgram">
-                <i class="mdi mdi-ticket-account icon-side-bar"></i>
+                <i class="mdi mdi-ticket-confirmation icon-side-bar"></i>
                 Program List
             </a>
         </li>
         <li class="nav-item @(ViewContext.RouteData.Values["Controller"].ToString() == "PatientRegistrations" && ViewContext.RouteData.Values["Action"].ToString() == "ServiceRequests" ? "active" : "")">
             <a asp-action="ServiceRequests" asp-controller="PatientRegistrations">
                 <i class="mdi mdi-ticket-confirmation icon-side-bar"></i>
-                Service Requests
+                Lab Service Requests
+            </a>
+        </li>
+        <li class="nav-item @(ViewContext.RouteData.Values["Controller"].ToString() == "PharmacyServiceRequest" && ViewContext.RouteData.Values["Action"].ToString() == "Index" ? "active" : "")">
+            <a asp-action="Index" asp-controller="PharmacyServiceRequest">
+                <i class="mdi mdi-ticket-confirmation icon-side-bar"></i>
+                Pharmacy Service Requests
             </a>
         </li>
     </ul>

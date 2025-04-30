@@ -1,7 +1,7 @@
-﻿@model List<PatientRegistrations>
+﻿@model List<PharmacyServiceRequestIndexViewModel>
 @Html.AntiForgeryToken()
 @{
-    ViewData["Title"] = "Lab Service Requests";
+    ViewData["Title"] = "Pharmacy Service Requests";
 }
 
 <header class="text-white mb-4">
@@ -48,7 +48,7 @@
         <li class="nav-item @(ViewContext.RouteData.Values["Controller"].ToString() == "PharmacyServiceRequest" && ViewContext.RouteData.Values["Action"].ToString() == "Index" ? "active" : "")">
             <a asp-action="Index" asp-controller="PharmacyServiceRequest">
                 <i class="mdi mdi-ticket-confirmation icon-side-bar"></i>
-                Pharmacy Service Requests
+               Pharmacy Service Requests
             </a>
         </li>
     </ul>
@@ -58,78 +58,51 @@
                 <tr>
                     <th>Request Date</th>
                     <th>Patient Name</th>
-                    <th>Co Payment Percentage</th>
-                    <th>Required Tests</th>
-                    <th>Lab</th>
-                    <th>Lab Branch</th>
-                    <th>E-Voucher PDF</th>
-                    <th>National ID</th>
-                    <th>Invoice</th>
-                    <th>Invoiced</th>
+                    <th>National Id</th>
+                    <th>Pharmacy</th>
+                    <th>Pharmacy Branch</th>
+                    <th>Medication Name</th>
+                    <th>Price after discount</th>
+                    <th>EVoucher PDF</th>
                 </tr>
             </thead>
             <tbody>
                 @if (Model != null && Model.Any())
                 {
-                    int counter = 1;
-                    @foreach (var patient in Model)
+                    @foreach (var serviceRequest in Model)
                     {
-                        var labBranch = patient?.ServiceRequests?.FirstOrDefault()?.LabBranch?.LabBranchName;
-
-                        if (string.IsNullOrEmpty(labBranch))
-                        {
-                            continue;
-                        }
-
-                        @foreach (var request in patient.ServiceRequests)
-                        {
                             <tr>
                                 <td>
-                                    @if (request.Date.HasValue)
-                                    {
-                                        <span>@request.Date.Value.ToString("yyyy-MM-dd HH:mm:ss")</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">No date</span>
-                                    }
-                                </td>
-
-                                <td>@patient.PatientName</td>
+                                        <span>@(serviceRequest.Date.ToString("yyyy-MM-dd HH:mm:ss")
+                                            ??"No date")</span>
+                               </td>
 
                                 <td>
-                                    @if (request.CoPaymentPercentage.HasValue)
-                                    {
-                                        <span>@request.CoPaymentPercentage</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">No CoPaymentPercentage available</span>
-                                    }
-                                </td>
+                                        <span>@(serviceRequest.PatientName ?? "No Patient")</span>
+                               </td>
 
                                 <td>
-                                    @if (!string.IsNullOrEmpty(request.RequiredTests))
-                                    {
-                                        <span>@request.RequiredTests</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">No Test available</span>
-                                    }
-                                </td>
+                                        <span>@(serviceRequest.NationalId ?? "No National Id")</span>
+                               </td>
 
                                 <td>
-                                    <span>@(request?.LabBranch?.Lab?.LabName ?? "No Lab")</span>
-                                </td>
+                                        <span>@(serviceRequest.Pharmacy ?? "No Pharmacy")</span>
+                               </td>
 
                                 <td>
-                                    <span>@(request?.LabBranch?.LabBranchName ?? "No Branch")</span>
-                                </td>
+                                    <span>@(serviceRequest?.PharmacyBranch ?? "No Lab")</span>
+                               </td>
+
                                 <td>
-                                    @if (!string.IsNullOrEmpty(request.EVoucherPDF))
+                                    <span>@(serviceRequest?.MedicationName ?? "No Medication")</span>
+                               </td>
+                                <td>
+                                <span>@(serviceRequest?.PriceAfterDiscount.ToString() ?? "No Price After Discount")</span>
+                               </td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(serviceRequest.EVoucherPDF))
                                     {
-                                        <a href="@Url.Content(request.EVoucherPDF)" download target="_blank" class="evoucher-icon-link">
+                                        <a href="@Url.Content(serviceRequest.EVoucherPDF)" download target="_blank" class="evoucher-icon-link">
                                             <span class="download-text">Download eVoucher</span>
                                             <span class="icon-wrapper">
                                                 <i class="fa-solid fa-ticket"></i>
@@ -141,50 +114,7 @@
                                         <span class="unavailable-dash">—</span>
                                     }
                                 </td>
-                                <td>@patient.NationalID</td>
-
-                                <td class="text-center align-middle">
-                                    <div class="upload-container" data-request-id="@request.Service_RequestId">
-
-                                        <div class="position-relative">
-                                            <!-- Conditional display -->
-                                            @if (!string.IsNullOrEmpty(request.Invoice))
-                                            {
-                                                <div class="mb-2 upload-status-text">
-                                                    <i class="fas fa-check-circle"></i> Invoice uploaded
-                                                </div>
-                                            }
-
-                                            <!-- Styled upload button -->
-                                            <label class="btn btn-sm custom-btn @(string.IsNullOrEmpty(request.Invoice) ? "btn-filled" : "btn-outline")">
-                                                <i class="fas @(string.IsNullOrEmpty(request.Invoice) ? "fa-upload" : "fa-sync") me-1"></i>
-                                                @(string.IsNullOrEmpty(request.Invoice) ? "Upload Invoice" : "Update Invoice")
-                                                <input type="file"
-                                                       name="file"
-                                                       class="invoice-upload d-none"
-                                                       accept=".jpg,.jpeg,.png,.pdf"
-                                                       onchange="uploadInvoiceFile(event)" />
-                                            </label>
-
-                                            <div class="upload-feedback small mt-1"></div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="d-flex justify-content-center">
-                                        <div class="form-check form-switch">
-                                            <input type="checkbox"
-                                                   class="form-check-input payment-toggle"
-                                                   data-request-id="@request.Service_RequestId"
-                                            @(request.Payment ? "checked" : "")
-                                                   data-url="@Url.Action("TogglePayment", "PatientRegistrations")" />
-                                        </div>
-                                    </div>
-                                </td>
                             </tr>
-                        }
-
-                        counter++;
                     }
                 }
                 else
@@ -375,7 +305,7 @@
     <script src="~/js/jquery.table2excel.min.js"></script>
     <script src="~/js/jquery.dataTables.min.js"></script>
     <script>
-             $(function () {
+        $(function () {
             var table = $('#patientsTable').DataTable({
                 "columnDefs": [{ "type": "date", "targets": 1 }],
                 "order": [[1, "desc"]]
@@ -397,71 +327,5 @@
                 table.page.len(currentPageLength).draw();
             });
         });
-       
     </script>
-    <script>
-        $(document).ready(function () {
-            // Handle payment toggle
-            $('.payment-toggle').change(function () {
-                var serviceRequestId = $(this).data('request-id');
-                var isChecked = $(this).is(':checked');
-                var $checkbox = $(this);
-                $.ajax({
-                    url: $checkbox.data('url'),
-                    type: 'POST',
-                    data: {
-                        serviceRequestId: serviceRequestId,
-                        __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
-                    },
-                    success: function () {
-                        // Optional: Show success feedback
-                        console.log('Payment status updated.');
-                    },
-                    error: function () {
-                        // Revert the toggle on error
-                        $(this).prop('checked', !isChecked);
-                        alert('Failed to update payment status.');
-                    }
-                });
-            });
-        });
-    </script>
-    <script>
-        function uploadInvoiceFile(e) {
-          // Get the file object (note: use files, not value)
-          var file = e.target.files[0];
-          if (!file) {
-            return;
-          }
-
-          // Get the container div that holds the data-request-id attribute
-          var $container = $(e.target).closest('.upload-container');
-          var serviceRequestId = $container.data('request-id');
-
-          // Prepare the form data
-          var formData = new FormData();
-          formData.append("file", file);
-          formData.append("serviceRequestId", serviceRequestId);
-          // Add anti-forgery token if needed; assuming it's available in a hidden field or meta tag
-          formData.append("__RequestVerificationToken", $('input[name="__RequestVerificationToken"]').val());
-
-          // Send the AJAX request
-          $.ajax({
-            url: '@Url.Action("UploadInvoice", "ServiceRequests")',
-            type: 'POST',
-            data: formData,
-            contentType: false,
-            processData: false,
-            success: function(response) {
-              // Redirect manually after a successful upload (or update UI accordingly)
-              window.location.href = '@Url.Action("Indexadmin", "PatientRegistrations")';
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-              console.error("Error details:", jqXHR.responseText, textStatus, errorThrown);
-              $container.find('.upload-feedback').html('<span class="text-danger">Upload failed: ' + jqXHR.responseText + '</span>');
-            }
-          });
-        }
-    </script>
-
-}
+    }
