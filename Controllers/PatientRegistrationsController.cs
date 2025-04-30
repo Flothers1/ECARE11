@@ -30,7 +30,7 @@ namespace ECARE.Controllers
             _hostingEnvironment = hostingEnvironment;
         }
 
-        //[Authorize(Roles = AuthorizationConstants.LabAdmin) ]
+        [Authorize(Roles = AuthorizationConstants.LabAdmin) ]
         public async Task<IActionResult> Index()
         {
             var user = await _usersService.GetUserAfterLogin();
@@ -39,7 +39,6 @@ namespace ECARE.Controllers
                 // Handle unauthenticated user (e.g., redirect to login)
                 return Challenge();
             }
-            var userRoles = await _usersService.GetUserRole(user);
 
             List<PatientRegistrations> filteredPatients;
 
@@ -49,22 +48,8 @@ namespace ECARE.Controllers
                             .ThenInclude(s => s.LabBranch)
                             .ThenInclude(l => l!.Lab).ToListAsync();
 
-
-            if (userRoles.Contains(AuthorizationConstants.Admin))
-            {
-                filteredPatients =  patients;
-            }
-            else if(userRoles.Contains(AuthorizationConstants.LabAdmin))
-            {
                 filteredPatients =  patients.Where(p => p.ServiceRequests
-                .Any(sr => sr.LabBranch.LabId == user.LabId)).ToList();
-            }
-            else
-            {
-                filteredPatients =  patients.Where(p => 
-                                p.ServiceRequests.Any(l => l.LabBranchId == user.LabBranchId)).ToList();
-            }
-
+                .Any(sr => sr.LabBranch.LabId == user.LabId && sr.IsDeleted == null)).ToList();
             ViewBag.UserLabId = user.LabId;
             return View(filteredPatients);
 

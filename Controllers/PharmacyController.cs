@@ -66,8 +66,8 @@ namespace ECARE.Controllers
           EVoucherPDF = psr.EVoucherPDF,
           PharmacyId = psr.PharmacyBranch.PharmacyId
              }).ToListAsync();
-
-            return View(data.Where(psr => psr.PharmacyId == user.PharmacyId).ToList());
+            var filteredData = data.Where(psr => psr.PharmacyId == user.PharmacyId && psr.IsDeleted == null).ToList();
+            return View(filteredData);
         }
         public async Task<IActionResult> ClosedPharmacyServiceRequests()
         {

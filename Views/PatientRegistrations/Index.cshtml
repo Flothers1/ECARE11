@@ -72,15 +72,15 @@
                     @if (Model != null && Model.Any())
                     {
                         foreach (var patient in Model)
-                        {
+                        {@* 
                             var filteredRequests = patient.ServiceRequests
                             ?.Where(r => r.LabBranch?.LabId == userLabId && r.IsDeleted == null)
                             .ToList();
-                            
 
-                            if (filteredRequests != null && filteredRequests.Any())
+ *@
+                            if (patient.ServiceRequests != null && patient.ServiceRequests.Any())
                             {
-                                foreach (var request in filteredRequests)
+                                foreach (var request in patient.ServiceRequests)
                                 {
                                     <tr>
                                         <td>@patient.PatientName</td>
