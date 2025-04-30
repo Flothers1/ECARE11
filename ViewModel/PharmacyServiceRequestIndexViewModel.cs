@@ -12,6 +12,7 @@ namespace ECARE.ViewModel
         public DateTime Date { get; set; } = DateTime.UtcNow.AddHours(2);
         [Display (Name = "EVoucher PDF")]
         public string EVoucherPDF { get; set; }
+        public string SignedEVoucherPDF { get; set; }
         public int PharmacyBranchId { get; set; }
         [Display(Name = "Pharmacy branch")]
 

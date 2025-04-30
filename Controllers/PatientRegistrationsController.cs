@@ -14,7 +14,7 @@ using System.Text.Json;
 
 namespace ECARE.Controllers
 {
-    //[Authorize]
+    [Authorize]
     public class PatientRegistrationsController : Controller
     {
         private readonly ECAREContext _context;
@@ -117,7 +117,7 @@ namespace ECARE.Controllers
         }
 
         [HttpPost]
-        //[Authorize(Roles = AuthorizationConstants.Admin)]
+        [Authorize(Roles = AuthorizationConstants.Admin)]
         public async Task<IActionResult> Create(PatientRegistrations patient)
         {
            

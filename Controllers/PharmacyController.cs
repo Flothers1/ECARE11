@@ -4,6 +4,7 @@ using ECARE.Interface;
 using ECARE.Interface.FileStorage;
 using ECARE.Models;
 using ECARE.ViewModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
@@ -14,6 +15,7 @@ using System.Text.Json;
 
 namespace ECARE.Controllers
 {
+    [Authorize(Roles =AuthorizationConstants.PharmacyAdmin)]
     public class PharmacyController : Controller
     {
         private readonly ECAREContext _context;
@@ -64,6 +66,7 @@ namespace ECARE.Controllers
           OTP = psr.OTP,
           OTPExpiration = psr.OTPExpiration,
           EVoucherPDF = psr.EVoucherPDF,
+          SignedEVoucher = psr.SignedEVoucher,
           PharmacyId = psr.PharmacyBranch.PharmacyId
              }).ToListAsync();
             var filteredData = data.Where(psr => psr.PharmacyId == user.PharmacyId && psr.IsDeleted == null).ToList();
@@ -103,6 +106,7 @@ namespace ECARE.Controllers
                 OTP = psr.OTP,
                 OTPExpiration = psr.OTPExpiration,
                 EVoucherPDF = psr.EVoucherPDF,
+                SignedEVoucher = psr.SignedEVoucher,
                 PharmacyId = psr.PharmacyBranch.PharmacyId
             }).ToListAsync();
             List<PharmacyIndexViewModel> filteredClosedRequests;
@@ -121,6 +125,34 @@ namespace ECARE.Controllers
                 filteredClosedRequests = new List<PharmacyIndexViewModel> { };
             }
             return View(filteredClosedRequests);
+        }
+        [HttpPost]
+        public async Task<IActionResult> UploadSignedEVoucher(int serviceRequestId, IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return RedirectToAction("Index", "Pharmacy");
+            }
+            try
+            {
+                var pharmacyServiceRequest = await _context.PharmacyServiceRequests
+                    .FirstOrDefaultAsync(sr => sr.Id == serviceRequestId);
+                if (pharmacyServiceRequest == null)
+                {
+                    return RedirectToAction("Index", "Pharmacy");
+                }
+                var filePath = await _fileStorageService.SaveFile("PSRSignedEVoucher", file);
+                pharmacyServiceRequest.SignedEVoucher = filePath;
+
+                _context.Update(pharmacyServiceRequest);
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction("Index", "Pharmacy");
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("Index", "Pharmacy");
+            }
         }
 
         [HttpPost]

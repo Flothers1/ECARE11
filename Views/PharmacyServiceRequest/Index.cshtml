@@ -64,6 +64,7 @@
                     <th>Medication Name</th>
                     <th>Price after discount</th>
                     <th>EVoucher PDF</th>
+                    <th>Signed EVoucher </th>
                 </tr>
             </thead>
             <tbody>
@@ -114,6 +115,21 @@
                                         <span class="unavailable-dash">—</span>
                                     }
                                 </td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(serviceRequest.SignedEVoucherPDF))
+                                {
+                                    <a href="@Url.Content(serviceRequest.SignedEVoucherPDF)" download target="_blank" class="evoucher-icon-link">
+                                        <span class="download-text">Download Signed EVoucher</span>
+                                        <span class="icon-wrapper">
+                                            <i class="fa-solid fa-ticket"></i>
+                                        </span>
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="unavailable-dash">—</span>
+                                }
+                            </td>
                             </tr>
                     }
                 }

@@ -47,6 +47,7 @@
                         <th>Distributer</th>
                         <th>Payment</th>
                         <th>EVoucherPDF</th>
+                        <th>Upload Signed EVoucher</th>
 
                         @if (ViewContext.RouteData.Values["action"]?.ToString() != "ClosedRequests")
                         {
@@ -59,25 +60,25 @@
                 <tbody>
                     @if (Model != null && Model.Any())
                     {
-                        foreach (var serviceRequest in Model)
+                        foreach (var item in Model)
                         {
                                     <tr>
-                                        <td>@serviceRequest.PatientName</td>
-                                        <td>@serviceRequest.PhoneNumber1</td>
-                                        <td>@serviceRequest.NationalID</td>
-                                        <td>@serviceRequest.Email</td>
-                                        <td>@(serviceRequest?.PharmacyName ?? "No Pharmacy")</td>
-                                        <td>@(serviceRequest?.BranchName ?? "No Branch")</td>
-                                        <td>@(serviceRequest?.MedicationName ?? "No Medication")</td>
-                                        <td>@(serviceRequest?.PriceAfterDiscount.ToString() ?? "No Price After Discount")</td>
-                                        <td>@(serviceRequest?.Distributer ?? "No Distributer")</td>
-                                        <td>@(serviceRequest?.Payment.ToString() ?? "No Payment")</td>
+                                        <td>@item.PatientName</td>
+                                        <td>@item.PhoneNumber1</td>
+                                        <td>@item.NationalID</td>
+                                        <td>@item.Email</td>
+                                        <td>@(item?.PharmacyName ?? "No Pharmacy")</td>
+                                        <td>@(item?.BranchName ?? "No Branch")</td>
+                                        <td>@(item?.MedicationName ?? "No Medication")</td>
+                                        <td>@(item?.PriceAfterDiscount.ToString() ?? "No Price After Discount")</td>
+                                        <td>@(item?.Distributer ?? "No Distributer")</td>
+                                        <td>@(item?.Payment.ToString() ?? "No Payment")</td>
                                         <td>
-                                            @if (serviceRequest.IsVerified.GetValueOrDefault())
+                                            @if (item.IsVerified.GetValueOrDefault())
                                             {
-                                                if (!string.IsNullOrEmpty(serviceRequest.EVoucherPDF))
+                                                if (!string.IsNullOrEmpty(item.EVoucherPDF))
                                                 {
-                                                    <a href="@Url.Content(serviceRequest.EVoucherPDF)" download target="_blank" class="evoucher-icon-link">
+                                                    <a href="@Url.Content(item.EVoucherPDF)" download target="_blank" class="evoucher-icon-link">
                                                         <span class="download-text">Download eVoucher</span>
                                                         <span class="icon-wrapper">
                                                             <i class="fa-solid fa-ticket"></i>
@@ -96,18 +97,46 @@
                                                 </span>
                                             }
                                         </td>
-                                        @if (ViewContext.RouteData.Values["action"]?.ToString() != "ClosedRequests")
+                                        <td class="text-center align-middle">
+                                            <div class="upload-container" data-request-id="@item.PharmacyServiceRequestId">
+                                       
+                                                <div class="position-relative">
+                                                    <!-- Conditional display -->
+                                                    @if (!string.IsNullOrEmpty(item.SignedEVoucher))
+                                                    {
+                                                        <div class="mb-2 upload-status-text">
+                                                            <i class="fas fa-check-circle"></i> Signed EVoucher uploaded
+                                                        </div>
+                                                    }
+                                       
+                                                    <!-- Styled upload button -->
+                                                    <label class="btn btn-sm custom-btn @(string.IsNullOrEmpty(item.SignedEVoucher) ? "btn-filled" : "btn-outline")">
+                                                        <i class="fas @(string.IsNullOrEmpty(item.SignedEVoucher) ? "fa-upload" : "fa-sync") me-1"></i>
+                                                    @(string.IsNullOrEmpty(item.SignedEVoucher) ? "Upload Signed EVoucher" : "Update Signed EVoucher")
+                                                        <input type="file"
+                                                               name="file"
+                                                               class="eVoucher-upload d-none"
+                                                               accept=".jpg,.jpeg,.png,.pdf"
+                                                               onchange="uploadEVoucherFile(event)" />
+                                                    </label>
+                                       
+                                                    <div class="upload-feedback small mt-1"></div>
+                                                </div>
+                                            </div>
+                                        </td>
+
+                                @if (ViewContext.RouteData.Values["action"]?.ToString() != "ClosedRequests")
                                         {
                                     <td>
                                         <form asp-action="SendPharmacyOTP" method="post" style="display: inline;">
-                                            <input type="hidden" name="patientId" value="@serviceRequest.PatientRegistrationsId" />
-                                            <input type="hidden" name="pharmacyServiceRequestId" value="@serviceRequest.PharmacyServiceRequestId" />
+                                            <input type="hidden" name="patientId" value="@item.PatientRegistrationsId" />
+                                            <input type="hidden" name="pharmacyServiceRequestId" value="@item.PharmacyServiceRequestId" />
                                             <button type="submit" title="Send OTP">
                                                 <img src="~/img/otp_transparent.png" alt="Send OTP" style="width: 24px; height: 24px;">
                                             </button>
                                         </form>
 
-                                        @if (serviceRequest.IsVerified.GetValueOrDefault())
+                                        @if (item.IsVerified.GetValueOrDefault())
                                         {
                                             <span class="text-success fw-bold">✔ Verified</span>
                                         }
@@ -117,12 +146,12 @@
                                         }
                                     </td>
                                             <td>
-                                                @if (!string.IsNullOrEmpty(serviceRequest.Email))
+                                                @if (!string.IsNullOrEmpty(item.Email))
                                                 {
                                                     <a asp-action="SendVerificationCode"
                                                        asp-controller="Pharmacy"
-                                                       asp-route-patientId="@serviceRequest.PatientRegistrationsId"
-                                                       asp-route-pharmacyServiceRequestId="@serviceRequest.PharmacyServiceRequestId">
+                                                       asp-route-patientId="@item.PatientRegistrationsId"
+                                                       asp-route-pharmacyServiceRequestId="@item.PharmacyServiceRequestId">
                                                         <img src="~/img/MSG_transparent.png" alt="Email Verification" style="width: 24px; height: 24px;">
                                                     </a>
                                                 }
@@ -132,7 +161,7 @@
                                                          style="width: 24px; height: 24px; opacity: 0.4; cursor: not-allowed;" title="Email not available" />
                                                 }
 
-                                                @if (serviceRequest.IsVerified.GetValueOrDefault())
+                                                @if (item.IsVerified.GetValueOrDefault())
                                                 {
                                                     <span class="text-success fw-bold">✔ Verified</span>
                                                 }
@@ -143,7 +172,7 @@
                                             </td>
                                             <td>
                                         <form asp-action="SoftDeletePharmacyServiceRequest" asp-controller="Pharmacy" method="post" style="display: inline;">
-                                            <input type="hidden" name="pharmacyServiceRequestId" value="@serviceRequest.PharmacyServiceRequestId" />
+                                            <input type="hidden" name="pharmacyServiceRequestId" value="@item.PharmacyServiceRequestId" />
                                                     <button type="submit" style="border: none; background: none; padding: 0;">
                                                         <img src="~/img/resolve_transparent.png" alt="Close Request" style="width: 24px; height: 24px; cursor: pointer;">
                                                     </button>
@@ -207,9 +236,9 @@
         height: 100%;
     }
 
-        .table-overflow tbody tr {
-            background-color: #eee;
-        }
+    .table-overflow tbody tr {
+        background-color: #eee;
+    }
 
     th {
         width: calc(100% / 7);
@@ -224,42 +253,57 @@
         float: left;
         margin-right: 40px;
     }
-    /* invoice */
-    .invoice-icon-link {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px; /* Reduced from 10px to 5px */
-        text-decoration: none;
-        color: #957200;
-        transition: all 0.3s ease;
-    }
 
-    .icon-wrapper {
+    .upload-container form {
         display: flex;
-        font-size: 1.5rem;
-        padding: 8px;
-        border-radius: 50%;
-        background-color: rgba(149, 114, 0, 0.1);
+        justify-content: center;
+        align-items: center;
+        min-height: 50px; /* Adjust as needed */
+    }
+
+    .form-control-file {
+        border: 2px dashed #957200;
+        padding: 10px;
+        border-radius: 8px;
+        background-color: #f8f9fa;
+        cursor: pointer;
         transition: all 0.3s ease;
     }
 
-    .download-text {
-        font-size: 0.875rem;
-        margin-right: 0; /* Removed the 4px margin */
-        transition: color 0.3s ease;
+        .form-control-file:hover {
+            background-color: #fff;
+            border-color: #756000;
+        }
+
+    .custom-btn {
+        color: #957200 !important;
+        border-color: #957200 !important;
     }
 
-    .invoice-icon-link:hover .icon-wrapper {
-        color: white;
-        background-color: #957200;
-        transform: scale(1.1);
-        box-shadow: 0 2px 8px rgba(149, 114, 0, 0.3);
+        .custom-btn.btn-filled {
+            background-color: #957200;
+            color: white !important;
+        }
+
+        .custom-btn.btn-outline {
+            background-color: transparent;
+        }
+
+        .custom-btn:hover {
+            background-color: #7a5d00 !important;
+            border-color: #7a5d00 !important;
+            color: white !important;
+        }
+
+    .upload-status-text {
+        color: #957200 !important;
+        font-weight: 500;
     }
 
-    .invoice-icon-link:hover .download-text {
+    .upload-feedback {
         color: #957200;
-        text-decoration: underline;
     }
+
     /* IVoucher */
     .evoucher-icon-link {
         display: inline-flex;
@@ -270,36 +314,24 @@
         transition: all 0.3s ease;
     }
 
-        /* Hover effects for eVoucher (same as invoice) */
-        .evoucher-icon-link:hover .icon-wrapper {
-            color: white;
-            background-color: #957200;
-            transform: scale(1.1);
-            box-shadow: 0 2px 8px rgba(149, 114, 0, 0.3);
-        }
+    /* Hover effects for eVoucher (same as invoice) */
+    .evoucher-icon-link:hover .icon-wrapper {
+        color: white;
+        background-color: #957200;
+        transform: scale(1.1);
+        box-shadow: 0 2px 8px rgba(149, 114, 0, 0.3);
+    }
 
-        .evoucher-icon-link:hover .download-text {
-            color: #957200;
-            text-decoration: underline;
-        }
+    .evoucher-icon-link:hover .download-text {
+        color: #957200;
+        text-decoration: underline;
+    }
     /* dash of unavailable */
     .unavailable-dash {
         display: inline-block;
         color: #6c757d; /* text-muted color */
         font-weight: 400;
         font-size: 1rem;
-    }
-    /* The notification by SignalR */
-    .small-swal-popup {
-        width: 250px !important; /* Small width */
-        height: 200px;
-        font-size: 0.5rem !important; /* Reduced font size */
-        padding: 0.5rem !important; /* Compact padding */
-        border-radius: 5px !important; /* Slightly rounded corners */
-        /* Uses default background */
-        color: #333 !important; /* Dark gray text for good contrast */
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2) !important; /* Subtle shadow for depth */
-        text-align: center;
     }
 </style>
 
@@ -340,4 +372,42 @@
 
     </script>
 
+
+    <script>
+        function uploadEVoucherFile(e) {
+          // Get the file object (note: use files, not value)
+          var file = e.target.files[0];
+          if (!file) {
+            return;
+          }
+
+          // Get the container div that holds the data-request-id attribute
+          var $container = $(e.target).closest('.upload-container');
+          var serviceRequestId = $container.data('request-id');
+
+          // Prepare the form data
+          var formData = new FormData();
+          formData.append("file", file);
+          formData.append("serviceRequestId", serviceRequestId);
+          // Add anti-forgery token if needed; assuming it's available in a hidden field or meta tag
+          formData.append("__RequestVerificationToken", $('input[name="__RequestVerificationToken"]').val());
+
+          // Send the AJAX request
+          $.ajax({
+            url: '@Url.Action("UploadSignedEVoucher", "Pharmacy")',
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function(response) {
+              // Redirect manually after a successful upload (or update UI accordingly)
+              window.location.href = '@Url.Action("Index", "Pharmacy")';
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+              console.error("Error details:", jqXHR.responseText, textStatus, errorThrown);
+              $container.find('.upload-feedback').html('<span class="text-danger">Upload failed: ' + jqXHR.responseText + '</span>');
+            }
+          });
+        }
+    </script>
 }

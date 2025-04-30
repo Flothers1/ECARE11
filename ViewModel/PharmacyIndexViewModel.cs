@@ -26,6 +26,8 @@ namespace ECARE.ViewModel
         public bool Payment { get; set; }
         public string Distributer { get; set; }
         public string EVoucherPDF { get; set; }
+
+        public string SignedEVoucher { get; set; }
         [MaxLength(100)]
         public string? OTP { get; set; }
         public DateTime OTPExpiration { get; set; }

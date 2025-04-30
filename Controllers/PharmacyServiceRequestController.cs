@@ -36,6 +36,7 @@ namespace ECARE.Controllers
                     Pharmacy = psr.PharmacyBranch.Pharmacy.Name,
                     PharmacyBranch = psr.PharmacyBranch.Name,
                     EVoucherPDF = psr.EVoucherPDF,
+                    SignedEVoucherPDF = psr.SignedEVoucher,
                 }).ToList();
 
             return View(requests);
