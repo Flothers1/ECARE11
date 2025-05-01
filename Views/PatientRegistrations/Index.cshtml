@@ -137,7 +137,7 @@
                                             <td>
                                                 <form asp-action="SendOTP" asp-controller="PatientRegistrations" method="post" style="display: inline;">
                                                     <input type="hidden" name="patientId" value="@patient.PatientRegistrationsId" />
-                                                    <input type="hidden" name="serviseRequstid" value="@request?.Service_RequestId" />
+                                                    <input type="hidden" name="serviceRequestId" value="@request?.Service_RequestId" />
                                                     <button type="submit" title="Send OTP" style="border: none; background: none; padding: 0;">
                                                         <img src="~/img/otp_transparent.png" alt="Send OTP" style="width: 24px; height: 24px;">
                                                     </button>

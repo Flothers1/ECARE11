@@ -186,7 +186,6 @@ namespace ECARE.Controllers
             {
                 return RedirectToAction("Index", new { message = "Phone number not registered!" });
             }
-
             if (pharmacyRequest.OTP != otpCode)
             {
                 ViewBag.PatientId = patientId;
