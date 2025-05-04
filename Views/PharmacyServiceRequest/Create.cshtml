@@ -22,26 +22,26 @@
     <form asp-action="Create" method="post" enctype="multipart/form-data">
         <div class="row g-4">
             <!-- Left Column -->
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label asp-for="SelectedCareProgramId"></label>
-                    <select asp-for="SelectedCareProgramId" asp-items="Model.CareProgramOptions" class="form-select"
+            <div class="col-12 col-md-6">
+                <div class="form-group mb-3">
+                    <label asp-for="SelectedCareProgramId" class="form-label fw-bold"></label>
+                    <select asp-for="SelectedCareProgramId" asp-items="Model.CareProgramOptions" class="form-select form-select-lg"
                             id="CareProgramSelect" data-placeholder="Select Program">
                         <option value=""></option>
                     </select>
-                    <span asp-validation-for="SelectedCareProgramId" class="text-danger"></span>
+                    <span asp-validation-for="SelectedCareProgramId" class="text-danger small"></span>
                 </div>
 
-                <div class="form-group mt-4">
+                <div class="form-group mb-3">
                     <label asp-for="PatientRegistrationsId" class="form-label fw-bold"></label>
-                    <select asp-for="PatientRegistrationsId" class="form-select" id="patientId" data-placeholder="Select Patient">
+                    <select asp-for="PatientRegistrationsId" class="form-select form-select-lg" id="patientId" data-placeholder="Select Patient">
                         <option value=""></option>
                     </select>
                     <span asp-validation-for="PatientRegistrationsId" class="text-danger small"></span>
                 </div>
 
-                <div class="form-group mt-4">
-                    <label asp-for="pharmacyId"></label>
+                <div class="form-group mb-3">
+                    <label asp-for="pharmacyId" class="form-label fw-bold"></label>
                     <select id="pharmacy" asp-for="pharmacyId" asp-items="Model.PharmaciesOptions"
                             class="form-select" data-placeholder="Select Pharmacy">
                         <option value=""></option>
@@ -50,30 +50,57 @@
 
             </div>
             <!-- Right Column -->
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label asp-for="PharmacyBranchId"></label>
-                    <select id="pharmacyBranch" asp-for="PharmacyBranchId" class="form-select">
-                        <option value="">-- Select Pharmacy branch --</option>
+            <div class="col-12 col-md-6">
+                <div class="form-group mb-3">
+                    <label asp-for="PharmacyBranchId" class="form-label fw-bold"></label>
+                    <select id="pharmacyBranch" asp-for="PharmacyBranchId" class="form-select form-select-lg">
+                        <option value="">-- Select Branch --</option>
                     </select>
                     <span asp-validation-for="PharmacyBranchId" class="text-danger"></span>
                 </div>
-                <div class="form-group mt-4">
+                <div class="form-group mb-3">
                     <label asp-for="EVoucherPDF" class="form-label fw-bold"></label>
-                    <input asp-for="EVoucherPDF" class="form-select" type="file" />
+                    <input asp-for="EVoucherPDF" class="form-select form-control-lg" type="file" />
                     <span asp-validation-for="EVoucherPDF" class="text-danger small"></span>
                 </div>
-                <div class="form-group mt-4">
+                <div class="form-group mb-3">
                     <input asp-for="Payment" type="checkbox" class="form-check-input" />
-                    <label asp-for="Payment" class="form-check-label">Payment Completed</label>
+                    <label asp-for="Payment" class="form-check-label fw-bold">Payment Completed</label>
                 </div>
             </div>
         </div>
+
+        <!-- Add this section below your existing form columns -->
+        <div class="row mt-4" id="pharmacyRequestsSection" style="display: none;">
+            <div class="col-12">
+                <h4 class="mb-3">Patient's Existing Pharmacy Requests</h4>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>National Id</th>
+                                <th>Medication</th>
+                                <th>Pharmacy</th>
+                                <th>Branch</th>
+                                <th>Price</th>
+                                <th>EVoucher PDF</th>
+                                <th>SignedEVoucherPDF</th>
+                            </tr>
+                        </thead>
+                        <tbody id="requestsTableBody">
+                            <!-- AJAX content will load here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
         <!-- Form Footer -->
         <div class="row mt-5">
             <div class="col-12 text-center">
                 <button type="submit" class="btn btn-primary px-5 py-2">
-                    <i class="bi bi-save me-2"></i>Create Program
+                    <i class="bi bi-save me-2"></i>Submit
                 </button>
                 <a asp-action="Index" class="btn btn-outline-secondary px-5 py-2 ms-3">
                     <i class="bi bi-x-circle me-2"></i>Cancel
@@ -99,6 +126,23 @@
            background-color: #7a5e00;
            border-color: #7a5e00;
        }
+
+
+        #pharmacyRequestsSection {
+            margin-top: 2rem;
+            border-top: 2px solid #eee;
+            padding-top: 1.5rem;
+        }
+
+        .table th {
+            background-color: #957200;
+            color: white;
+            font-weight: bold;
+        }
+
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: rgba(149, 114, 0, 0.05);
+        }
     </style>
 }
 
@@ -160,7 +204,45 @@
           });
         });
     </script>
+
+    <script>
+        $(document).ready(function() {
+            // Existing CareProgram→Patients and Pharmacy→Branch code...
+
+            // New Patient→Requests handler
+            $('#patientId').change(function() {
+                var patientId = $(this).val();
+                var $section = $('#pharmacyRequestsSection');
+                var $tbody = $('#requestsTableBody');
+
+                if (patientId) {
+                    $.ajax({
+                        url: '@Url.Action("GetPatientPharmacyRequests", "PharmacyServiceRequest")',
+                        type: 'GET',
+                        data: { patientId: patientId },
+                        beforeSend: function() {
+                            $tbody.html('<tr><td colspan="8" class="text-center">Loading...</td></tr>');
+                        },
+                        success: function(data) {
+                            $section.show();
+                            $tbody.html(data);
+                        },
+                        error: function() {
+                            $tbody.html('<tr><td colspan="8" class="text-center text-danger">Error loading requests</td></tr>');
+                        }
+                    });
+                } else {
+                    $section.hide();
+                    $tbody.empty();
+                }
+            });
+        });
+    </script>
+    <script>
+
+    </script>
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
+
     }
 }

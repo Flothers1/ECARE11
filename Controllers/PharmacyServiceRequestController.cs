@@ -127,5 +127,28 @@ namespace ECARE.Controllers
 
             return Json(branches);
         }
+
+        public IActionResult GetPatientPharmacyRequests(int patientId)
+        {
+            var requests = _context.PharmacyServiceRequests
+                .Include(r => r.CareProgram)
+                .Include(r => r.PharmacyBranch)
+                    .ThenInclude(pb => pb.Pharmacy)
+                .Include(r => r.PatientRegistrations)
+                .Where(r => r.PatientRegistrations.PatientRegistrationsId == patientId)
+                .Select(psr => new PharmacyServiceRequestIndexViewModel
+                {
+                    Date = psr.Date,
+                    NationalId = psr.PatientRegistrations.NationalID,
+                    Pharmacy = psr.PharmacyBranch.Pharmacy.Name,
+                    PharmacyBranch = psr.PharmacyBranch.Name,
+                    MedicationName = psr.CareProgram.MedicationName,
+                    PriceAfterDiscount = psr.CareProgram.PriceAfterDiscount,
+                    EVoucherPDF = psr.EVoucherPDF,
+                    SignedEVoucherPDF = psr.SignedEVoucher
+                }).ToList();
+
+            return PartialView("_PatientPharmacyRequests", requests);
+        }
     }
 }

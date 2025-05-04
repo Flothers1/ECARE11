@@ -1,0 +1,24 @@
+﻿@model IEnumerable<PharmacyServiceRequestIndexViewModel>
+
+@if (!Model.Any())
+{
+    <tr>
+        <td colspan="6" class="text-center">No requests found for this patient</td>
+    </tr>
+}
+else
+{
+    foreach (var request in Model)
+    {
+        <tr>
+            <td>@request.Date.ToString("d")</td>
+            <td>@request.NationalId</td>
+            <td>@request.MedicationName</td>
+            <td>@request.Pharmacy</td>
+            <td>@request.PharmacyBranch</td>
+            <td>@request.PriceAfterDiscount.ToString("C")</td>
+            <td>@(request.EVoucherPDF != null ? "Exist" : "No EVoucher found")</td>
+            <td>@(request.SignedEVoucherPDF != null ? "Completed" : "Pending")</td>
+        </tr>
+    }
+}
