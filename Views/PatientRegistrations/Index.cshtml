@@ -4,7 +4,13 @@
     var userLabId = (int)ViewBag.UserLabId;
 
 }
-
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
 
 <header class="text-white mb-4">
     <!-- Removed custom-gray-header class -->
@@ -48,6 +54,7 @@
             <table id="patientsTable" class="table table-tab d-block text-center border-bottom-0 table-overflow">
                 <thead>
                     <tr>
+                        <th>Request Date</th>
                         <th>Patient Name</th>
                         <th>Phone Number 1</th>
                         <th>National ID</th>
@@ -83,6 +90,7 @@
                                 foreach (var request in patient.ServiceRequests)
                                 {
                                     <tr>
+                                        <td>@request.Date</td>
                                         <td>@patient.PatientName</td>
                                         <td>@patient.PhoneNumber1</td>
                                         <td>@patient.NationalID</td>
@@ -181,7 +189,8 @@
                                                 <form asp-action="SoftDeletePatient" asp-controller="PatientRegistrations" method="post" style="display: inline;">
                                                     <input type="hidden" name="patientId" value="@request.Service_RequestId" />
                                                     <button type="submit" style="border: none; background: none; padding: 0;">
-                                                        <img src="~/img/resolve_transparent.png" alt="Close Request" style="width: 24px; height: 24px; cursor: pointer;">
+                                                        <img src="~/img/resolve_transparent.png" alt="Close Request" 
+                                                        style="width: 24px; height: 24px; cursor: pointer;">
                                                     </button>
                                                 </form>
                                             </td>

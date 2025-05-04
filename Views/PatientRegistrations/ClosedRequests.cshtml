@@ -28,6 +28,8 @@
         <table class="table table-tab d-block text-center border-bottom-0 table-overflow" id="patientsTable">
             <thead>
                 <tr>
+                    <th>Request Date</th>
+                    <th>Request Closed Date</th>
                     <th>Patient Name</th>
                     <th>Phone Number 1</th>
                     <th>Email</th>
@@ -48,6 +50,8 @@
                     {
                         var patient = request.PatientRegistrations;
                         <tr>
+                            <td>@request.Date</td>
+                            <td>@request.RequestClosedDate</td>
                             <td>@patient?.PatientName</td>
                             <td>@patient?.PhoneNumber1</td>
                             <td>@patient?.Email </td>

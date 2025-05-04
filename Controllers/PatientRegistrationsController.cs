@@ -358,9 +358,19 @@ namespace ECARE.Controllers
             {
                 return NotFound();
             }
+            if(serviceRequest.IsVerified == true)
+            {
 
-            serviceRequest.IsDeleted = true;
-            _context.SaveChanges();
+                serviceRequest.IsDeleted = true;
+                serviceRequest.RequestClosedDate = DateTime.UtcNow.AddHours(2);
+                _context.SaveChanges();
+            }
+            else
+            {
+
+                TempData["ErrorMessage"] = "Patient verification is required to complete this request.";
+            }
+
 
             return RedirectToAction("Index");
         }

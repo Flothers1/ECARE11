@@ -44,6 +44,7 @@
             <table id="patientsTable" class="table table-tab d-block text-center border-bottom-0 table-overflow">
                 <thead>
                     <tr>
+                        <th>Request Date</th>
                         <th>Patient Name</th>
                         <th>Phone Number 1</th>
                         <th>National ID</th>
@@ -71,6 +72,7 @@
                         foreach (var item in Model)
                         {
                                     <tr>
+                                        <td>@item.RequestDate</td>
                                         <td>@item.PatientName</td>
                                         <td>@item.PhoneNumber1</td>
                                         <td>@item.NationalID</td>
@@ -419,16 +421,5 @@
             }
           });
         }
-    </script>
-
-    <script>
-            document.querySelectorAll('form[data-soft-delete]').forEach(form => {
-        form.addEventListener('submit', function(e) {
-            if (!this.querySelector('button:not([disabled])')) {
-                e.preventDefault();
-                alert('Patient must be verified to perform this action');
-            }
-        });
-    });
     </script>
 }
