@@ -101,6 +101,7 @@ namespace ECARE.Controllers
                 BranchName = psr.PharmacyBranch.Name,
                 Payment = psr.Payment,
                 RequestDate = psr.Date,
+                RequestClosedDate = psr.RequestClosedDate.Value,
                 IsDeleted = psr.IsDeleted,
                 IsVerified = psr.IsVerified,
                 OTP = psr.OTP,
@@ -158,13 +159,22 @@ namespace ECARE.Controllers
         [HttpPost]
         public IActionResult SoftDeletePharmacyServiceRequest(int pharmacyServiceRequestId)
         {
+           
             var request = _context.PharmacyServiceRequests
                 .FirstOrDefault(p => p.Id == pharmacyServiceRequestId);
 
             if (request == null) return NotFound();
 
-            request.IsDeleted = true;
-            _context.SaveChanges();
+            if (request.IsVerified == true)
+            {
+                request.IsDeleted = true;
+                request.RequestClosedDate = DateTime.UtcNow.AddHours(2);
+                _context.SaveChanges();
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Patient verification is required to complete this request.";
+            }
             return RedirectToAction("Index");
         }
 

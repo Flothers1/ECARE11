@@ -50,7 +50,7 @@
                 <div class="form-group">
                     <label>Patient Name</label>
                     <input asp-for="PatientName" class="form-control" />
-                    <span asp-validation-for="PatientName" class="text-danger"></span>
+                     <span asp-validation-for="PatientName" class="text-danger"></span> 
                 </div>
             </div>
 
@@ -151,8 +151,8 @@
             <div class="col-md-6">
                 <div class="form-group">
                     <label>HCP Government</label>
-                    <select asp-for="HCPGovernment" asp-items="ViewBag.Governorates" class="form-control">
-                        <option value="">-- Select Governorate --</option>
+                    <select asp-for="HCPGovernment" asp-items="ViewBag.Governments" class="form-control">
+                        <option value="">-- Select Government --</option>
                     </select>
                     <span asp-validation-for="HCPGovernment" class="text-danger"></span>
                 </div>
@@ -213,8 +213,8 @@
             <div class="col-md-6">
                 <div class="form-group">
                     <label asp-for="Government"></label>
-                    <select asp-for="Government" class="form-control" asp-items="ViewBag.Governorates">
-                        <option value="">-- Select Governorate --</option>
+                    <select asp-for="Government" class="form-control" asp-items="ViewBag.Governments">
+                        <option value="">-- Select Government --</option>
                     </select>
                     <span asp-validation-for="Government" class="text-danger"></span>
                 </div>

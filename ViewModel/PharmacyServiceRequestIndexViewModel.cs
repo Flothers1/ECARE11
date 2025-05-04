@@ -9,7 +9,9 @@ namespace ECARE.ViewModel
         // Pharmacy service request
         public int Id { get; set; }
         [Display(Name = "Request Date")]
-        public DateTime Date { get; set; } = DateTime.UtcNow.AddHours(2);
+        public DateTime Date { get; set; }
+        [Display(Name = "Request Closed Date")]
+        public DateTime RequestClosedDate { get; set; }
         [Display (Name = "EVoucher PDF")]
         public string EVoucherPDF { get; set; }
         public string SignedEVoucherPDF { get; set; }

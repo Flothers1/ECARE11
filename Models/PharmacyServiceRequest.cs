@@ -8,6 +8,7 @@ namespace ECARE.Models
         [Key]
         public int Id { get; set; }
         public DateTime Date { get; set; } = DateTime.UtcNow.AddHours(2);
+        public DateTime? RequestClosedDate { get; set; }
         public bool Payment { get; set; }
         public bool? IsDeleted { get; set; }
         [MaxLength(500)]

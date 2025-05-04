@@ -110,7 +110,7 @@ namespace ECARE.Controllers
 
             ViewBag.CarePorgrams = new SelectList(carePrograms, "Id", "Name");
 
-            ViewBag.Governorates = new SelectList(regions);
+            ViewBag.Governments = new SelectList(regions);
             ViewBag.TodayDate = DateTime.Today.ToString("yyyy-MM-dd"); 
 
             return View();
@@ -224,21 +224,14 @@ namespace ECARE.Controllers
         "Prostate Cancer",
         "NA"
     };
-            var sponsors = new List<string>
-    {
-        "Janssen", "AstraZeneca", "BMS", "EVA", "Pfizer", "Sanofi",
-        "Roche", "Novartis", "GSK", "Buyer", "Takeda",
-        "Boehringer Ingelheim", "Apex Pharma", "GYPTO Pharma",
-        "Astellas", "Parkville", "Orchidia"
-    };
             var ageGroups = new List<string>
     {
         "18-36", "37-46", "47-56", "57-66", "67-76", "77-86", "87-95"
     };
             var carePrograms = _context.CarePrograms.ToList();
-            ViewBag.AgeGroups = new SelectList(ageGroups);
+            ViewBag.Governments = new SelectList(regions);
 
-            ViewBag.Sponsors = new SelectList(sponsors);
+            ViewBag.AgeGroups = new SelectList(ageGroups);
 
             ViewBag.Indications = new SelectList(indications);
 

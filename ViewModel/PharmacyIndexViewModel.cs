@@ -36,6 +36,10 @@ namespace ECARE.ViewModel
 
         [DisplayFormat(DataFormatString = "{0:dd MMM yyyy}")]
         public DateTime RequestDate { get; set; }
+        [DisplayFormat(DataFormatString = "{0:dd MMM yyyy}")]
+
+        public DateTime RequestClosedDate { get; set; }
+
 
     }
 }

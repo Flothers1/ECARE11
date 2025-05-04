@@ -18,11 +18,31 @@
     @* google fonts *@
     <link href="~/css/cairo-font.css" rel="stylesheet">
      @RenderSection("Styles", required: false)
+    <style>
+        /* Add these styles */
+        html, body {
+            height: 100%;
+            margin: 0;
+            overflow: hidden; /* Disable default browser scroll */
+        }
+
+        .main-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        main {
+            flex: 1;
+            overflow-y: auto; /* Only this element will scroll */
+            padding: 20px;
+        }
+    </style>
 </head>
 <body>
-    <div class="main-container dashboard  d-flex">
+    <div class="main-container dashboard ">
 
-        <main role="main" class="main">
+        <main role="main" class="main p-3">
             @RenderBody()
         </main>
     </div>
