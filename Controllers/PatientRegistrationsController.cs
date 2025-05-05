@@ -2,6 +2,7 @@
 using ECARE.Constants;
 using ECARE.Interface;
 using ECARE.Models;
+using ECARE.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -244,10 +245,43 @@ namespace ECARE.Controllers
         public async Task<IActionResult> Indexadmin()
         {
             var patients = await _context.PatientRegistrations
+                            .AsNoTracking()
                            .Include(p => p.CareProgram)
                            .Include(p => p.ServiceRequests)
                            .ThenInclude(s => s.LabBranch)
-                           .ThenInclude(l => l.Lab).ToListAsync();
+                           .ThenInclude(l => l.Lab).
+                           OrderByDescending(p => p.RegistrationDate)
+                           .Select(p => new PatientRegistrationIndexViewModel
+                           {
+                               RegistrationDate = p.RegistrationDate,
+                               PatientName = p.PatientName,
+                               NationalID = p.NationalID,
+                               CopyOfIDOrPassportPathFront = p.CopyOfIDOrPassportPathFront,
+                               CopyOfIDOrPassportPathBack = p.CopyOfIDOrPassportPathBack,
+                               Gender = p.Gender,
+                               Age = p.Age,
+                               AgeGroup = p.AgeGroup,
+                               PhoneNumber1 = p.PhoneNumber1,
+                               PhoneNumber2 = p.PhoneNumber2,
+                               Email = p.Email,
+                               Government = p.Government,
+                               Territory = p.Territory,
+                               CaregiverName = p.CaregiverName,
+                               CaregiverPhone = p.CaregiverPhone,
+                               ProgramName = p.CareProgram.Name,
+                               MembershipNumber = p.MembershipNumber,
+                               Indication = p.Indication,
+                               Comment = p.Comment,
+                               StartDateOfMedication = p.StartDateOfMedication,
+                               HealthcareProvider = p.HealthcareProvider,
+                               HealthcareProviderAddress = p.HealthcareProviderAddress,
+                               HCPGovernment = p.HCPGovernment,
+                               HCPTerritory = p.HCPTerritory,
+                               Prescription = p.Prescription,
+                               TestDocument1 = p.TestDocument1,
+                               TestDocument2 = p.TestDocument2,
+                           }).ToListAsync();
+                           ;
             return View(patients);
         }
 
@@ -290,7 +324,7 @@ namespace ECARE.Controllers
                 return View();
             }
 
-            if (serviceRequest.OTPExpiration < DateTime.Now)
+            if (serviceRequest.OTPExpiration < SD.TimeInEgypt)
             {
                 ViewData["ErrorMessage"] = "The verification code is incorrect. Please try again.";
                 return View(patientId);
@@ -340,7 +374,7 @@ namespace ECARE.Controllers
             if (response.IsSuccessStatusCode)
             {
                 latestRequest.OTP = otpCode;
-                latestRequest.OTPExpiration = DateTime.Now.AddMinutes(20);
+                latestRequest.OTPExpiration = SD.TimeInEgypt.AddMinutes(20);
                 _context.SaveChanges();
 
                 return RedirectToAction("VerifyOTP", new { patientId = patientId, serviceRequestid = serviceRequestId }); 
@@ -428,7 +462,7 @@ namespace ECARE.Controllers
             var verificationCode = new Random().Next(100000, 999999).ToString();
 
             latestRequest.OTP = verificationCode;
-            latestRequest.OTPExpiration = DateTime.Now.AddMinutes(20);
+            latestRequest.OTPExpiration = SD.TimeInEgypt.AddMinutes(20);
             await _context.SaveChangesAsync();
 
             var subject = "Your Verification Code";

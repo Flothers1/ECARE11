@@ -204,7 +204,7 @@ namespace ECARE.Controllers
                 return View();
             }
 
-            if (pharmacyRequest.OTPExpiration < DateTime.Now)
+            if (pharmacyRequest.OTPExpiration < SD.TimeInEgypt)
             {
                 ViewData["ErrorMessage"] = "Expired OTP!";
                 return View(patientId);
@@ -253,7 +253,7 @@ namespace ECARE.Controllers
             if (response.IsSuccessStatusCode)
             {
                 pharmacyRequest.OTP = otpCode;
-                pharmacyRequest.OTPExpiration = DateTime.Now.AddMinutes(20);
+                pharmacyRequest.OTPExpiration = SD.TimeInEgypt.AddMinutes(20);
                 await _context.SaveChangesAsync();
 
                 return RedirectToAction("VerifyPharmacyOTP", new
@@ -312,7 +312,7 @@ namespace ECARE.Controllers
             var verificationCode = new Random().Next(100000, 999999).ToString();
 
             pharmacyRequest.OTP = verificationCode;
-            pharmacyRequest.OTPExpiration = DateTime.Now.AddMinutes(20);
+            pharmacyRequest.OTPExpiration = SD.TimeInEgypt.AddMinutes(20);
             await _context.SaveChangesAsync();
 
             var subject = "Your Verification Code";

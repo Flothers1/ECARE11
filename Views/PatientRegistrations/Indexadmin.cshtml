@@ -1,4 +1,4 @@
-﻿@model List<PatientRegistrations>
+﻿@model List<PatientRegistrationIndexViewModel>
 @{
     ViewData["Title"] = "Patient Registrations";
 
@@ -80,8 +80,8 @@
                         <th>Indication</th>
                         <th>Comment</th>
                         <th>Start Date Of Medication</th>
-                        <th>Healthcare Provider</th>
-                        <th>Healthcare Provider Address</th>
+                        <th>HealthCare Provider</th>
+                        <th>HealthCare Provider Address</th>
                         <th>HCP Government</th>
                         <th>HCP Territory</th>
                         <th>Prescription</th>
@@ -152,7 +152,7 @@
                                 <td>@patient.Territory</td>
                                 <td>@patient.CaregiverName</td>
                                 <td>@patient.CaregiverPhone</td>
-                                <td>@patient.CareProgram.Name</td>
+                                <td>@patient.ProgramName</td>
                                 <td>@patient.MembershipNumber</td>
                                 <td>@patient.Indication</td>
                                 <td>@patient.Comment</td>
@@ -206,90 +206,6 @@
                                         <span class="unavailable-dash">—</span>
                                     }
                                 </td>
-                                @*   <td>
-                            @if (patient.ServiceRequests != null && patient.ServiceRequests.Any())
-                            {
-                                foreach (var request in patient.ServiceRequests)
-                                {
-                                    <span>@request.CoPaymentPercentage</span>
-                                    <br />
-                                }
-                            }
-                            else
-                            {
-                                <span class="text-muted">No CoPaymentPercentage available</span>
-                            }
-                        </td>
-                        <td>
-                            @if (patient.ServiceRequests != null && patient.ServiceRequests.Any())
-                            {
-                                foreach (var request in patient.ServiceRequests)
-                                {
-                                    <span>@request.RequiredTests</span>
-                                    <br />
-                                }
-                            }
-                            else
-                            {
-                                <span class="text-muted">No Test available</span>
-                            }
-                        </td>
-
-                        <td>
-                            @(patient?.ServiceRequests?.FirstOrDefault()?.LabBranch?.Lab?.LabName ?? "No Lab Assigned")
-                        </td>
-                        <td>
-                            @(patient?.ServiceRequests?.FirstOrDefault()?.LabBranch?.LabBranchName ?? "No Lab Branch Assigned")
-                        </td>
-
-                        <td>
-                            @if (patient.ServiceRequests != null && patient.ServiceRequests.Any())
-                            {
-                                foreach (var request in patient.ServiceRequests)
-                                {
-                                    if (!string.IsNullOrEmpty(request.EVoucherPDF))
-                                    {
-                                        <a href="@Url.Content(request.EVoucherPDF)" download target="_blank">
-                                            Download eVoucher
-                                        </a>
-                                        <br />
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">No eVoucher available</span>
-                                        <br />
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                <span class="text-muted">No eVoucher available</span>
-                            }
-                        </td>
-
-                        <td>
-                            @if (patient.ServiceRequests != null && patient.ServiceRequests.Any())
-                            {
-                                foreach (var request in patient.ServiceRequests)
-                                {
-                                    <span>@request.Payment</span>
-                                    <br />
-                                }
-                            }
-                            else
-                            {
-                                <span class="text-muted">No Payment available</span>
-                            }
-                        </td> *@
-
-
-                                @*  <td>
-                            <a class="permission-link" asp-action="VerificationCode" asp-controller="Devices" title="Verification Code">
-                                <img src="~/img/MSG_transparent.png" alt="Verification Code" style="width: 24px; height: 24px; display: inline-block; margin: 0; padding: 0;">
-                                <img src="~/img/otp_transparent.png" alt="OTP Code" style="width: 24px; height: 24px; display: inline-block; margin: 0; padding: 0;">
-                                <img src="~/img/resolve_transparent.png" alt="OTP Code" style="width: 24px; height: 24px; display: inline-block; margin: 0; padding: 0;">
-                            </a>
-                        </td> *@
                             </tr>
 
                             counter++;
