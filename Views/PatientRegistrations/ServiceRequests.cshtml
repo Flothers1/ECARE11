@@ -1,4 +1,4 @@
-﻿@model List<PatientRegistrations>
+﻿@model List<ServiceRequestIndexViewModel>
 @Html.AntiForgeryToken()
 @{
     ViewData["Title"] = "Lab Service Requests";
@@ -71,23 +71,22 @@
             <tbody>
                 @if (Model != null && Model.Any())
                 {
-                    int counter = 1;
-                    @foreach (var patient in Model)
-                    {
+                    @foreach (var item in Model)
+                    {@* 
                         var labBranch = patient?.ServiceRequests?.FirstOrDefault()?.LabBranch?.LabBranchName;
 
                         if (string.IsNullOrEmpty(labBranch))
                         {
                             continue;
                         }
-
-                        @foreach (var request in patient.ServiceRequests)
-                        {
+ *@
+                   @*      @foreach (var request in patient.ServiceRequests)
+                        { *@
                             <tr>
                                 <td>
-                                    @if (request.Date.HasValue)
+                                    @if (item.Date != null)
                                     {
-                                        <span>@request.Date.Value.ToString("yyyy-MM-dd HH:mm:ss")</span>
+                                        <span>@item.Date?.ToString("yyyy-MM-dd HH:mm:ss")</span>
                                     }
                                     else
                                     {
@@ -95,12 +94,12 @@
                                     }
                                 </td>
 
-                                <td>@patient.PatientName</td>
+                                <td>@item.PatientName</td>
 
                                 <td>
-                                    @if (request.CoPaymentPercentage.HasValue)
+                                    @if (item.CoPaymentPercentage != null)
                                     {
-                                        <span>@request.CoPaymentPercentage</span>
+                                        <span>@item.CoPaymentPercentage</span>
                                     }
                                     else
                                     {
@@ -109,9 +108,9 @@
                                 </td>
 
                                 <td>
-                                    @if (!string.IsNullOrEmpty(request.RequiredTests))
+                                    @if (!string.IsNullOrEmpty(item.RequiredTests))
                                     {
-                                        <span>@request.RequiredTests</span>
+                                        <span>@item.RequiredTests</span>
                                     }
                                     else
                                     {
@@ -120,16 +119,16 @@
                                 </td>
 
                                 <td>
-                                    <span>@(request?.LabBranch?.Lab?.LabName ?? "No Lab")</span>
+                                    <span>@(item.Lab ?? "No Lab")</span>
                                 </td>
 
                                 <td>
-                                    <span>@(request?.LabBranch?.LabBranchName ?? "No Branch")</span>
+                                    <span>@(item?.LabBranch ?? "No Branch")</span>
                                 </td>
                                 <td>
-                                    @if (!string.IsNullOrEmpty(request.EVoucherPDF))
+                                    @if (!string.IsNullOrEmpty(item.EVoucherPDF))
                                     {
-                                        <a href="@Url.Content(request.EVoucherPDF)" download target="_blank" class="evoucher-icon-link">
+                                        <a href="@Url.Content(item.EVoucherPDF)" download target="_blank" class="evoucher-icon-link">
                                             <span class="download-text">Download eVoucher</span>
                                             <span class="icon-wrapper">
                                                 <i class="fa-solid fa-ticket"></i>
@@ -141,14 +140,14 @@
                                         <span class="unavailable-dash">—</span>
                                     }
                                 </td>
-                                <td>@patient.NationalID</td>
+                                <td>@item.NationalId</td>
 
                                 <td class="text-center align-middle">
-                                    <div class="upload-container" data-request-id="@request.Service_RequestId">
+                                    <div class="upload-container" data-request-id="@item.Service_RequestId">
 
                                         <div class="position-relative">
                                             <!-- Conditional display -->
-                                            @if (!string.IsNullOrEmpty(request.Invoice))
+                                            @if (!string.IsNullOrEmpty(item.Invoice))
                                             {
                                                 <div class="mb-2 upload-status-text">
                                                     <i class="fas fa-check-circle"></i> Invoice uploaded
@@ -156,9 +155,9 @@
                                             }
 
                                             <!-- Styled upload button -->
-                                            <label class="btn btn-sm custom-btn @(string.IsNullOrEmpty(request.Invoice) ? "btn-filled" : "btn-outline")">
-                                                <i class="fas @(string.IsNullOrEmpty(request.Invoice) ? "fa-upload" : "fa-sync") me-1"></i>
-                                                @(string.IsNullOrEmpty(request.Invoice) ? "Upload Invoice" : "Update Invoice")
+                                            <label class="btn btn-sm custom-btn @(string.IsNullOrEmpty(item.Invoice) ? "btn-filled" : "btn-outline")">
+                                                <i class="fas @(string.IsNullOrEmpty(item.Invoice) ? "fa-upload" : "fa-sync") me-1"></i>
+                                                @(string.IsNullOrEmpty(item.Invoice) ? "Upload Invoice" : "Update Invoice")
                                                 <input type="file"
                                                        name="file"
                                                        class="invoice-upload d-none"
@@ -175,16 +174,15 @@
                                         <div class="form-check form-switch">
                                             <input type="checkbox"
                                                    class="form-check-input payment-toggle"
-                                                   data-request-id="@request.Service_RequestId"
-                                            @(request.Payment ? "checked" : "")
+                                                   data-request-id="@item.Service_RequestId"
+                                            @(item.Payment ? "checked" : "")
                                                    data-url="@Url.Action("TogglePayment", "PatientRegistrations")" />
                                         </div>
                                     </div>
                                 </td>
                             </tr>
-                        }
+                        @* } *@
 
-                        counter++;
                     }
                 }
                 else

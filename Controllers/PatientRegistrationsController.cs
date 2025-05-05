@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
-using System.Net.Http;
 using System.Net.Mail;
 using System.Text;
 using System.Text.Json;
@@ -285,13 +284,37 @@ namespace ECARE.Controllers
             return View(patients);
         }
 
-        public IActionResult ServiceRequests()
+        public async Task<IActionResult> ServiceRequests()
         {
-            var patientRegistrations = _context.PatientRegistrations.Include(p => p.ServiceRequests)
-                                                                     .ThenInclude(sr => sr.LabBranch)
-                                                                     .ThenInclude(lb => lb.Lab)
-                                                                     .ToList();
-            return View(patientRegistrations);
+        //    var patientRegistrations = await _context.PatientRegistrations
+        //        .AsNoTracking().
+        //        Include(p => p.ServiceRequests)
+        //        .ThenInclude(sr => sr.LabBranch)
+        //        .ThenInclude(lb => lb.Lab)
+        //        .OrderByDescending()
+        //        .ToListAsync();
+
+            var serviceRequests = await _context.ServiceRequests
+               .AsNoTracking().
+               Include(sr => sr.PatientRegistrations)
+               .Include(sr => sr.LabBranch)
+               .ThenInclude(lb => lb.Lab)
+               .OrderByDescending(sr => sr.Date)
+               .Select(sr => new ServiceRequestIndexViewModel
+               {
+                   Service_RequestId =sr.Service_RequestId,
+                   Date = sr.Date,
+                  PatientName = sr.PatientRegistrations.PatientName,
+                  CoPaymentPercentage = sr.CoPaymentPercentage,
+                  RequiredTests = sr.RequiredTests,
+                  Lab = sr.LabBranch.Lab.LabName,
+                  LabBranch = sr.LabBranch.LabBranchName,
+                  EVoucherPDF = sr.EVoucherPDF,
+                  NationalId = sr.PatientRegistrations.NationalID,
+                  Invoice = sr.Invoice,
+                  Payment = sr.Payment
+               }).ToListAsync();
+            return View(serviceRequests);
         }
 
 
@@ -416,10 +439,12 @@ namespace ECARE.Controllers
             List<Service_Request> filteredClosedRequests;
 
             var closedRequests = _context.ServiceRequests
+                                         .AsNoTracking()
                                          .Include(s => s.PatientRegistrations)
                                          .Include(s => s.LabBranch)
                                          .ThenInclude(l => l.Lab)
-                                         .Where(s => s.IsDeleted == true);
+                                         .Where(s => s.IsDeleted == true)
+                                         .OrderByDescending(s => s.Date);
 
             if ((await _usersService.GetUserRole(user)).Contains("Admin"))
             {
