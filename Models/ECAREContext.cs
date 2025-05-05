@@ -27,15 +27,7 @@ namespace ECARE.Models
         {
             base.OnModelCreating(builder);
 
-            builder.Entity<IdentityRole>().HasData(
-                new IdentityRole
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Name = "PharmacyAdmin",
-                    NormalizedName = "PHARMACYADMIN"
-                }
-                );
-                
+        
             builder.Entity<CareProgram>()
                 .HasMany(psr => psr.Pharmacies)
                 .WithMany()
@@ -46,14 +38,6 @@ namespace ECARE.Models
                 .WithMany()
                 .UsingEntity(j => j.ToTable("ProgramDistributors"));
 
-            //builder.Entity<CareProgram>()
-            //    .Property(cp => cp.HCPList)
-            //    .HasConversion(
-            //        v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
-            //        v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions)null)!)
-            //    .HasColumnType("nvarchar(max)");
-
-            // Configure PatientRegistrations -> Program
             builder.Entity<PatientRegistrations>()
                 .HasOne(pr => pr.CareProgram)
                 .WithMany(p => p.PatientRegistrations)

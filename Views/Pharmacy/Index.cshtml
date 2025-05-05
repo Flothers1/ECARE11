@@ -63,6 +63,7 @@
                             <th>Mobile Verification</th>
                             <th>Email Verification</th>
                             <th>Mark Complete</th>
+                            <th>Confirm the Serial Number</th>
                         }
                     </tr>
                 </thead>
@@ -190,6 +191,22 @@
                                                 </button>
                                         </form>
                                             </td>
+                                    <td >
+                                        <div class="serial-confirm  justify-content-center d-flex align-items-center"
+                                             data-serials='@Html.Raw(System.Text.Json.JsonSerializer.Serialize(item.ValidSerials))'>
+                                            <input type="text"
+                                                   class="form-control serial-input me-2"
+                                                   placeholder="Enter Serial"
+                                                   aria-label="Serial Number" />
+                                            <button type="button"
+                                                    class="btn btn-outline-success btn-icon"
+                                                    onclick="confirmSerial(this)">
+                                                <i class="fa fa-check" aria-hidden="true"></i>
+                                            </button>
+                                            <div class="serial-feedback ms-3"></div>
+                                        </div>
+                                    </td>
+
                                         }
                                     </tr>
                                 }
@@ -345,6 +362,52 @@
         font-weight: 400;
         font-size: 1rem;
     }
+
+
+
+    /* Container flexes input + icon horizontally */
+    .serial-confirm {
+        gap: 0.5rem;
+    }
+
+    /* Make the input wider */
+    .serial-input {
+        width: 200px; /* adjust to taste */
+        max-width: 100%;
+    }
+
+    /* Icon‑only button, no extra padding */
+    .btn-icon {
+        padding: 0.5rem;
+        line-height: 1;
+    }
+
+        /* Hover/active styling for the icon button */
+        .btn-icon:hover {
+            background-color: #28a745;
+            color: #fff;
+        }
+
+    /* Feedback text sits at baseline */
+    .serial-feedback {
+        font-size: 0.9rem;
+        min-width: 120px;
+    }
+
+        .serial-feedback .text-success {
+            color: #28a745 !important;
+        }
+
+        .serial-feedback .text-danger {
+            color: #dc3545 !important;
+        }
+
+
+    .table-table th:nth-child(13),
+    .table-table td:nth-child(13) {
+        text-align: center;
+        vertical-align: middle;
+    }
 </style>
 
 
@@ -420,6 +483,26 @@
               $container.find('.upload-feedback').html('<span class="text-danger">Upload failed: ' + jqXHR.responseText + '</span>');
             }
           });
+        }
+    </script>
+
+    <script>
+        function confirmSerial(button) {
+          // 1. Find the container DIV:
+          const container = button.closest('.serial-confirm');
+          // 2. Parse the JSON array of valid serials:
+          const validSerials = JSON.parse(container.getAttribute('data-serials'));
+          // 3. Get the user’s input value:
+          const input = container.querySelector('.serial-input');
+          const value = input.value.trim();
+          // 4. Locate the feedback element:
+          const feedback = container.querySelector('.serial-feedback');
+          // 5. Check membership with Array.includes:
+          if (validSerials.includes(value)) {
+            feedback.innerHTML = '<span class="text-success">✔ Serial confirmed</span>';
+          } else {
+            feedback.innerHTML = '<span class="text-danger">✖ Invalid serial</span>';
+          }
         }
     </script>
 }

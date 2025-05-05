@@ -1,5 +1,4 @@
-﻿using Azure;
-using ECARE.Constants;
+﻿using ECARE.Constants;
 using ECARE.Interface;
 using ECARE.Interface.FileStorage;
 using ECARE.Models;
@@ -8,7 +7,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
-using System.Net.Http;
 using System.Net.Mail;
 using System.Text;
 using System.Text.Json;
@@ -67,7 +65,9 @@ namespace ECARE.Controllers
           OTPExpiration = psr.OTPExpiration,
           EVoucherPDF = psr.EVoucherPDF,
           SignedEVoucher = psr.SignedEVoucher,
-          PharmacyId = psr.PharmacyBranch.PharmacyId
+          PharmacyId = psr.PharmacyBranch.PharmacyId,
+          ValidSerials = _context.SerialNumbers.Where(s => s.CareProgramId == psr.CareProgramId)
+          .Select(s => s.Code).ToList()
              }).ToListAsync();
             var filteredData = data.Where(psr => psr.PharmacyId == user.PharmacyId && psr.IsDeleted == null).ToList();
             return View(filteredData);
