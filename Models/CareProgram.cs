@@ -43,5 +43,6 @@ namespace ECARE.Models
         public ICollection<PharmacyServiceRequest> PharmaciesServiceRequests { get; set; }
             = new HashSet<PharmacyServiceRequest>();
         public ICollection<PatientRegistrations> PatientRegistrations { get; set; }
+        public ICollection<SerialNumber> SerialNumbers { get; set; } = new HashSet<SerialNumber>();
     }
 }

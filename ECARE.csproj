@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="CountryData.Standard" Version="1.5.0" />
+    <PackageReference Include="EFCore.BulkExtensions" Version="8.0.0" />
     <PackageReference Include="FluentValidation" Version="11.11.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.0" />

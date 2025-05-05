@@ -22,7 +22,7 @@ namespace ECARE.Models
         public DbSet<PharmacyBranch> pharmacyBranches { get; set; }
         public DbSet<Pharmacy> Pharmacies { get; set; }
         public DbSet<Distributor> Distributors { get; set; }
-
+        public DbSet<SerialNumber> SerialNumbers { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

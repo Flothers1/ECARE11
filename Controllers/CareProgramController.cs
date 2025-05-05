@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-
+using EFCore.BulkExtensions;
 namespace ECARE.Controllers
 {
     [Authorize(Roles = AuthorizationConstants.Admin)]
@@ -89,31 +89,61 @@ namespace ECARE.Controllers
         {
             if (ModelState.IsValid)
             {
-                var careProgram = new CareProgram
+                using var transaction = _context.Database.BeginTransaction();
+                try
                 {
-                    Name = viewModel.Name,
-                    StartDate = viewModel.StartDate,
-                    ProductManager = viewModel.ProductManager,
-                    SponsorCompany = viewModel.SponsorCompany,
-                    MedicationName = viewModel.MedicationName,
-                    MedicationPackSize = viewModel.MedicationPackSize,
-                    MedicationPackConsumptionDuration = viewModel.MedicationPackConsumptionDuration,
-                    OriginalPrice = viewModel.OriginalPrice,
-                    PriceAfterDiscount = viewModel.PriceAfterDiscount,
-                    HCPList = viewModel.HCPList?.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>()
+                    var careProgram = new CareProgram
+                    {
+                        Name = viewModel.Name,
+                        StartDate = viewModel.StartDate,
+                        ProductManager = viewModel.ProductManager,
+                        SponsorCompany = viewModel.SponsorCompany,
+                        MedicationName = viewModel.MedicationName,
+                        MedicationPackSize = viewModel.MedicationPackSize,
+                        MedicationPackConsumptionDuration = viewModel.MedicationPackConsumptionDuration,
+                        OriginalPrice = viewModel.OriginalPrice,
+                        PriceAfterDiscount = viewModel.PriceAfterDiscount,
+                        HCPList = viewModel.HCPList?.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>()
 
-                };
-                // Add relationships
-                careProgram.Pharmacies = await _context.Pharmacies
-                .Where(p => viewModel.SelectedPharmacyIds.Contains(p.Id))
-                    .ToListAsync();
+                    };
+                    careProgram.Pharmacies = await _context.Pharmacies
+              .Where(p => viewModel.SelectedPharmacyIds.Contains(p.Id))
+                  .ToListAsync();
 
-                careProgram.Distributors = await _context.Distributors
-                    .Where(d => viewModel.SelectedDistributorIds.Contains(d.Id))
-                    .ToListAsync();
+                    careProgram.Distributors = await _context.Distributors
+                        .Where(d => viewModel.SelectedDistributorIds.Contains(d.Id))
+                        .ToListAsync();
 
-                _context.Add(careProgram);
-                await _context.SaveChangesAsync();
+                    _context.Add(careProgram);
+                    await _context.SaveChangesAsync();
+
+                    var serials = viewModel.SerialNumbers?
+                        .Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries)
+                        .Select(s =>s.Trim())
+                        .Distinct()
+                        .ToList();
+
+                    if(serials?.Any() == true)
+                    {
+                        _context.BulkInsert(serials.Select(s => new SerialNumber
+                        {
+                            Code = s,
+                            CareProgramId = careProgram.Id
+                        }).ToList());
+                        await transaction.CommitAsync();
+
+                        return RedirectToAction(nameof(Index));
+                    }
+                    await transaction.CommitAsync();
+
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    // Log error
+                    ModelState.AddModelError("", "An error occurred while saving");
+                    return View(viewModel);
+                }
                 return RedirectToAction(nameof(Index));
             }
             var sponsors = new List<string>

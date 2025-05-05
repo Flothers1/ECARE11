@@ -70,6 +70,16 @@
                     </select>
                     <span asp-validation-for="SelectedPharmacyIds" class="text-danger small"></span>
                 </div>
+               @*  serial number *@
+                <div class="form-group mt-4">
+                    <label asp-for="SerialNumbers" class="form-label fw-bold"></label>
+                    <div class="tag-input-container border rounded" style="padding: 0.375rem 0.75rem;">
+                        <input asp-for="SerialNumbers" id="serialNumbers" name="SerialNumbers"
+                               class="form-control border-0 p-0 input-serial"
+                               placeholder="Enter serial numbers separated by commas or press Enter" />
+                    </div>
+                    <span asp-validation-for="SerialNumbers" class="text-danger small"></span> <!-- Fixed validation span -->
+                </div>
             </div>
 
             <!-- Right Column -->
@@ -125,7 +135,7 @@
         <div class="row mt-5">
             <div class="col-12 text-center">
                 <button type="submit" class="btn btn-primary px-5 py-2">
-                    <i class="bi bi-save me-2"></i>Create Program
+                    <i class="bi bi-save me-2"></i>Submit
                 </button>
                 <a asp-action="Index" class="btn btn-outline-secondary px-5 py-2 ms-3">
                     <i class="bi bi-x-circle me-2"></i>Cancel
@@ -169,7 +179,68 @@
         .select2-container {
             width: 100% !important;
         }
-    </style>
+        /*serial number*/
+        .tag-input-container {
+            border-color: #ced4da !important;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+
+        .tag-input-container.focus {
+            border-color: #957200 !important;
+            box-shadow: 0 0 0 0.25rem rgba(149, 114, 0, 0.25);
+        }
+
+        /* TagIt plugin styling */
+        .tagit {
+            border: none !important;
+            padding: 0 !important;
+            margin: -2px 0;
+            cursor:pointer;
+
+        }
+
+        .tagit li.tagit-choice {
+            border: 1px solid #7a5e00;
+            color: #7a5e00;
+            border-radius: 0.40rem;
+            padding: 0.25rem 0.5rem;
+            line-height: 1.5;
+            margin-bottom: 0.1rem;
+            font-weight: bold;
+        }
+
+        .tagit li.tagit-choice a{
+            color: red;
+            margin-left: 4px;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .tagit li.tagit-choice .tagit-close {
+            color: white;
+            line-height: 1.5;
+            margin-left: 4px;
+        }
+
+        .tagit li.tagit-choice .tagit-close .text-icon {
+            display: none;
+        }
+       
+        .tagit li.tagit-choice .tagit-close:after {
+            content: 'X';
+            font-size: 1.25rem;
+            font-weight:bold
+
+        }
+
+        .tagit input[type="text"] {
+            padding: 0 !important;
+            margin: 0 !important;
+            min-height: 38px;
+            width:100%;
+            height:100%;
+        }
+        </style>
 }
 
 @section Scripts {
@@ -183,6 +254,28 @@
             });
         });
     </script>
+    <script>
+        $(function () {
+              $('#serialNumbers').tagit({
+                  allowSpaces: false,
+                  singleField: true,
+                  placeholderText: 'Add serial numbers...',
+                  beforeTagAdded: function (event, ui) {
+                      return ui.tagLabel.indexOf(' ') === -1; // Disallow spaces
+                  },
+                  onFocus: function () {
+                      $('.tag-input-container').addClass('focus');
+                  },
+                  onBlur: function () {
+                      $('.tag-input-container').removeClass('focus');
+                  }
+              });
+
+              // Match Bootstrap's form control height
+              $('.tagit').css('min-height', '38px');
+          });
+    </script>
+        
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }

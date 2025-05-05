@@ -66,5 +66,7 @@ namespace ECARE.ViewModel
         [ValidateNever]
 
         public MultiSelectList DistributorOptions { get; set; }
+        [Display(Name = "Serial Numbers")]
+        public string? SerialNumbers { get; set; }
     }
 }
