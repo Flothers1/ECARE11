@@ -9,7 +9,7 @@ namespace ECARE.ViewModel
     {
         public int Id { get; set; }
         [Display(Name = "Request Date")]
-        public DateTime Date { get; set; } = DateTime.UtcNow.AddHours(2);
+        public DateTime Date { get; set; } 
         [Display(Name = "Payment Status")]
         public bool Payment { get; set; }
         public bool? IsDeleted { get; set; }

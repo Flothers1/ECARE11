@@ -168,7 +168,7 @@ namespace ECARE.Controllers
             if (request.IsVerified == true)
             {
                 request.IsDeleted = true;
-                request.RequestClosedDate = DateTime.UtcNow.AddHours(2);
+                request.RequestClosedDate = Constants.SD.TimeInEgypt;
                 _context.SaveChanges();
             }
             else

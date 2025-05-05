@@ -362,7 +362,7 @@ namespace ECARE.Controllers
             {
 
                 serviceRequest.IsDeleted = true;
-                serviceRequest.RequestClosedDate = DateTime.UtcNow.AddHours(2);
+                serviceRequest.RequestClosedDate = SD.TimeInEgypt;
                 _context.SaveChanges();
             }
             else
