@@ -15,7 +15,7 @@ namespace ECARE.ViewModel
 
         [Display(Name = "Owner Type")]
         public string? OwnerType { get; set; }
-        public DateTime? Date { get; set; } 
+        public DateTime? Date { get; set; } = Constants.SD.TimeInEgypt;
         [Display(Name = "CoPayment Percentage")]
 
         public double? CoPaymentPercentage { get; set; }

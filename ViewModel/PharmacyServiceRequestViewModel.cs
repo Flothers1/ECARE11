@@ -9,7 +9,7 @@ namespace ECARE.ViewModel
     {
         public int Id { get; set; }
         [Display(Name = "Request Date")]
-        public DateTime Date { get; set; } 
+        public DateTime Date { get; set; } = Constants.SD.TimeInEgypt;
         [Display(Name = "Payment Status")]
         public bool Payment { get; set; }
         public bool? IsDeleted { get; set; }
