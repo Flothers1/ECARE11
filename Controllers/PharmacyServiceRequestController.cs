@@ -21,11 +21,12 @@ namespace ECARE.Controllers
         }
         public IActionResult Index()
         {
-            var requests = _context.PharmacyServiceRequests
+            var requests = _context.PharmacyServiceRequests.AsNoTracking()
                 .Include(r => r.CareProgram)
                 .Include(r => r.PharmacyBranch)
                 .ThenInclude(pb => pb.Pharmacy)
                 .Include(r => r.PatientRegistrations)
+                .OrderByDescending(r => r.Date)
                 .Select(psr => new PharmacyServiceRequestIndexViewModel
                 {
                     Date = psr.Date,
@@ -102,7 +103,7 @@ namespace ECARE.Controllers
         [HttpGet]
         public async Task<JsonResult> GetPatients(int CareProgramId)
         {
-            var patients = await _context.PatientRegistrations
+            var patients = await _context.PatientRegistrations.AsNoTracking()
                 .Where(pr => pr.CareProgramId == CareProgramId)
                 .OrderBy(pr => pr.PatientName)    // or whatever property holds the name
                 .Select(pr => new {
@@ -116,7 +117,7 @@ namespace ECARE.Controllers
         [HttpGet]
         public async Task<JsonResult> GetBranches(int pharmacyId)
         {
-            var branches = await _context.pharmacyBranches
+            var branches = await _context.pharmacyBranches.AsNoTracking()
                 .Where(pb => pb.PharmacyId == pharmacyId)
                 .OrderBy(pb => pb.Name)
                 .Select(pb => new {
@@ -130,12 +131,13 @@ namespace ECARE.Controllers
 
         public IActionResult GetPatientPharmacyRequests(int patientId)
         {
-            var requests = _context.PharmacyServiceRequests
+            var requests = _context.PharmacyServiceRequests.AsNoTracking()
                 .Include(r => r.CareProgram)
                 .Include(r => r.PharmacyBranch)
                     .ThenInclude(pb => pb.Pharmacy)
                 .Include(r => r.PatientRegistrations)
                 .Where(r => r.PatientRegistrations.PatientRegistrationsId == patientId)
+                .OrderByDescending(r => r.Date)
                 .Select(psr => new PharmacyServiceRequestIndexViewModel
                 {
                     Date = psr.Date,

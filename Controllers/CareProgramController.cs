@@ -20,15 +20,15 @@ namespace ECARE.Controllers
         //TODO: ADD DropDown list for Sponsors
         public async Task<IActionResult> Index()
         {
-            var carePrograms = await _context.CarePrograms.Include(cp => cp.Pharmacies)
+            var carePrograms = await _context.CarePrograms.AsNoTracking().Include(cp => cp.Pharmacies)
                 .Include(cp => cp.Distributors)
                 .ToListAsync();
 
-            var pharmacyList = await _context.Pharmacies
+            var pharmacyList = await _context.Pharmacies.AsNoTracking()
                 .ToListAsync();
 
 
-            var distributorList = await _context.Distributors
+            var distributorList = await _context.Distributors.AsNoTracking()
                 .ToListAsync();
             var vm = carePrograms.Select( p => new CareProgramViewModel
             {

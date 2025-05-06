@@ -33,7 +33,7 @@ namespace ECARE.Controllers
         [HttpGet]
         public JsonResult GetLabBranches(int labId)
         {
-            var branches = _context.LabBranch
+            var branches = _context.LabBranch.AsNoTracking()
                 .Where(b => b.LabId == labId)
                 .Select(b => new { b.Id, b.LabBranchName })
                 .ToList();
@@ -131,22 +131,5 @@ namespace ECARE.Controllers
                 return RedirectToAction("ServiceRequests", "PatientRegistrations");
             }
         }
-        // POST: ServiceRequest/Create
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Create(Service_Request serviceRequest)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        _context.ServiceRequests.Add(serviceRequest);
-        //        await _context.SaveChangesAsync();
-        //        return RedirectToAction("Indexadmin", "PatientRegistrations");
-        //    }
-
-        //    ViewBag.Patients = new SelectList(await _context.PatientRegistrations.ToListAsync(), "PatientRegistrationsId", "PatientName", serviceRequest.PatientRegistrationsId);
-        //    return View(serviceRequest);
-        //}
-
-
     }
 }

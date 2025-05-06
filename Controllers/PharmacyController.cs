@@ -37,11 +37,13 @@ namespace ECARE.Controllers
                 return Challenge();
             }
             var data =await _context.PharmacyServiceRequests
+                .AsNoTracking()
              .Include(psr => psr.PatientRegistrations)
              .Include(psr => psr.CareProgram)
              .ThenInclude(cp =>cp.Distributors)
              .Include(psr => psr.PharmacyBranch)
              .ThenInclude(pb => pb.Pharmacy)
+             .OrderByDescending(psr =>psr.Date)
              .Select(psr => new PharmacyIndexViewModel
       {
           PatientRegistrationsId = psr.PatientRegistrations.PatientRegistrationsId,
@@ -78,12 +80,14 @@ namespace ECARE.Controllers
 
 
             var closedRequests =await  _context.PharmacyServiceRequests
+                .AsNoTracking()
             .Include(psr => psr.PatientRegistrations)
             .Include(psr => psr.CareProgram)
             .ThenInclude(cp => cp.Distributors)
             .Include(psr => psr.PharmacyBranch)
             .ThenInclude(pb => pb.Pharmacy)
             .Where(s => s.IsDeleted == true)
+            .OrderByDescending(psr => psr.Date)
             .Select(psr => new PharmacyIndexViewModel
             {
                 PatientRegistrationsId = psr.PatientRegistrations.PatientRegistrationsId,
