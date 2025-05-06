@@ -19,28 +19,28 @@
         </div>
     </div>
 
-    <form asp-action="Create" method="post" enctype="multipart/form-data">
+    <form  asp-action="Create"  method="post"  enctype="multipart/form-data">
         <div class="row g-4">
             <!-- Left Column -->
-            <div class="col-12 col-md-6">
-                <div class="form-group mb-3">
+            <div class="col-md-6">
+                <div class="form-group">
                     <label asp-for="SelectedCareProgramId" class="form-label fw-bold"></label>
-                    <select asp-for="SelectedCareProgramId" asp-items="Model.CareProgramOptions" class="form-select form-select-lg"
+                    <select asp-for="SelectedCareProgramId" asp-items="Model.CareProgramOptions" class="form-select"
                             id="CareProgramSelect" data-placeholder="Select Program">
                         <option value=""></option>
                     </select>
                     <span asp-validation-for="SelectedCareProgramId" class="text-danger small"></span>
                 </div>
 
-                <div class="form-group mb-3">
+                <div class="form-group mt-4">
                     <label asp-for="PatientRegistrationsId" class="form-label fw-bold"></label>
-                    <select asp-for="PatientRegistrationsId" class="form-select form-select-lg" id="patientId" data-placeholder="Select Patient">
+                    <select asp-for="PatientRegistrationsId" class="form-select" id="patientId" data-placeholder="Select Patient">
                         <option value=""></option>
                     </select>
                     <span asp-validation-for="PatientRegistrationsId" class="text-danger small"></span>
                 </div>
 
-                <div class="form-group mb-3">
+                <div class="form-group mt-4">
                     <label asp-for="pharmacyId" class="form-label fw-bold"></label>
                     <select id="pharmacy" asp-for="pharmacyId" asp-items="Model.PharmaciesOptions"
                             class="form-select" data-placeholder="Select Pharmacy">
@@ -50,22 +50,25 @@
 
             </div>
             <!-- Right Column -->
-            <div class="col-12 col-md-6">
-                <div class="form-group mb-3">
+            <div class="col-md-6">
+                <div class="form-group">
                     <label asp-for="PharmacyBranchId" class="form-label fw-bold"></label>
-                    <select id="pharmacyBranch" asp-for="PharmacyBranchId" class="form-select form-select-lg">
-                        <option value="">-- Select Branch --</option>
+                    <select id="pharmacyBranch" asp-for="PharmacyBranchId" class="form-select" 
+                    data-placeholder="Select PatientBranch">
+                        <option value=""></option>
                     </select>
-                    <span asp-validation-for="PharmacyBranchId" class="text-danger"></span>
+                    <span asp-validation-for="PharmacyBranchId" class="text-danger small"></span>
                 </div>
-                <div class="form-group mb-3">
+                <div class="form-group mt-4">
                     <label asp-for="EVoucherPDF" class="form-label fw-bold"></label>
-                    <input asp-for="EVoucherPDF" class="form-select form-control-lg" type="file" />
+                    <input asp-for="EVoucherPDF" class="form-control custom-file-input" type="file" />
                     <span asp-validation-for="EVoucherPDF" class="text-danger small"></span>
                 </div>
-                <div class="form-group mb-3">
-                    <input asp-for="Payment" type="checkbox" class="form-check-input" />
-                    <label asp-for="Payment" class="form-check-label fw-bold">Payment Completed</label>
+                <div class="form-group mt-4">
+                    <div class="d-flex align-items-center custom-payment-div">
+                        <input asp-for="Payment" type="checkbox" class="form-check-input" id="paymentCheckbox" />
+                        <label asp-for="Payment" class="form-check-label fw-bold ms-2" for="paymentCheckbox">Payment Completed</label>
+                    </div>
                 </div>
             </div>
         </div>
@@ -127,6 +130,24 @@
            border-color: #7a5e00;
        }
 
+        /* Select2 height and padding matching Bootstrap */
+        .select2-container .select2-selection--single {
+            height: 38px !important;
+            border-radius: 0.375rem !important;
+            border: 1px solid #ced4da !important;
+            padding: 0.375rem 0.75rem !important;
+        }
+
+        /* Select2 focus state to match Bootstrap */
+        .select2-container--focus .select2-selection--single {
+            border-color: #957200 !important;
+            box-shadow: 0 0 0 0.25rem rgba(149, 114, 0, 0.25) !important;
+        }
+
+        /* Ensure Select2 dropdown matches input width */
+        .select2-container {
+            width: 100% !important;
+        }
 
         #pharmacyRequestsSection {
             margin-top: 2rem;
@@ -143,6 +164,27 @@
         .table-striped tbody tr:nth-of-type(odd) {
             background-color: rgba(149, 114, 0, 0.05);
         }
+
+    /* evoucher */
+    .custom-file-input:focus {
+        border-color: #957200;
+        box-shadow: 0 0 0 0.25rem rgba(149, 114, 0, 0.25);
+    }
+    
+    /* Checkbox alignment and spacing */
+    .form-check-input {
+        margin-top: 0;
+    }
+    
+    .form-check-input:checked {
+        background-color: #957200;
+        border-color: #957200;
+    }
+    
+    .form-check-input:focus {
+        border-color: #957200;
+        box-shadow: 0 0 0 0.25rem rgba(149, 114, 0, 0.25);
+    }
     </style>
 }
 

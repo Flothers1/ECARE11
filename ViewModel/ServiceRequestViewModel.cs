@@ -25,12 +25,13 @@ namespace ECARE.ViewModel
         //TODO: check this 
         public LabBranch? LabBranch { get; set; }
         public bool Payment { get; set; }
-        [Display(Name = "Patient Name")]
 
         public bool? IsDeleted { get; set; }
         public string? OTP { get; set; }
         public DateTime OTPExpiration { get; set; }
         public bool? IsVerified { get; set; }
+        [Display(Name = "Patient Name")]
+
         public int PatientRegistrationsId { get; set; }
         
         public IFormFile? Invoice { get; set; }

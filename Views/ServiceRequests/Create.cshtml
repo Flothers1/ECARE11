@@ -26,16 +26,17 @@
                 <div class="form-group">
                     <label asp-for="PatientRegistrationsId" class="form-label fw-bold"></label>
                     <select asp-for="PatientRegistrationsId" asp-items="ViewBag.Patients"
-                            class="form-select" id="PatientSelect">
-                        <option value="">-- Select Patient --</option>
+                            data-placeholder="Select Patient" class="form-select" id="PatientSelect">
+                        <option value=""></option>
                     </select>
                     <span asp-validation-for="PatientRegistrationsId" class="text-danger small"></span>
                 </div>
 
                 <div class="form-group mt-4">
                     <label for="RequiredTests" class="form-label fw-bold">Required Tests</label>
-                    <select asp-for="RequiredTests" class="form-select select2-test" id="RequiredTests">
-                        <option value="">-- Select Test --</option>
+                    <select asp-for="RequiredTests" class="form-select select2-test" 
+                    data-placeholder="Select Test" id="RequiredTests">
+                        <option value=""></option>
                         <option value="Germline BRCA">Germline BRCA</option>
                         <option value="Tissue BRCA">Tissue BRCA</option>
                         <option value="Somatic BRCA">Somatic BRCA</option>
@@ -46,8 +47,9 @@
 
                 <div class="form-group mt-4">
                     <label class="form-label fw-bold">Lab</label>
-                    <select id="LabId" asp-items="@ViewBag.Labs" class="form-select">
-                        <option value="">-- Select Lab --</option>
+                    <select id="LabId" asp-items="@ViewBag.Labs" 
+                    class="form-select" data-placeholder="Select Lab">
+                        <option value=""></option>
                     </select>
                 </div>
             </div>
@@ -56,22 +58,24 @@
             <div class="col-md-6">
                 <div class="form-group">
                     <label asp-for="EVoucherPDFFile" class="form-label fw-bold"></label>
-                    <input type="file" asp-for="EVoucherPDFFile" class="form-control" />
+                    <input type="file" asp-for="EVoucherPDFFile" class="form-control custom-file-input" />
                     <span asp-validation-for="EVoucherPDFFile" class="text-danger small"></span>
                 </div>
 
                 <div class="form-group mt-4">
                     <label class="form-label fw-bold">Lab Branch</label>
-                    <select id="LabBranchId" asp-for="LabBranchId" class="form-select">
-                        <option value="">-- Select Lab Branch --</option>
+                    <select id="LabBranchId" asp-for="LabBranchId"
+                            data-placeholder="Select Lab Branch" class="form-select">
+                        <option value=""></option>
                     </select>
                     <span asp-validation-for="LabBranchId" class="text-danger small"></span>
                 </div>
 
                 <div class="form-group mt-4">
                     <label class="form-label fw-bold">CoPayment Percentage</label>
-                    <select asp-for="CoPaymentPercentage" class="form-select">
-                        <option value="0">-- Select CoPayment Percentage --</option>
+                    <select asp-for="CoPaymentPercentage"
+                            data-placeholder="Select CoPayment Percentage" class="form-select">
+                        <option value="0"></option>
                         <option value="0">0%</option>
                         <option value="30">30%</option>
                     </select>
@@ -151,6 +155,36 @@
         .form-check-input:checked {
             background-color: #957200;
             border-color: #957200;
+        }
+
+        .custom-file-input:focus {
+            border-color: #957200;
+            box-shadow: 0 0 0 0.25rem rgba(149, 114, 0, 0.25);
+        }
+
+        /* Select2 height and padding matching Bootstrap */
+        .select2-container .select2-selection--single {
+            height: 38px !important;
+            border-radius: 0.375rem !important;
+            border: 1px solid #ced4da !important;
+            padding: 0.375rem 0.75rem !important;
+        }
+
+        /* Select2 focus state to match Bootstrap */
+        .select2-container--focus .select2-selection--single {
+            border-color: #957200 !important;
+            box-shadow: 0 0 0 0.25rem rgba(149, 114, 0, 0.25) !important;
+        }
+
+        /* Ensure Select2 dropdown matches input width */
+        .select2-container {
+            width: 100% !important;
+        }
+
+        /* evoucher */
+        .custom-file-input:focus {
+            border-color: #957200;
+            box-shadow: 0 0 0 0.25rem rgba(149, 114, 0, 0.25);
         }
     </style>
 }
