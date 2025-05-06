@@ -136,26 +136,26 @@
                                             </div>
                                         </td>
 
-                                @if (ViewContext.RouteData.Values["action"]?.ToString() != "ClosedRequests")
-                                        {
-                                    <td>
-                                        <form asp-action="SendPharmacyOTP" method="post" style="display: inline;">
-                                            <input type="hidden" name="patientId" value="@item.PatientRegistrationsId" />
-                                            <input type="hidden" name="pharmacyServiceRequestId" value="@item.PharmacyServiceRequestId" />
-                                            <button type="submit" title="Send OTP">
-                                                <img src="~/img/otp_transparent.png" alt="Send OTP" style="width: 24px; height: 24px;">
-                                            </button>
-                                        </form>
-
-                                        @if (item.IsVerified.GetValueOrDefault())
-                                        {
-                                            <span class="text-success fw-bold">✔ Verified</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="text-danger fw-bold">❌ Not Verified</span>
-                                        }
-                                    </td>
+                                    @if (ViewContext.RouteData.Values["action"]?.ToString() != "ClosedRequests")
+                                            {
+                                        <td>
+                                            <form asp-action="SendPharmacyOTP" method="post" style="display: inline;">
+                                                <input type="hidden" name="patientId" value="@item.PatientRegistrationsId" />
+                                                <input type="hidden" name="pharmacyServiceRequestId" value="@item.PharmacyServiceRequestId" />
+                                                <button type="submit" title="Send OTP">
+                                                    <img src="~/img/otp_transparent.png" alt="Send OTP" style="width: 24px; height: 24px;">
+                                                </button>
+                                            </form>
+                                 
+                                            @if (item.IsVerified.GetValueOrDefault())
+                                            {
+                                                <span class="text-success fw-bold">✔ Verified</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-danger fw-bold">❌ Not Verified</span>
+                                            }
+                                        </td>
                                             <td>
                                                 @if (!string.IsNullOrEmpty(item.Email))
                                                 {
@@ -182,28 +182,33 @@
                                                 }
                                             </td>
                                             <td>
-                                        <form asp-action="SoftDeletePharmacyServiceRequest" asp-controller="Pharmacy" method="post" style="display: inline;">
-                                            <input type="hidden" name="pharmacyServiceRequestId" value="@item.PharmacyServiceRequestId" />
-
-                                                <button type="submit" style="border: none; background: none; padding: 0;">
-                                                    <img src="~/img/resolve_transparent.png" alt="Close Request"
-                                                         style="width: 24px; height: 24px; cursor: pointer;">
-                                                </button>
-                                        </form>
+                                                    <form asp-action="SoftDeletePharmacyServiceRequest" asp-controller="Pharmacy" method="post" style="display: inline;">
+                                                        <input type="hidden" name="pharmacyServiceRequestId" value="@item.PharmacyServiceRequestId" />
+                                               
+                                                            <button type="submit" style="border: none; background: none; padding: 0;">
+                                                                <img src="~/img/resolve_transparent.png" alt="Close Request"
+                                                                     style="width: 24px; height: 24px; cursor: pointer;">
+                                                            </button>
+                                                    </form>
                                             </td>
-                                    <td >
-                                        <div class="serial-confirm  justify-content-center d-flex align-items-center"
+                                    <td class="text-center align-middle">
+                                        <div class="serial-confirm d-flex flex-column align-items-center"
                                              data-serials='@Html.Raw(System.Text.Json.JsonSerializer.Serialize(item.ValidSerials))'>
-                                            <input type="text"
-                                                   class="form-control serial-input me-2"
-                                                   placeholder="Enter Serial"
-                                                   aria-label="Serial Number" />
-                                            <button type="button"
-                                                    class="btn btn-outline-success btn-icon"
-                                                    onclick="confirmSerial(this)">
-                                                <i class="fa fa-check" aria-hidden="true"></i>
-                                            </button>
-                                            <div class="serial-feedback ms-3"></div>
+
+                                            <!-- 1) First row: input + icon -->
+                                            <div class="d-flex justify-content-center align-items-center w-100">
+                                                <input type="text"
+                                                       class="form-control serial-input me-2"
+                                                       placeholder="Enter Serial" />
+                                                <button type="button"
+                                                        class="btn btn-outline-success btn-icon"
+                                                        onclick="confirmSerial(this)">
+                                                    <i class="fa fa-check"></i>
+                                                </button>
+                                            </div>
+
+                                            <!-- 2) Second row: feedback under -->
+                                            <div class="serial-feedback mt-2 text-center"></div>
                                         </div>
                                     </td>
 
@@ -367,40 +372,38 @@
 
     /* Container flexes input + icon horizontally */
     .serial-confirm {
-        gap: 0.5rem;
+        gap: 0.25rem;
     }
 
-    /* Make the input wider */
     .serial-input {
-        width: 200px; /* adjust to taste */
+        width: 200px; 
         max-width: 100%;
     }
 
-    /* Icon‑only button, no extra padding */
     .btn-icon {
         padding: 0.5rem;
         line-height: 1;
     }
 
-        /* Hover/active styling for the icon button */
-        .btn-icon:hover {
-            background-color: #28a745;
-            color: #fff;
-        }
-
-    /* Feedback text sits at baseline */
-    .serial-feedback {
-        font-size: 0.9rem;
-        min-width: 120px;
+    .btn-icon:hover {
+        background-color: #28a745;
+        color: #fff;
     }
 
-        .serial-feedback .text-success {
-            color: #28a745 !important;
-        }
+    .serial-feedback {
+        font-size: 0.9rem;
+        min-width: 1.23m;
+    }
 
-        .serial-feedback .text-danger {
-            color: #dc3545 !important;
-        }
+    .serial-feedback .text-success {
+        color: #28a745 !important;
+            font-weight: bold;
+    }
+
+    .serial-feedback .text-danger {
+        color: #dc3545 !important;
+            font-weight: bold;
+    }
 
 
     .table-table th:nth-child(13),
