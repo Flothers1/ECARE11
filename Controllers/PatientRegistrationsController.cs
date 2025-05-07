@@ -40,18 +40,42 @@ namespace ECARE.Controllers
                 return Challenge();
             }
 
-            List<PatientRegistrations> filteredPatients;
+            List<ServiceRequestIndexViewModel> filteredData;
 
-            var patients =await _context.PatientRegistrations!
-                            .Include(p => p.CareProgram)!
-                            .Include(p => p.ServiceRequests)!
-                            .ThenInclude(s => s.LabBranch)
-                            .ThenInclude(l => l!.Lab).ToListAsync();
 
-                filteredPatients =  patients.Where(p => p.ServiceRequests
-                .Any(sr => sr.LabBranch.LabId == user.LabId && sr.IsDeleted == null)).ToList();
+            var serviceRequests = await _context.ServiceRequests
+             .AsNoTracking().
+             Include(sr => sr.PatientRegistrations)
+             .Include(sr => sr.LabBranch)
+             .ThenInclude(lb => lb.Lab)
+             .OrderByDescending(sr => sr.Date)
+             .Select(sr => new ServiceRequestIndexViewModel
+             {
+                 Service_RequestId = sr.Service_RequestId,
+                 Date = sr.Date,
+                 PatientName = sr.PatientRegistrations.PatientName,
+                 CoPaymentPercentage = sr.CoPaymentPercentage,
+                 RequiredTests = sr.RequiredTests,
+                 LabId = sr.LabBranch.Lab.Id,
+                 Lab = sr.LabBranch.Lab.LabName,
+                 LabBranch = sr.LabBranch.LabBranchName,
+                 EVoucherPDF = sr.EVoucherPDF,
+                 NationalId = sr.PatientRegistrations.NationalID,
+                 Invoice = sr.Invoice,
+                 Payment = sr.Payment,
+                 PatientRegistrationsId = sr.PatientRegistrations.PatientRegistrationsId,
+                 Email = sr.PatientRegistrations.Email,
+                 PhoneNumber1 = sr.PatientRegistrations.PhoneNumber1,
+                 IsDeleted = sr.IsDeleted,
+                 IsVerified = sr.IsVerified,
+                 LabBranchId = sr.LabBranchId,
+                 OTP = sr.OTP,
+                 OTPExpiration = sr.OTPExpiration
+
+             }).ToListAsync();
+            filteredData =  serviceRequests.Where(sr => sr.LabId == user.LabId && sr.IsDeleted == null).ToList();
             ViewBag.UserLabId = user.LabId;
-            return View(filteredPatients);
+            return View(filteredData);
 
         }
         //TODO:
@@ -286,13 +310,6 @@ namespace ECARE.Controllers
 
         public async Task<IActionResult> ServiceRequests()
         {
-        //    var patientRegistrations = await _context.PatientRegistrations
-        //        .AsNoTracking().
-        //        Include(p => p.ServiceRequests)
-        //        .ThenInclude(sr => sr.LabBranch)
-        //        .ThenInclude(lb => lb.Lab)
-        //        .OrderByDescending()
-        //        .ToListAsync();
 
             var serviceRequests = await _context.ServiceRequests
                .AsNoTracking().

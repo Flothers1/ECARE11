@@ -33,9 +33,13 @@ namespace ECARE.ViewModel
         public bool? IsVerified { get; set; }
         public int PatientRegistrationsId { get; set; }
         public string PatientName { get; set; }
+        public int LabId { get; set; }
         public string Lab { get; set; }
         public string Invoice { get; set; }
         //Patient registration
         public string NationalId { get; set; }
+        public string PhoneNumber1 { get; set; }
+        public string Email { get; set; }
+
     }
 }

@@ -1,4 +1,4 @@
-﻿@model List<PatientRegistrations>
+﻿@model List<ServiceRequestIndexViewModel>
 @{
     ViewData["Title"] = "Patient Registrations";
     var userLabId = (int)ViewBag.UserLabId;
@@ -78,34 +78,34 @@
                 <tbody>
                     @if (Model != null && Model.Any())
                     {
-                        foreach (var patient in Model)
+                        foreach (var item in Model)
                         {@* 
                             var filteredRequests = patient.ServiceRequests
                             ?.Where(r => r.LabBranch?.LabId == userLabId && r.IsDeleted == null)
                             .ToList();
 
  *@
-                            if (patient.ServiceRequests != null && patient.ServiceRequests.Any())
+                          @*   if (patient.ServiceRequests != null && patient.ServiceRequests.Any())
                             {
                                 foreach (var request in patient.ServiceRequests)
-                                {
+                                { *@
                                     <tr>
-                                        <td>@request.Date</td>
-                                        <td>@patient.PatientName</td>
-                                        <td>@patient.PhoneNumber1</td>
-                                        <td>@patient.NationalID</td>
-                                        <td>@patient.Email</td>
-                                        <td>@(request?.LabBranch?.Lab?.LabName ?? "No Lab")</td>
-                                        <td>@(request?.LabBranch?.LabBranchName ?? "No Branch")</td>
-                                        <td>@(request?.RequiredTests ?? "No Test")</td>
-                                        <td>@(request?.CoPaymentPercentage?.ToString() ?? "No CoPayment")</td>
-                                        <td>@(request?.Payment.ToString() ?? "No Payment")</td>
+                                        <td>@item.Date</td>
+                                        <td>@item.PatientName</td>
+                                        <td>@item.PhoneNumber1</td>
+                                        <td>@item.NationalId</td>
+                                        <td>@item.Email</td>
+                                        <td>@(item?.Lab ?? "No Lab")</td>
+                                        <td>@(item.LabBranch ?? "No Branch")</td>
+                                        <td>@(item?.RequiredTests ?? "No Test")</td>
+                                        <td>@(item?.CoPaymentPercentage?.ToString() ?? "No CoPayment")</td>
+                                        <td>@(item?.Payment.ToString() ?? "No Payment")</td>
                                         <td>
-                                            @if (request.IsVerified.GetValueOrDefault())
+                                            @if (item.IsVerified.GetValueOrDefault())
                                             {
-                                                if (!string.IsNullOrEmpty(request.EVoucherPDF))
+                                                if (!string.IsNullOrEmpty(item.EVoucherPDF))
                                                 {
-                                                    <a href="@Url.Content(request.EVoucherPDF)" download target="_blank" class="evoucher-icon-link">
+                                                    <a href="@Url.Content(item.EVoucherPDF)" download target="_blank" class="evoucher-icon-link">
                                                         <span class="download-text">Download eVoucher</span>
                                                         <span class="icon-wrapper">
                                                             <i class="fa-solid fa-ticket"></i>
@@ -125,9 +125,9 @@
                                             }
                                         </td>
                                         <td>
-                                            @if (!string.IsNullOrEmpty(request.Invoice))
+                                            @if (!string.IsNullOrEmpty(item.Invoice))
                                             {
-                                                <a href="@Url.Content(request.Invoice)" download target="_blank" class="invoice-icon-link">
+                                                <a href="@Url.Content(item.Invoice)" download target="_blank" class="invoice-icon-link">
                                                     <span class="download-text">Download Invoice</span>
                                                     <span class="icon-wrapper">
                                                         <i class="fa-solid fa-file-invoice-dollar"></i>
@@ -144,14 +144,14 @@
                                         {
                                             <td>
                                                 <form asp-action="SendOTP" asp-controller="PatientRegistrations" method="post" style="display: inline;">
-                                                    <input type="hidden" name="patientId" value="@patient.PatientRegistrationsId" />
-                                                    <input type="hidden" name="serviceRequestId" value="@request?.Service_RequestId" />
+                                                    <input type="hidden" name="patientId" value="@item.PatientRegistrationsId" />
+                                                    <input type="hidden" name="serviceRequestId" value="@item?.Service_RequestId" />
                                                     <button type="submit" title="Send OTP" style="border: none; background: none; padding: 0;">
                                                         <img src="~/img/otp_transparent.png" alt="Send OTP" style="width: 24px; height: 24px;">
                                                     </button>
                                                 </form>
 
-                                                @if (request.IsVerified.GetValueOrDefault())
+                                                @if (item.IsVerified.GetValueOrDefault())
                                                 {
                                                     <span class="text-success fw-bold">✔ Verified</span>
                                                 }
@@ -161,12 +161,12 @@
                                                 }
                                             </td>
                                             <td>
-                                                @if (!string.IsNullOrEmpty(patient.Email))
+                                                @if (!string.IsNullOrEmpty(item.Email))
                                                 {
                                                     <a asp-action="SendVerificationCode"
                                                        asp-controller="PatientRegistrations"
-                                                       asp-route-id="@patient.PatientRegistrationsId"
-                                                       asp-route-serviceRequestid="@request.Service_RequestId">
+                                                       asp-route-id="@item.PatientRegistrationsId"
+                                                       asp-route-serviceRequestid="@item.Service_RequestId">
                                                         <img src="~/img/MSG_transparent.png" alt="Verification Code" style="width: 24px; height: 24px;">
                                                     </a>
                                                 }
@@ -176,7 +176,7 @@
                                                          style="width: 24px; height: 24px; opacity: 0.4; cursor: not-allowed;" title="Email not available" />
                                                 }
 
-                                                @if (request.IsVerified.GetValueOrDefault())
+                                                @if (item.IsVerified.GetValueOrDefault())
                                                 {
                                                     <span class="text-success fw-bold">✔ Verified</span>
                                                 }
@@ -187,7 +187,7 @@
                                             </td>
                                             <td>
                                                 <form asp-action="SoftDeletePatient" asp-controller="PatientRegistrations" method="post" style="display: inline;">
-                                                    <input type="hidden" name="patientId" value="@request.Service_RequestId" />
+                                                    <input type="hidden" name="patientId" value="@item.Service_RequestId" />
                                                     <button type="submit" style="border: none; background: none; padding: 0;">
                                                         <img src="~/img/resolve_transparent.png" alt="Close Request" 
                                                         style="width: 24px; height: 24px; cursor: pointer;">
@@ -196,8 +196,8 @@
                                             </td>
                                         }
                                     </tr>
-                                }
-                            }
+                       @*          }
+                            } *@
                         }
                     }
                     else

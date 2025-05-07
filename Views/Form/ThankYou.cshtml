@@ -1,0 +1,209 @@
+﻿@{
+    ViewData["Title"] = "شكراً لتواصلك معنا";
+}
+
+<div class="thank-you-container" dir="rtl">
+    <div class="thank-you-card">
+        <div class="thank-you-icon">
+            <i class="bi bi-check-circle-fill"></i>
+        </div>
+
+        <h2 class="thank-you-title">شكراً لتواصلك معنا</h2>
+
+        <div class="thank-you-divider">
+            <span></span>
+        </div>
+
+        <p class="thank-you-message">
+            لقد استلمنا طلبك بنجاح وسوف نقوم بالتواصل معك في أقرب وقت ممكن.
+        </p>
+
+        <div class="confirmation-details">
+            <div class="confirmation-icon">
+                <i class="bi bi-envelope-check"></i>
+            </div>
+            <p>تم إرسال تأكيد بالبريد الإلكتروني</p>
+        </div>
+    </div>
+</div>
+
+<style>    body {
+        background-color: #f5f8fa;
+        font-family: 'Cairo', 'Tajawal', sans-serif;
+    }
+
+    .thank-you-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 80vh;
+        padding: 2rem;
+    }
+
+    .thank-you-card {
+        background: #ffffff;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        padding: 3rem 2rem;
+        text-align: center;
+        max-width: 600px;
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .thank-you-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #1976D2, #64B5F6);
+            opacity: 0.1;
+            border-radius: 0 0 0 100%;
+        }
+
+        .thank-you-card::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #1976D2, #64B5F6);
+            opacity: 0.1;
+            border-radius: 0 100% 0 0;
+        }
+
+    .thank-you-icon {
+        font-size: 5rem;
+        color: #4CAF50;
+        margin-bottom: 1.5rem;
+        animation: scaleIn 0.5s ease-out;
+    }
+
+    .thank-you-title {
+        color: #1976D2;
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .thank-you-divider {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 2rem 0;
+    }
+
+        .thank-you-divider span {
+            display: block;
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(to left, #1976D2, #64B5F6);
+            border-radius: 3px;
+        }
+
+    .thank-you-message {
+        font-size: 1.2rem;
+        color: #555;
+        margin-bottom: 2rem;
+        line-height: 1.8;
+        animation: fadeInUp 0.8s ease-out;
+    }
+
+    .confirmation-details {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #E3F2FD;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 2rem;
+        animation: fadeInUp 1s ease-out;
+    }
+
+    .confirmation-icon {
+        font-size: 1.5rem;
+        color: #1976D2;
+        margin-left: 1rem;
+    }
+
+    .confirmation-details p {
+        margin: 0;
+        font-weight: 600;
+        color: #1976D2;
+    }
+
+  
+
+    .thank-you-message {
+        font-size: 1rem;
+    }
+
+    .thank-you-card {
+        padding: 2rem 1.5rem;
+    }
+
+    }
+</style>
+
+<script>
+    // Optional: Add any additional JavaScript here
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add confetti effect (optional)
+        createConfetti();
+    });
+
+    function createConfetti() {
+        const confettiContainer = document.createElement('div');
+        confettiContainer.style.position = 'fixed';
+        confettiContainer.style.top = '0';
+        confettiContainer.style.left = '0';
+        confettiContainer.style.width = '100%';
+        confettiContainer.style.height = '100%';
+        confettiContainer.style.pointerEvents = 'none';
+        confettiContainer.style.zIndex = '-1';
+        document.body.appendChild(confettiContainer);
+
+        const colors = ['#1976D2', '#2196F3', '#64B5F6', '#4CAF50', '#81C784'];
+
+        for (let i = 0; i < 100; i++) {
+            setTimeout(() => {
+                const confetti = document.createElement('div');
+                confetti.style.position = 'absolute';
+                confetti.style.width = `${Math.random() * 10 + 5}px`;
+                confetti.style.height = `${Math.random() * 5 + 5}px`;
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.borderRadius = '50%';
+                confetti.style.opacity = Math.random() * 0.5 + 0.5;
+
+                const startLeft = Math.random() * 100;
+                confetti.style.left = `${startLeft}%`;
+                confetti.style.top = '-5px';
+                confettiContainer.appendChild(confetti);
+
+                let speed = Math.random() * 3 + 2;
+                let rotate = Math.random() * 360;
+                let translateX = (Math.random() - 0.5) * 200;
+
+                const animateConfetti = () => {
+                    rotate += Math.random() * 10;
+                    confetti.style.transform = `translateY(${speed}px) translateX(${translateX/100}px) rotate(${rotate}deg)`;
+                    speed += Math.random() * 0.2 + 0.1;
+
+                    if (parseFloat(confetti.style.top) < window.innerHeight) {
+                        confetti.style.top = `${parseFloat(confetti.style.top) + speed}px`;
+                        requestAnimationFrame(animateConfetti);
+                    } else {
+                        confetti.remove();
+                    }
+                };
+
+                requestAnimationFrame(animateConfetti);
+            }, Math.random() * 2000);
+        }
+    }
+</script>

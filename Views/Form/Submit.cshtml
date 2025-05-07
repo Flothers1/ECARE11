@@ -1,0 +1,246 @@
+﻿@model ECARE.ViewModel.ContactFormViewModel
+@{
+    ViewData["Title"] = "نموذج التسجيل";
+}
+
+<div class="arabic-form-container" dir="rtl">
+    <div class="form-header">
+        <h2 class="arabic-title">@ViewData["Title"]</h2>
+    </div>
+
+    <form asp-action="Submit" asp-controller="Form"
+          method="post"
+          enctype="multipart/form-data"
+          class="arabic-form">
+
+        <div class="mb-4">
+            <label asp-for="Name" class="form-label fw-bold">الاسم</label>
+            <input asp-for="Name" class="form-control arabic-input" placeholder="أدخل الاسم الكامل" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+
+        <div class="mb-4">
+            <label asp-for="PhoneNumber" class="form-label fw-bold">رقم الهاتف</label>
+            <input type="tel" value="" asp-for="PhoneNumber" class="form-control arabic-input" placeholder="أدخل رقم الهاتف" />
+            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+        </div>
+
+        <div class="mb-4">
+            <label asp-for="Prescription" class="form-label fw-bold">الوصفة الطبية</label>
+            <div class="input-group">
+                <input asp-for="Prescription" type="file" class="form-control arabic-input" />
+                <span class="input-group-text"><i class="bi bi-file-earmark-medical"></i></span>
+            </div>
+            <span asp-validation-for="Prescription" class="text-danger"></span>
+        </div>
+
+        <div class="mb-4">
+            <label asp-for="NationalIDPhotoFront" class="form-label fw-bold">صورة الهوية الوطنية (الأمامية)</label>
+            <div class="input-group">
+                <input asp-for="NationalIDPhotoFront" type="file" class="form-control arabic-input" />
+                <span class="input-group-text"><i class="bi bi-card-image"></i></span>
+            </div>
+            <span asp-validation-for="NationalIDPhotoFront" class="text-danger"></span>
+        </div>
+
+        <div class="mb-4">
+            <label asp-for="NationalIDPhotoBack" class="form-label fw-bold">صورة الهوية الوطنية (الخلفية)</label>
+            <div class="input-group">
+                <input asp-for="NationalIDPhotoBack" type="file" class="form-control arabic-input" />
+                <span class="input-group-text"><i class="bi bi-card-image"></i></span>
+            </div>
+            <span asp-validation-for="NationalIDPhotoBack" class="text-danger"></span>
+        </div>
+
+        <div class="mb-4">
+            <label asp-for="PSATestImage" class="form-label fw-bold">صورة فحص PSA</label>
+            <div class="input-group">
+                <input asp-for="PSATestImage" type="file" class="form-control arabic-input" />
+                <span class="input-group-text"><i class="bi bi-file-medical"></i></span>
+            </div>
+            <span asp-validation-for="PSATestImage" class="text-danger"></span>
+        </div>
+
+        <div class="mb-4">
+            <label asp-for="AtomicScanningImage" class="form-label fw-bold">صورة المسح الذري</label>
+            <div class="input-group">
+                <input asp-for="AtomicScanningImage" type="file" class="form-control arabic-input" />
+                <span class="input-group-text"><i class="bi bi-file-earmark-medical"></i></span>
+            </div>
+            <span asp-validation-for="AtomicScanningImage" class="text-danger"></span>
+        </div>
+
+        <div class="consent-section mb-4 mt-5 p-4 bg-light border rounded">
+            <h4 class="consent-title mb-3">اقرار الموافقة علي الاشتراك في البرنامج</h4>
+
+            <div class="consent-text">
+                <p>هذا البرنامج لا يهدف إلى الترويج لأي دواء، سواء بشكل مباشر أو غير مباشر، كما لا يسعى بأي شكل من الأشكال إلى التأثير على قرارات الأطباء المعالجين أو تحفيزهم على وصف أدوية معينة.</p>
+                <p>كذلك، لا يهدف البرنامج إلى تشجيع المرضى على الاستمرار في استخدام الدواء لفترات أطول، إلا إذا استدعت الحالة الطبية ذلك وبناءً على قرار الطبيب المعالج فقط.</p>
+                <p>تؤكد الشركة الراعية للبرنامج أنها لا تقوم بجمع أي بيانات من شأنها تحديد هوية المرضى أو المساس بخصوصيتهم دون موافقة صريحة.</p>
+                <p>بموجب الاشتراك في برنامج دعم المرضى، يُعد المريض موافقًا على مشاركة بياناته الصحية ذات الصلة مع شركة "اينوفاكسس"، وذلك لأغراض المتابعة وتحسين جودة الرعاية، مع الالتزام التام بسرية وأمان المعلومات وفقًا للمعايير المعمول بها.</p>
+            </div>
+
+            <div class="consent-checkbox mt-4 d-flex align-items-center">
+                <input type="checkbox" class="form-check-input me-2" id="consentCheckbox" required>
+                <label class="form-check-label fw-bold" for="consentCheckbox">
+                    أوافق على الاشتراك في البرنامج
+                </label>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary btn-lg arabic-button" id="submitButton" disabled>
+                <i class="bi bi-send me-2"></i> إرسال
+            </button>
+        </div>
+    </form>
+</div>
+
+<style>
+    /* Arabic Form Styling */
+    .arabic-form-container {
+        background-color: #fff;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        font-family: 'Cairo', 'Tajawal', sans-serif;
+        max-width: 800px;
+        margin: 2rem auto;
+    }
+
+    .arabic-title {
+        color: #1976D2;
+        text-align: center;
+        margin-bottom: 2rem;
+        font-weight: 700;
+        position: relative;
+        padding-bottom: 15px;
+    }
+
+        .arabic-title:after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            right: 50%;
+            transform: translateX(50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(to left, #1976D2, #64B5F6);
+        }
+
+    .arabic-form .form-label {
+        font-weight: 600;
+        color: #555;
+        margin-bottom: 0.5rem;
+    }
+
+    .arabic-input {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 0.75rem;
+        transition: all 0.3s ease;
+    }
+
+        .arabic-input:focus {
+            border-color: #1976D2;
+            box-shadow: 0 0 0 0.2rem rgba(25, 118, 210, 0.25);
+        }
+
+    .input-group-text {
+        background-color: #f8f9fa;
+        border: 1px solid #ddd;
+    }
+
+    .arabic-button {
+        background: linear-gradient(to left, #1976D2, #2196F3);
+        border: none;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+        .arabic-button:hover {
+            background: linear-gradient(to left, #1565C0, #1976D2);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(25, 118, 210, 0.3);
+        }
+
+   
+    .consent-section {
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 12px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .consent-title {
+        color: #1976D2;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        border-bottom: 2px solid #e9ecef;
+        padding-bottom: 0.75rem;
+    }
+
+    .consent-text {
+        font-size: 0.95rem;
+        line-height: 1.7;
+        text-align: justify;
+    }
+
+        .consent-text p {
+            margin-bottom: 1rem;
+        }
+
+    .consent-checkbox {
+        margin-top: 1.5rem;
+    }
+
+    .form-check-input {
+        width: 20px;
+        height: 20px;
+        margin-left: 10px;
+        cursor: pointer;
+    }
+
+        .form-check-input:checked {
+            background-color: #1976D2;
+            border-color: #1976D2;
+        }
+
+    .form-check-label {
+        cursor: pointer;
+        font-size: 1.1rem;
+    }
+
+    #submitButton.active {
+        animation: pulse 1.5s infinite;
+    }
+
+</style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set text direction for all inputs
+            document.querySelectorAll('.arabic-input').forEach(function(input) {
+                input.setAttribute('dir', 'rtl');
+            });
+
+            // Enable/disable submit button based on checkbox
+            const consentCheckbox = document.getElementById('consentCheckbox');
+            const submitButton = document.getElementById('submitButton');
+
+            consentCheckbox.addEventListener('change', function() {
+                submitButton.disabled = !this.checked;
+
+                if(this.checked) {
+                    submitButton.classList.add('active');
+                } else {
+                    submitButton.classList.remove('active');
+                }
+            });
+        });
+    </script>
+}
