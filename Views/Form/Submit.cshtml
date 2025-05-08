@@ -1,11 +1,20 @@
 ﻿@model ECARE.ViewModel.ContactFormViewModel
 @{
-    ViewData["Title"] = "نموذج التسجيل";
+    ViewData["Title"] = "نموذج التواصل";
 }
 
 <div class="arabic-form-container" dir="rtl">
     <div class="form-header">
-        <h2 class="arabic-title">@ViewData["Title"]</h2>
+        <h2 class="arabic-title">اهلا بكم في برنامج غالي علينا لدعم المرضي</h2>
+        <div class="welcome-message">
+            <p>برجاء استكمال البيانات المطلوبة في النموذج ادناه.</p>
+            <p>يسعدنا استقبال اتصالاتكم من التاسعة صباحا الي الخامسة مساءا من الاحد الي الخميس ماعدا الاجازات الرسمية</p>
+            <div class="contact-number">
+                <i class="fa-solid fa-mobile"></i>
+                <span>رقم التواصل: </span>
+                <strong dir="ltr">002 0110 366 8700</strong>
+            </div>
+        </div>
     </div>
 
     <form asp-action="Submit" asp-controller="Form"
@@ -20,13 +29,13 @@
         </div>
 
         <div class="mb-4">
-            <label asp-for="PhoneNumber" class="form-label fw-bold">رقم الهاتف</label>
-            <input type="tel" value="" asp-for="PhoneNumber" class="form-control arabic-input" placeholder="أدخل رقم الهاتف" />
+            <label asp-for="PhoneNumber" class="form-label fw-bold">رقم الموبيل</label>
+            <input asp-for="PhoneNumber" class="form-control arabic-input" placeholder="أدخل رقم الهاتف" />
             <span asp-validation-for="PhoneNumber" class="text-danger"></span>
         </div>
 
         <div class="mb-4">
-            <label asp-for="Prescription" class="form-label fw-bold">الوصفة الطبية</label>
+            <label asp-for="Prescription" class="form-label fw-bold">صورة الروشتة </label>
             <div class="input-group">
                 <input asp-for="Prescription" type="file" class="form-control arabic-input" />
                 <span class="input-group-text"><i class="bi bi-file-earmark-medical"></i></span>
@@ -35,7 +44,7 @@
         </div>
 
         <div class="mb-4">
-            <label asp-for="NationalIDPhotoFront" class="form-label fw-bold">صورة الهوية الوطنية (الأمامية)</label>
+            <label asp-for="NationalIDPhotoFront" class="form-label fw-bold">صورة الرقم القومي (الأمامية)</label>
             <div class="input-group">
                 <input asp-for="NationalIDPhotoFront" type="file" class="form-control arabic-input" />
                 <span class="input-group-text"><i class="bi bi-card-image"></i></span>
@@ -44,7 +53,7 @@
         </div>
 
         <div class="mb-4">
-            <label asp-for="NationalIDPhotoBack" class="form-label fw-bold">صورة الهوية الوطنية (الخلفية)</label>
+            <label asp-for="NationalIDPhotoBack" class="form-label fw-bold">صورة الرقم القومي (الخلفية)</label>
             <div class="input-group">
                 <input asp-for="NationalIDPhotoBack" type="file" class="form-control arabic-input" />
                 <span class="input-group-text"><i class="bi bi-card-image"></i></span>
@@ -53,7 +62,7 @@
         </div>
 
         <div class="mb-4">
-            <label asp-for="PSATestImage" class="form-label fw-bold">صورة فحص PSA</label>
+            <label asp-for="PSATestImage" class="form-label fw-bold">صورة تحليل PSA</label>
             <div class="input-group">
                 <input asp-for="PSATestImage" type="file" class="form-control arabic-input" />
                 <span class="input-group-text"><i class="bi bi-file-medical"></i></span>
@@ -108,10 +117,18 @@
         margin: 2rem auto;
     }
 
+    .form-header {
+        margin-bottom: 2.5rem;
+        background: linear-gradient(to left, rgba(25, 118, 210, 0.05), rgba(100, 181, 246, 0.1));
+        padding: 1.5rem;
+        border-radius: 12px;
+        border-right: 4px solid #1976D2;
+    }
+
     .arabic-title {
         color: #1976D2;
-        text-align: center;
-        margin-bottom: 2rem;
+        text-align: right;
+        margin-bottom: 1rem;
         font-weight: 700;
         position: relative;
         padding-bottom: 15px;
@@ -121,11 +138,42 @@
             content: "";
             position: absolute;
             bottom: 0;
-            right: 50%;
-            transform: translateX(50%);
+            right: 0;
             width: 100px;
             height: 3px;
             background: linear-gradient(to left, #1976D2, #64B5F6);
+        }
+
+    .welcome-message {
+        text-align: right;
+        color: #555;
+        line-height: 1.7;
+    }
+
+        .welcome-message p {
+            margin-bottom: 0.75rem;
+        }
+
+    .contact-number {
+        display: flex;
+        align-items: center;
+        margin-top: 1rem;
+        background-color: rgba(25, 118, 210, 0.08);
+        padding: 0.75rem;
+        border-radius: 8px;
+        font-size: 1.1rem;
+    }
+
+        .contact-number i {
+            color: #1976D2;
+            margin-left: 0.75rem;
+            font-size: 1.25rem;
+        }
+
+        .contact-number strong {
+            margin-right: 0.5rem;
+            color: #1976D2;
+            font-weight: 700;
         }
 
     .arabic-form .form-label {
@@ -165,8 +213,7 @@
             transform: translateY(-2px);
             box-shadow: 0 5px 10px rgba(25, 118, 210, 0.3);
         }
-
-   
+    /* Consent section styling */
     .consent-section {
         background-color: #f8f9fa;
         border: 1px solid #e9ecef;
@@ -216,7 +263,6 @@
     #submitButton.active {
         animation: pulse 1.5s infinite;
     }
-
 </style>
 
 @section Scripts {

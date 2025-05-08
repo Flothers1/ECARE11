@@ -535,7 +535,7 @@ namespace ECARE.Controllers
             {
                 using (var smtpClient = new SmtpClient("Mail.innovaxcess.com", 587))
                 {
-                    smtpClient.Credentials = new NetworkCredential("ecare@innovaxcess.com", "Ecare@132@324");
+                    smtpClient.Credentials = new NetworkCredential("ecare@innovaxcess.com", "Ecare@1324");
                     smtpClient.EnableSsl = true; 
                     smtpClient.UseDefaultCredentials = false;
                     smtpClient.DeliveryMethod = SmtpDeliveryMethod.Network;
