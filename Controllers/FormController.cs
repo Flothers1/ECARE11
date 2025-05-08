@@ -39,7 +39,9 @@ namespace ECARE.Controllers
                 return View(model);
             var prescriptionUrl = await _fileStorageService.SaveFile("RegistrationForm", model.Prescription);
             var frontIdUrl = await _fileStorageService.SaveFile("RegistrationForm", model.NationalIDPhotoFront);
-            var backIdUrl = await _fileStorageService.SaveFile("RegistrationForm", model.NationalIDPhotoBack);
+         
+            string backIdUrl = model.NationalIDPhotoBack ==  null ? "" :  await _fileStorageService.SaveFile("RegistrationForm", model.NationalIDPhotoBack);
+            
             var psaTestUrl = await _fileStorageService.SaveFile("RegistrationForm", model.PSATestImage);
             var atomicScanningImage = await _fileStorageService.SaveFile("RegistrationForm", model.AtomicScanningImage);
 
@@ -59,7 +61,7 @@ namespace ECARE.Controllers
 
             var prescriptionLink = $"{baseUrl}{registration.Prescription}";
             var frontIdLink = $"{baseUrl}{registration.NationalIDPhotoFront}";
-            var backIdLink = $"{baseUrl}{registration.NationalIDPhotoBack}";
+            string backIdLink =string.IsNullOrEmpty(registration.NationalIDPhotoBack) ? "" : $"{baseUrl}{registration.NationalIDPhotoBack}";
             var psaTestLink = $"{baseUrl}{registration.PSATestImage}";
             var atomicScanningLink = $"{baseUrl}{registration.AtomicScanningImage}";
             _context.Add(registration);
@@ -72,7 +74,9 @@ namespace ECARE.Controllers
             // Single‑file fields:
             sb.AppendLine($"<p><strong>الروشتة:</strong> <a href=\"{prescriptionLink}\">عرض</a></p>");
             sb.AppendLine($"<p><strong>الوجه الأمامي للبطاقة:</strong>  <a href=\"{frontIdLink}\">عرض</a></p>");
-            sb.AppendLine($"<p><strong>الوجه الخلفي للبطاقة:</strong>   <a href=\"{backIdLink}\">عرض</a></p>");
+            if (!string.IsNullOrEmpty(backIdLink)){
+                sb.AppendLine($"<p><strong>الوجه الخلفي للبطاقة:</strong>   <a href=\"{backIdLink}\">عرض</a></p>");
+            }
             sb.AppendLine($"<p><strong>صورة تحليل PSA:</strong> <a href=\"{psaTestLink}\">عرض</a></p>");
             sb.AppendLine($"<p><strong>صورة المسح الذري:</strong> <a href=\"{atomicScanningLink}\">عرض</a></p>");
 
@@ -80,7 +84,7 @@ namespace ECARE.Controllers
             // Reuse your existing helper, passing the attachments
             await SendEmailAsync(
                 toEmail: "Contact.center2@innovaxcess.com",
-               // toEmail: "moohamedali571@gmail.com",
+                //toEmail: "moohamedali571@gmail.com",
                 subject: "نموذج التسجيل",
                 body:sb.ToString()
                  );

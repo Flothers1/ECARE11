@@ -18,9 +18,8 @@ namespace ECARE.ViewModel
         [Required]
         [Display(Name = "وجه البطاقه - صورة الرقم القومي")]
         public IFormFile NationalIDPhotoFront { get; set; }
-        [Required]
         [Display(Name = "ظهر البطاقه - صورة الرقم القومي")]
-        public IFormFile NationalIDPhotoBack { get; set; }
+        public IFormFile? NationalIDPhotoBack { get; set; }
         [Required]
         [Display(Name = "PSA صورة تحليل")]
         public IFormFile PSATestImage { get; set; }

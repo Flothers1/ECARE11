@@ -16,7 +16,7 @@ namespace ECARE.Models
         [MaxLength(500)]
         public string NationalIDPhotoFront { get; set; }
         [MaxLength(500)]
-        public string NationalIDPhotoBack { get; set; }
+        public string? NationalIDPhotoBack { get; set; }
         [MaxLength(500)]
         public string PSATestImage { get; set; }
         [MaxLength(500)]
