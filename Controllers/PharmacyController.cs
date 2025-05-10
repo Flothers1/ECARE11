@@ -65,6 +65,8 @@ namespace ECARE.Controllers
           IsVerified = psr.IsVerified,
           OTP = psr.OTP,
           OTPExpiration = psr.OTPExpiration,
+          DeliveryOTP = psr.DeliveryOTP,
+          DeliveryOTPExpiration = psr.DeliveryOTPExpiration,
           EVoucherPDF = psr.EVoucherPDF,
           SignedEVoucher = psr.SignedEVoucher,
           PharmacyId = psr.PharmacyBranch.PharmacyId,
@@ -108,6 +110,7 @@ namespace ECARE.Controllers
                 RequestClosedDate = psr.RequestClosedDate.Value,
                 IsDeleted = psr.IsDeleted,
                 IsVerified = psr.IsVerified,
+                IsDelivered = psr.IsDelivered,
                 OTP = psr.OTP,
                 OTPExpiration = psr.OTPExpiration,
                 EVoucherPDF = psr.EVoucherPDF,
@@ -183,47 +186,79 @@ namespace ECARE.Controllers
         }
 
 
-        // Add these new actions to your controller
+
+
         [HttpGet]
         public IActionResult VerifyPharmacyOTP(int id)
         {
             return View(id);
         }
 
+
         [HttpPost]
         public IActionResult VerifyPharmacyOTP(int patientId, string otpCode, int pharmacyServiceRequestId)
         {
-            var pharmacyRequest = _context.PharmacyServiceRequests
-                .FirstOrDefault(psr => psr.PRId == patientId && psr.Id == pharmacyServiceRequestId);
-
-            if (pharmacyRequest == null)
-            {
-                return RedirectToAction("Index", new { message = "Phone number not registered!" });
-            }
-            if (pharmacyRequest.OTP != otpCode)
-            {
-                ViewBag.PatientId = patientId;
-                ViewBag.PharmacyServiceRequestId = pharmacyServiceRequestId;
-                ViewData["ErrorMessage"] = "Incorrect OTP!";
-                return View();
-            }
-
-            if (pharmacyRequest.OTPExpiration < SD.TimeInEgypt)
-            {
-                ViewData["ErrorMessage"] = "Expired OTP!";
-                return View(patientId);
-            }
-
-            pharmacyRequest.IsVerified = true;
-            _context.SaveChanges();
-
-            return RedirectToAction("Index", new { message = "Verification successful!" });
+            return VerifyOTP(
+                patientId,
+                otpCode,
+                pharmacyServiceRequestId,
+                r => r.OTP,
+                r => r.OTPExpiration,
+                (r, status) => r.IsVerified = status,
+                "Verification successful!"
+            );
         }
+
+        [HttpGet]
+        public IActionResult VerifyDeliveryOTP(int id)
+        {
+            return View(id); // Reuse the same view or create a new one
+        }
+
+        [HttpPost]
+        public IActionResult VerifyDeliveryOTP(int patientId, string otpCode, int pharmacyServiceRequestId)
+        {
+            return VerifyOTP(
+                patientId,
+                otpCode,
+                pharmacyServiceRequestId,
+                r => r.DeliveryOTP,
+                r => r.DeliveryOTPExpiration,
+                (r, status) => r.IsDelivered = status,
+                "Delivery confirmed successfully!"
+            );
+        }
+
+
+
+
 
         [HttpPost]
         public async Task<IActionResult> SendPharmacyOTP(int patientId, int pharmacyServiceRequestId)
         {
-            string apiUrl = "https://app.community-ads.com/SendSMSAPI/api/SMSSender/SendSMS";
+            return await SendOTP(
+                patientId,
+                pharmacyServiceRequestId,
+                (r, otp) => r.OTP = otp,
+                (r, exp) => r.OTPExpiration = exp,
+                "VerifyPharmacyOTP",
+                "Invalid request!"
+            );
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SendDeliveryOTP(int patientId, int pharmacyServiceRequestId)
+        {
+            return await SendOTP( patientId,  pharmacyServiceRequestId,   (r, otp) => r.DeliveryOTP = otp, // Ensure these fields exist in your model
+                (r, exp) => r.DeliveryOTPExpiration = exp,
+                "VerifyDeliveryOTP",
+                "Invalid delivery request!"
+            );
+        }
+        private async Task<IActionResult> SendOTP(int patientId, int pharmacyServiceRequestId,  Action<PharmacyServiceRequest, string> setOTP,
+    Action<PharmacyServiceRequest, DateTime> setExpiration,  string redirectAction, string errorMessage)
+        {
+            const string apiUrl = "https://app.community-ads.com/SendSMSAPI/api/SMSSender/SendSMS";
 
             var patient = await _context.PatientRegistrations
                 .FirstOrDefaultAsync(p => p.PatientRegistrationsId == patientId);
@@ -233,7 +268,7 @@ namespace ECARE.Controllers
 
             if (patient == null || pharmacyRequest == null)
             {
-                return RedirectToAction("PharmacyIndex", new { message = "Invalid request!" });
+                return RedirectToAction("PharmacyIndex", new { message = errorMessage });
             }
 
             var otpCode = new Random().Next(100000, 999999).ToString();
@@ -253,22 +288,135 @@ namespace ECARE.Controllers
 
             HttpResponseMessage response = await _httpClient.PostAsync(apiUrl, content);
 
-
             if (response.IsSuccessStatusCode)
             {
-                pharmacyRequest.OTP = otpCode;
-                pharmacyRequest.OTPExpiration = SD.TimeInEgypt.AddMinutes(20);
+                setOTP(pharmacyRequest, otpCode);
+                setExpiration(pharmacyRequest, SD.TimeInEgypt.AddMinutes(20));
                 await _context.SaveChangesAsync();
 
-                return RedirectToAction("VerifyPharmacyOTP", new
-                {
-                    patientId = patientId,
-                    pharmacyServiceRequestId = pharmacyServiceRequestId
-                });
+                return RedirectToAction(redirectAction, new { patientId, pharmacyServiceRequestId });
             }
 
             return RedirectToAction("PharmacyIndex", new { message = "Error sending OTP" });
         }
+        private IActionResult VerifyOTP(int patientId,  string otpCode, int pharmacyServiceRequestId,
+    Func<PharmacyServiceRequest, string> getOTP,  Func<PharmacyServiceRequest, DateTime?> getExpiration,
+    Action<PharmacyServiceRequest, bool> setVerificationStatus,  string successMessage)
+        {
+            var pharmacyRequest = _context.PharmacyServiceRequests
+                .FirstOrDefault(psr => psr.PRId == patientId && psr.Id == pharmacyServiceRequestId);
+
+            if (pharmacyRequest == null)
+            {
+                return RedirectToAction("Index", new { message = "Phone number not registered!" });
+            }
+
+            if (getOTP(pharmacyRequest) != otpCode)
+            {
+                ViewBag.PatientId = patientId;
+                ViewBag.PharmacyServiceRequestId = pharmacyServiceRequestId;
+                ViewData["ErrorMessage"] = "Incorrect OTP!";
+                return View();
+            }
+
+            if (getExpiration(pharmacyRequest) < SD.TimeInEgypt)
+            {
+                ViewData["ErrorMessage"] = "Expired OTP!";
+                return View(patientId);
+            }
+
+            setVerificationStatus(pharmacyRequest, true);
+            _context.SaveChanges();
+
+            return RedirectToAction("Index", new { message = successMessage });
+        }
+
+        // Add these new actions to your controller
+        //[HttpGet]
+        //public IActionResult VerifyPharmacyOTP(int id)
+        //{
+        //    return View(id);
+        //}
+
+        //[HttpPost]
+        //public IActionResult VerifyPharmacyOTP(int patientId, string otpCode, int pharmacyServiceRequestId)
+        //{
+        //    var pharmacyRequest = _context.PharmacyServiceRequests
+        //        .FirstOrDefault(psr => psr.PRId == patientId && psr.Id == pharmacyServiceRequestId);
+
+        //    if (pharmacyRequest == null)
+        //    {
+        //        return RedirectToAction("Index", new { message = "Phone number not registered!" });
+        //    }
+        //    if (pharmacyRequest.OTP != otpCode)
+        //    {
+        //        ViewBag.PatientId = patientId;
+        //        ViewBag.PharmacyServiceRequestId = pharmacyServiceRequestId;
+        //        ViewData["ErrorMessage"] = "Incorrect OTP!";
+        //        return View();
+        //    }
+
+        //    if (pharmacyRequest.OTPExpiration < SD.TimeInEgypt)
+        //    {
+        //        ViewData["ErrorMessage"] = "Expired OTP!";
+        //        return View(patientId);
+        //    }
+
+        //    pharmacyRequest.IsVerified = true;
+        //    _context.SaveChanges();
+
+        //    return RedirectToAction("Index", new { message = "Verification successful!" });
+        //}
+
+        //[HttpPost]
+        //public async Task<IActionResult> SendPharmacyOTP(int patientId, int pharmacyServiceRequestId)
+        //{
+        //    string apiUrl = "https://app.community-ads.com/SendSMSAPI/api/SMSSender/SendSMS";
+
+        //    var patient = await _context.PatientRegistrations
+        //        .FirstOrDefaultAsync(p => p.PatientRegistrationsId == patientId);
+
+        //    var pharmacyRequest = await _context.PharmacyServiceRequests
+        //        .FirstOrDefaultAsync(psr => psr.Id == pharmacyServiceRequestId && psr.PRId == patientId);
+
+        //    if (patient == null || pharmacyRequest == null)
+        //    {
+        //        return RedirectToAction("PharmacyIndex", new { message = "Invalid request!" });
+        //    }
+
+        //    var otpCode = new Random().Next(100000, 999999).ToString();
+        //    var requestData = new
+        //    {
+        //        UserName = "InnovaxcessAPI",
+        //        Password = "Oh$|&L-bON",
+        //        SMSText = $"Your OTP Code: {otpCode}",
+        //        SMSLang = "E",
+        //        SMSSender = "Innovaxcess",
+        //        SMSReceiver = patient.PhoneNumber1,
+        //        SMSID = Guid.NewGuid().ToString(),
+        //    };
+
+        //    string jsonContent = JsonSerializer.Serialize(requestData);
+        //    var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+        //    HttpResponseMessage response = await _httpClient.PostAsync(apiUrl, content);
+
+
+        //    if (response.IsSuccessStatusCode)
+        //    {
+        //        pharmacyRequest.OTP = otpCode;
+        //        pharmacyRequest.OTPExpiration = SD.TimeInEgypt.AddMinutes(20);
+        //        await _context.SaveChangesAsync();
+
+        //        return RedirectToAction("VerifyPharmacyOTP", new
+        //        {
+        //            patientId = patientId,
+        //            pharmacyServiceRequestId = pharmacyServiceRequestId
+        //        });
+        //    }
+
+        //    return RedirectToAction("PharmacyIndex", new { message = "Error sending OTP" });
+        //}
 
         private async Task<bool> SendSMS(string phoneNumber, string otpCode)
         {

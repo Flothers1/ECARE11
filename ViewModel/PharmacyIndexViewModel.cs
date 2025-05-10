@@ -30,8 +30,13 @@ namespace ECARE.ViewModel
         public string SignedEVoucher { get; set; }
         [MaxLength(100)]
         public string? OTP { get; set; }
-        public DateTime OTPExpiration { get; set; }
+        public DateTime? OTPExpiration { get; set; }
+        [MaxLength(100)]
+        public string? DeliveryOTP { get; set; }
+        public DateTime? DeliveryOTPExpiration { get; set; }
         public bool? IsVerified { get; set; }
+        public bool? IsDelivered { get; set; }
+
         public bool? IsDeleted { get; set; }
 
         [DisplayFormat(DataFormatString = "{0:dd MMM yyyy}")]

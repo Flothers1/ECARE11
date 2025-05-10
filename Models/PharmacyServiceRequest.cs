@@ -18,7 +18,11 @@ namespace ECARE.Models
         [MaxLength(100)]
         public string? OTP { get; set; }
         public DateTime OTPExpiration { get; set; }
+        [MaxLength(100)]
+        public string? DeliveryOTP { get; set; }
+        public DateTime DeliveryOTPExpiration { get; set; }
         public bool? IsVerified { get; set; }
+        public bool? IsDelivered { get; set; }
 
         public int CareProgramId { get; set; }
         [ForeignKey("CareProgramId")]
